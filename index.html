@@ -174,8 +174,8 @@
     line-height: 1.6;
     color: var(--body);
   }
-  .field-text a{ color: var(--amber); text-decoration: none; border-bottom: 1px solid var(--amber-tint); }
-  .field-text a:hover{ border-bottom-color: var(--amber); }
+  .field-text a{ color: var(--amber); text-decoration: none; border-bottom: 1.5px solid var(--amber); }
+  .field-text a:hover{ color: var(--amber-hover); border-bottom-color: var(--amber-hover); }
 
   .info-box{
     background: var(--status-done-bg);
@@ -522,6 +522,29 @@ const PODCASTS = [
       { url: "https://www.cognitoforms.com/HVACRDPodcast/HVACRDPodcastQuestionnaire", label: "Fill out the questionnaire" },
       { url: "https://calendly.com/hvacrnd/podcast_recording", label: "Book a recording time" }
     ]
+  },
+  {
+    id: "home-service-happy-hour",
+    name: "Home Service Happy Hour",
+    host: "Dan Platta · Best Damn Bookkeeping",
+    niche: "Home service business owners",
+    responseType: "choice",
+    options: [
+      { value: "booked", label: "✓ Booked it" },
+      { value: "pending", label: "Not yet" },
+      { value: "skip", label: "✕ Not interested" }
+    ],
+    fields: [
+      { label: "Podcast", text: "<a href=\"https://bestdamnbookkeeping.com/\" target=\"_blank\">bestdamnbookkeeping.com</a>" },
+      { label: "About the host", text: "Dan Platta is the founder of Best Damn Bookkeeping. He spent 10 years running home service businesses himself, and now does bookkeeping specifically for home service owners. <a href=\"https://www.linkedin.com/in/dan-platta-bestdamnbookkeeping/\" target=\"_blank\">LinkedIn</a>" },
+      { label: "About the show", text: "A conversational show for home service entrepreneurs — \"no topic off-limits,\" with a relaxed, friendly happy-hour vibe, but an audience that's squarely home service business owners." },
+      { label: "Why you're a fit", text: "The audience matches Sales Ask's ICP one-to-one — home service company owners. Dan has run these businesses himself, so he understands the context and can moderate a strong conversation about scaling (your OGC $40M+ story) and 'The One Meeting Close'." },
+      { label: "What Dan said", text: "\"Hey Moe, I think that would be great! Can you grab 15 minutes with me whenever it works for you and we'll chat quick, then get a date on the calendar for doing a podcast.\"" },
+      { label: "What to expect on the call", text: "This is a quick intro chat, not a deep topic-prep session — the goal is just to connect and land a recording date. Good to have your OGC scaling story and 'The One Meeting Close' top of mind in case Dan wants a preview, but no formal agenda has been set." }
+    ],
+    action: "Dan already responded positively and proposed a 15-minute call before the recording. Book a time below when you get a chance.",
+    highlightMissing: true,
+    link: { url: "https://calendly.com/bestdamnbookkeeping/15min", label: "Book a 15-min call with Dan" }
   }
 ];
 
@@ -547,7 +570,7 @@ function fieldHTML(f){
 
 function render(){
   list.innerHTML = "";
-  PODCASTS.forEach(p => {
+  PODCASTS.forEach((p, idx) => {
     const resp = responses[p.id] || null; // "choice": single value string. "checklist": comma-joined string
     const selectedSet = p.responseType === "checklist" ? new Set((resp || "").split(",").filter(Boolean)) : null;
     const card = document.createElement("details");
@@ -617,7 +640,7 @@ function render(){
       <summary>
         <div class="card-content">
           <div class="card-title-block">
-            <p class="card-title">${p.name}</p>
+            <p class="card-title">${idx+1}. ${p.name}</p>
             <p class="card-meta">${p.host}</p>
           </div>
           <span class="badge ${badgeCls}">${badgeLabel}</span>
