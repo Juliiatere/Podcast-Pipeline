@@ -112,6 +112,14 @@
   }
   .card summary::-webkit-details-marker{ display:none; }
 
+  .card-content{
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
   .chev{
     width: 18px; height: 18px;
     flex: 0 0 auto;
@@ -304,6 +312,16 @@
     font-size: 12.5px;
     color: var(--ink-dim);
     text-align: center;
+  }
+
+  @media (max-width: 640px){
+    .card-content{
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .card-title-block{ width: 100%; }
+    .badge{ align-self: flex-start; }
   }
 
   @media (max-width: 480px){
@@ -597,12 +615,14 @@ function render(){
 
     card.innerHTML = `
       <summary>
-        <svg class="chev" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <div class="card-title-block">
-          <p class="card-title">${p.name}</p>
-          <p class="card-meta">${p.host}</p>
+        <div class="card-content">
+          <div class="card-title-block">
+            <p class="card-title">${p.name}</p>
+            <p class="card-meta">${p.host}</p>
+          </div>
+          <span class="badge ${badgeCls}">${badgeLabel}</span>
         </div>
-        <span class="badge ${badgeCls}">${badgeLabel}</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </summary>
       <div class="card-body">
         <div class="card-body-inner">
