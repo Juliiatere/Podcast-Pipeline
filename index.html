@@ -202,6 +202,44 @@
   }
   .info-box .field-text{ color: #125c3b; font-size: 14.5px; line-height: 1.6; }
 
+  .precall-box{
+    background: #ffffff;
+    border: 1px solid var(--status-precall-border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 16px 0;
+  }
+  .precall-box .field-label{
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1.4;
+    color: var(--status-precall-fg);
+    margin-bottom: 6px;
+  }
+  .precall-box .field-text{ color: var(--body); font-size: 14.5px; line-height: 1.6; }
+
+  .skip-box{
+    background: #f7f7f9;
+    border: 1px solid #e3e4e9;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 16px 0;
+  }
+  .skip-box .field-label{
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1.4;
+    color: #676d77;
+    margin-bottom: 6px;
+  }
+  .skip-box .field-text{ color: var(--body); font-size: 14.5px; line-height: 1.6; }
+
   .action-box{
     background: #ffffff;
     border: 1px solid var(--status-action-border);
@@ -657,19 +695,61 @@ function render(){
         ? (selectedSet.has("skip") || (selectedSet.has("questionnaire") && selectedSet.has("call")))
         : !!resp;
 
-    const boxClass = p.responseType === "locked"
-      ? "info-box"
-      : (p.highlightMissing && !isResolved ? "action-box highlight" : "action-box");
+    const hostFirstName = (p.host || "").split(/\s|·/)[0] || "the host";
+
+    let boxClass, boxTitle, boxText, showLinks;
+
+    if (p.responseType === "locked") {
+      boxClass = "info-box";
+      boxTitle = "Status";
+      boxText = p.action;
+      showLinks = false;
+    } else if (p.responseType === "checklist") {
+      if (selectedSet.has("skip")) {
+        boxClass = "skip-box"; boxTitle = "Status";
+        boxText = "Marked as not interested — no further action needed.";
+        showLinks = false;
+      } else if (selectedSet.has("questionnaire") && selectedSet.has("call")) {
+        boxClass = "info-box"; boxTitle = "Status";
+        boxText = "You're all set — the questionnaire is in and the recording is booked. No action needed.";
+        showLinks = false;
+      } else {
+        boxClass = p.highlightMissing ? "action-box highlight" : "action-box";
+        boxTitle = "What we need from you";
+        boxText = p.action;
+        showLinks = true;
+      }
+    } else {
+      const respCls = resp ? BADGE_CLS[resp] : null;
+      if (respCls === "done") {
+        boxClass = "info-box"; boxTitle = "Status";
+        boxText = p.doneNote || "You're all set — the recording is booked. No action needed on your end.";
+        showLinks = false;
+      } else if (respCls === "precall") {
+        boxClass = "precall-box"; boxTitle = "Status";
+        boxText = p.precallNote || `You've booked a pre-call with ${hostFirstName} — nice. Once you land on a recording date, come back and mark "Booked recording."`;
+        showLinks = false;
+      } else if (respCls === "skip") {
+        boxClass = "skip-box"; boxTitle = "Status";
+        boxText = "Marked as not interested — no further action needed.";
+        showLinks = false;
+      } else {
+        boxClass = p.highlightMissing ? "action-box highlight" : "action-box";
+        boxTitle = "What we need from you";
+        boxText = p.action;
+        showLinks = true;
+      }
+    }
 
     const linkList = p.links ? p.links : (p.link ? [p.link] : []);
     let linksHTML = "";
-    if (linkList.length > 1) {
+    if (showLinks && linkList.length > 1) {
       linksHTML = `<div class="step-list">` + linkList.map((l, i) => `
         <div class="step-list-item">
           <span class="step-list-num">${i+1}</span>
           <a class="btn ${i===0 ? 'primary' : 'secondary'}" href="${l.url}" target="_blank" style="margin-top:0;">${l.label} \u2192</a>
         </div>`).join("") + `</div>`;
-    } else if (linkList.length === 1) {
+    } else if (showLinks && linkList.length === 1) {
       linksHTML = `<a class="btn primary" href="${linkList[0].url}" target="_blank">${linkList[0].label} \u2192</a>`;
     }
 
@@ -727,8 +807,8 @@ function render(){
           ${fieldHTML({label:"Niche", text:p.niche})}
           ${p.fields.map(fieldHTML).join("")}
           <div class="${boxClass}">
-            <div class="field-label">${p.responseType === "locked" ? "Status" : "What we need from you"}</div>
-            <div class="field-text">${p.action}</div>
+            <div class="field-label">${boxTitle}</div>
+            <div class="field-text">${boxText}</div>
             ${linksHTML}
           </div>
           ${responseRowHTML}
