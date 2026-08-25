@@ -637,6 +637,29 @@ const PODCASTS = [
     action: "Dan already responded positively and proposed a 15-minute call before the recording. Book a time below when you get a chance.",
     highlightMissing: true,
     link: { url: "https://calendly.com/bestdamnbookkeeping/15min", label: "Book a 15-min call with Dan" }
+  },
+  {
+    id: "cracking-the-code",
+    name: "Cracking the Code",
+    host: "Rob Riggs · Code Conspirators",
+    niche: "Digital strategy for small service businesses",
+    responseType: "choice",
+    options: [
+      { value: "recording_booked", label: "✓ Booked recording" },
+      { value: "pending", label: "Not yet" },
+      { value: "skip", label: "✕ Not interested" }
+    ],
+    fields: [
+      { label: "About the host", text: "Rob Riggs is Co-Founder and Chief Engineer at Code Conspirators. <a href=\"mailto:rob.riggs@codeconspirators.com\">rob.riggs@codeconspirators.com</a>" },
+      { label: "About the show", text: "Cracking the Code covers smarter digital strategy for small service businesses — high-converting websites, CRM automation, and AI tools that actually work. Active since October 2024, no fluff, just clear tactics to turn a website, marketing, and operations into a lead-generating machine. Recent guests include founders and CEOs talking through how they scaled their own service businesses using systems and technology, not just hustle." },
+      { label: "What we pitched him", text: "\"Wanted to see if you're open to guests on Cracking the Code? Your listeners could get actionable insights on scaling small service businesses and driving growth, particularly from my experience growing Ottawa General Contractors from a basement office to over $40M+ in sales. I also wrote 'The One Meeting Close,' and spent recent years building Sales Ask.\"" },
+      { label: "What Rob said", text: "\"Awesome, this sounds like a great fit for our audience. Feel free to schedule when it's convenient, and we'll follow up with an itinerary and some thought-provoking questions.\"" },
+      { label: "Why it's a fit for you", text: "The show's whole premise is systems and technology driving real growth for service businesses — exactly the story you tell with OGC (basement office to $40M+) and exactly what Sales Ask is built to do. Past episodes lean heavily on marketing/website/CRM tactics; you bring the sales-and-scaling angle they haven't covered as much, which is a strong hook for a first-time guest." },
+      { label: "Why it's a fit for his audience", text: "Rob's listeners are small service-business owners actively looking for practical growth tactics, not theory. A founder who scaled from a basement office to $40M+ using a repeatable sales system ('The One Meeting Close') is squarely the kind of concrete, field-tested story this audience tunes in for." }
+    ],
+    action: "Rob's ready whenever you are — no separate pre-call needed here, you can book the recording directly.",
+    highlightMissing: true,
+    link: { url: "https://schedule.codeconspirators.com/cracking-the-code", label: "Book your recording time" }
   }
 ];
 
