@@ -538,19 +538,20 @@ const PODCASTS = [
     niche: "AEC / construction, possible partnership angle",
     responseType: "choice",
     options: [
-      { value: "confirmed", label: "✓ Recorded & published" },
-      { value: "reminder", label: "⚠ Need to follow up with Chris" },
-      { value: "not_interested", label: "✕ Not interested" }
+      { value: "confirmed", label: "✓ Partnership call booked" },
+      { value: "reminder", label: "⚠ Waiting on Chris" },
+      { value: "not_interested", label: "✕ Not pursuing partnership" }
     ],
     fields: [
+      { label: "Timeline", text: "✓ Recording happened&nbsp;&nbsp;→&nbsp;&nbsp;✓ Episode published&nbsp;&nbsp;→&nbsp;&nbsp;✓ Chris asked about a Sales Ask × TrebleHook partnership&nbsp;&nbsp;→&nbsp;&nbsp;✓ Moe sent Chris his booking link&nbsp;&nbsp;→&nbsp;&nbsp;⏳ Waiting on Chris to pick a time&nbsp;&nbsp;→&nbsp;&nbsp;Partnership call" },
       { label: "Podcast", text: "<a href=\"https://podcasts.apple.com/us/podcast/built-with-purpose/id1836319196\" target=\"_blank\">Apple Podcasts</a> · <a href=\"https://www.builtwithpurposepodcast.com/\" target=\"_blank\">Podcast website</a>" },
       { label: "About the host", text: "Chris Fay, President & CEO of TPM and Founder/CEO of TrebleHook. <a href=\"https://www.linkedin.com/in/cjfay\" target=\"_blank\">LinkedIn</a>" },
       { label: "About the show", text: "A construction podcast focused on mission-driven, purpose-led owners in the AEC industry." },
-      { label: "Episode is live", text: "\"Chewing Glass and Staring Into the Abyss: The Real Cost of Entrepreneurship | Moe Abbas\" — <a href=\"https://www.builtwithpurposepodcast.com/chewing-glass-and-staring-into-the-abyss-the-real-cost-of-entrepreneurship-moe-abbas/\" target=\"_blank\">listen to the episode</a>. Chris confirmed the recording happened and the episode dropped: \"We reshuffled a few things and your podcast dropped today. Appreciate you taking the time. Please share on social, etc.\" Worth sharing on your channels when you get a chance." },
-      { label: "New ask: partnership call", text: "Chris wants to set up a separate call to explore a partnership between Sales Ask and TrebleHook/Salesforce, since AEC and your contractor base overlap with their core market. His words: \"Could we put something on the calendar for our teams to learn more and talk shop?\"" },
-      { label: "Times he offered", text: "The morning of 9/2, or virtually any afternoon ET during the week of 9/8–9/11. No booking link — just reply to Chris directly with what works for you." }
+      { label: "Episode is live", text: "\"Chewing Glass and Staring Into the Abyss: The Real Cost of Entrepreneurship | Moe Abbas\" — <a href=\"https://www.builtwithpurposepodcast.com/chewing-glass-and-staring-into-the-abyss-the-real-cost-of-entrepreneurship-moe-abbas/\" target=\"_blank\">listen to the episode</a>. Chris confirmed the recording happened and the episode dropped, and asked for it to be shared on social." },
+      { label: "Partnership call — where it stands", text: "Chris asked to connect on a Sales Ask × TrebleHook partnership, since AEC and your contractor base overlap with their core market: \"Could we put something on the calendar for our teams to learn more and talk shop?\" He offered the morning of 9/2 or any afternoon ET the week of 9/8–9/11. Moe replied and sent his own booking link, pointed at the week of 9/8–9/11, and asked Chris to confirm once he's booked." },
+      { label: "Link Moe sent Chris", text: "<a href=\"https://sales-ask.cal.com/moe/podcast-booking?month=2026-09&date=2026-09-08\" target=\"_blank\">sales-ask.cal.com/moe/podcast-booking</a> — for reference, in case Chris has trouble booking." }
     ],
-    action: "The recording already happened and the episode is live — nice work. Two follow-ups from Chris: share the episode on social, and reply to him directly with a time for the Sales Ask × TrebleHook partnership call (see times above). Mark the option below once you're set.",
+    action: "Recording's done, episode is live, and Moe's already sent Chris the booking link for the partnership call — now it's just waiting on Chris to pick a slot and confirm. Mark below once he's booked, or if a nudge is needed.",
     highlightMissing: true
   },
   {
