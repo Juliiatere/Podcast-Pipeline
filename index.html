@@ -710,6 +710,39 @@ const PODCASTS = [
     ],
     action: "Emerj brings guest inquiries through a short intake form rather than a direct yes/no — needs to be filled out to get considered for their editorial planning.",
     link: { url: "https://docs.google.com/forms/d/e/1FAIpQLScFPNd1zstrFvUOD1iaBjbqR5LehTbgvW7krslQbtUkBPz9tg/viewform", label: "Fill out the Emerj pitch/intake form" }
+  },
+  {
+    id: "amplify-your-marketing-message",
+    name: "Amplify Your Marketing Message",
+    host: "Christine Campbell Rapin",
+    niche: "B2B service owners — messaging, offers, client growth",
+    fields: [
+      { label: "Podcast", text: "<a href=\"https://podcasts.apple.com/us/podcast/amplify-your-marketing-message-with-christine-campbell/id1662227504\" target=\"_blank\">Apple Podcasts</a> · <a href=\"https://creators.spotify.com/pod/profile/christine-campbell-rapin/\" target=\"_blank\">Spotify</a>" },
+      { label: "About the host", text: "Christine Campbell Rapin — business mentor, consultant, and owner of CLEAR Acceleration Inc. Over 25 years in marketing, sales, and operations, having worked with 400+ businesses on a combined $1B+ in revenue. <a href=\"https://www.linkedin.com/in/christinecampbell1/\" target=\"_blank\">LinkedIn</a>" },
+      { label: "About the show", text: "Helps B2B service owners turn bland messaging into magnetic, sales-ready offers — practical frameworks, real case studies, and tactics to attract higher-value clients and scale predictably. Active since Dec 2022, 150–530 listeners/episode, PCI Score 71.91%." },
+      { label: "What we pitched Christine", text: "\"Wanted to see if you're open to guests on Amplify Your Marketing Message? There are a number of actionable takeaways your audience would get from my experience scaling two tech companies to 8-figure exits. I've also spent the last few years building Novacast.ai.\"" },
+      { label: "What Christine said back", text: "All interested guests must apply through her website rather than reply directly. She specifically flagged that guests need to be genuinely interested in building a personal referral relationship with her as host, and recommended engaging with her on LinkedIn and attending one of her events first to improve the odds of a fit." },
+      { label: "How it works", text: "The application page (linked below) asks you to first subscribe and listen to an episode, leave a review with key takeaways, then complete the guest application form — it's a multi-step process, not a quick one-line form." },
+      { label: "Why you're a fit", text: "Christine's audience is B2B service owners working on messaging and offers. Your two 8-figure exits ($52M+) plus the pivot into building Novacast.ai gives a concrete growth story, though her emphasis on relationship-building first means this is more of a longer play than a quick booking." }
+    ],
+    action: "Multi-step process: listen to an episode + leave a review, then submit the guest application on her site. She also flagged wanting a real relationship first — worth engaging with her on LinkedIn before/alongside applying.",
+    link: { url: "https://christinecampbellrapin.com/podcast-guest/", label: "View the guest application steps" }
+  },
+  {
+    id: "agents-of-change-podcast",
+    name: "The Agents of Change Digital Marketing Podcast",
+    host: "Rich Brooks · Founder, flyte new media",
+    niche: "Digital marketing — SEO, social media, mobile marketing",
+    fields: [
+      { label: "Podcast", text: "<a href=\"https://www.theagentsofchange.com\" target=\"_blank\">theagentsofchange.com</a>" },
+      { label: "About the host", text: "Rich Brooks — Founder & President of flyte new media (digital agency in Portland, Maine, ~25 years in business). Nationally recognized speaker on entrepreneurship, digital marketing, and social media; author of \"The Lead Machine.\" Also the \"tech guru\" on Maine's NBC affiliate evening news. <a href=\"https://www.linkedin.com/in/therichbrooks/\" target=\"_blank\">LinkedIn</a>" },
+      { label: "About the show", text: "Weekly interviews with leading marketers on SEO, social media, and mobile marketing — helping listeners increase visibility, drive qualified traffic, and convert it into leads and business. Active since Jul 2013, 1.7K–3.2K listeners/episode, 4.9★ (142 ratings), PCI Score 89.70% — a strong match." },
+      { label: "What we pitched Rich", text: "\"Wanted to see if you're open to guests on The Agents of Change Digital Marketing Podcast? There are a number of actionable takeaways your audience would get from my experience scaling two companies to 8-figure exits. I've also spent the last few years building Novacast.ai.\"" },
+      { label: "What Rich said back", text: "Guests must fill out a guest suggestion form to manage volume. He reviews them all and gets back within 1–2 weeks if there's a fit — but flagged they get 50+ inquiries a week for just one weekly spot, so a non-response is possible." },
+      { label: "Why you're a fit", text: "Very strong PCI score (89.70%) for a well-established, highly-rated show. Your two 8-figure exits plus building Novacast.ai as an AI-native product fits well alongside the practical, tactic-driven marketing guests this show usually features — but expect real competition given their inquiry volume." }
+    ],
+    action: "Guest suggestion form required — no direct pitch accepted. High inquiry volume (50+/week for one weekly slot), so expect it may take 1–2 weeks to hear back, or not at all.",
+    link: { url: "https://www.theagentsofchange.com/podcast-guest-suggestion-form/", label: "Fill out the guest suggestion form" }
   }
 ];
 
@@ -727,6 +760,22 @@ const STATUS_OPTIONS = [
 ];
 
 const BOX_CLASS_BY_CLS = { done: "info-box", action: "action-box", precall: "precall-box", skip: "skip-box" };
+
+// Sort tier: 0 = needs a first action (nothing started, or a form/pre-call to
+// book), 1 = in process (waiting on someone), 2 = pre-call booked, 3 = done.
+// Unset status defaults to tier 0 since it also needs a first action.
+const STATUS_PRIORITY = {
+  need_form: 0, need_precall: 0,
+  waiting_reply: 1, replied_to_host: 1, host_replied_need_response: 1, form_filled: 1,
+  precall_booked: 2,
+  recording_booked: 3
+};
+
+function lastChangedTime(id){
+  const hist = statusHistory[id];
+  if (!hist || !hist.length) return Date.now(); // never touched yet — treat as freshest
+  return new Date(hist[hist.length - 1].changed_at).getTime();
+}
 
 const list = document.getElementById("list");
 
@@ -747,6 +796,12 @@ const openCards = new Set();
 function render(){
   list.innerHTML = "";
   const visiblePodcasts = PODCASTS.filter(p => !deletedFlags[p.id]);
+  visiblePodcasts.sort((a, b) => {
+    const pa = STATUS_PRIORITY[responses[a.id]] ?? 0;
+    const pb = STATUS_PRIORITY[responses[b.id]] ?? 0;
+    if (pa !== pb) return pa - pb;
+    return lastChangedTime(b.id) - lastChangedTime(a.id); // freshest first within a tier
+  });
 
   visiblePodcasts.forEach((p, idx) => {
     const resp = responses[p.id] || null;
