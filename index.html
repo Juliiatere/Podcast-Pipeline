@@ -762,6 +762,21 @@ const PODCASTS = [
     ],
     action: "Book a recording slot via Calendly, then send a 1,400px+ headshot to Troy. Review the prep doc and question list beforehand — answers to be drafted separately before the recording.",
     link: { url: "https://calendly.com/growasmallbusiness/grow-a-small-business-podcast-interview?month=2027-03", label: "Book the recording slot" }
+  },
+  {
+    id: "pull-the-chute-podcast",
+    name: "Pull the Chute — Grow your People, Grow your Company",
+    host: "Jeff Sesol & Janna Landry",
+    niche: "Business/executive leadership coaching — culture, people-growth, leadership stories",
+    fields: [
+      { label: "Podcast", text: "<a href=\"https://podcasts.apple.com/us/podcast/pull-the-chute-grow-your-people-grow-your-company-podcast/id1616010994\" target=\"_blank\">Apple Podcasts</a> · <a href=\"https://open.spotify.com/show/3BiDaDU4A81jE0lpli0Yjv\" target=\"_blank\">Spotify</a>" },
+      { label: "About the host", text: "Jeff Sesol — Founder & CEO of Pull the Chute (Gallatin, TN), a business/executive/leadership coaching firm. 30+ years entrepreneurial — built and sold FreeDrive (early web-based storage, 28M+ users) and SonMedia (internet safety for parents), among other ventures. Best-selling author of \"The New Leadership Landscape.\" Co-hosted weekly with Janna Landry, an executive/leadership coach with 25+ years. <a href=\"https://www.linkedin.com/in/jeffsesol/\" target=\"_blank\">LinkedIn</a>" },
+      { label: "About the show", text: "Weekly interviews with business owners and C-level executives about how they built their culture — what worked, what failed. Active since 2022, 280+ episodes, 5.0★. Their stated mission: help small-to-medium businesses grow by growing their people first." },
+      { label: "What Jeff said back", text: "\"Technically, we have stopped taking guests for the remainder of the year. But I like your history.\" He's making an exception — asked us to use the Calendly link in his signature to find a recording date." },
+      { label: "Why you're a fit", text: "Jeff's show leans into real, unfiltered leadership and culture-building stories — not just wins. Cahill's build-lose-rebuild arc across two 8-figure exits, plus now building Novacast.ai with a team of 8–10, fits that \"what actually worked\" format well." }
+    ],
+    action: "Jeff made an exception despite pausing guests for the year — book a recording slot via his Calendly before he changes his mind.",
+    link: { url: "https://calendly.com/pullthechute", label: "Book a recording slot" }
   }
 ];
 
@@ -775,7 +790,8 @@ const STATUS_OPTIONS = [
   { value: "form_filled", label: "Form filled out", cls: "action" },
   { value: "need_precall", label: "Need to book pre-call", cls: "action" },
   { value: "precall_booked", label: "Pre-call booked", cls: "precall" },
-  { value: "recording_booked", label: "Recording booked", cls: "done" }
+  { value: "recording_booked", label: "Recording booked", cls: "done" },
+  { value: "episode_recorded", label: "Episode recorded", cls: "done" }
 ];
 
 const BOX_CLASS_BY_CLS = { done: "info-box", action: "action-box", precall: "precall-box", skip: "skip-box" };
@@ -787,7 +803,8 @@ const STATUS_PRIORITY = {
   need_form: 0, need_precall: 0,
   waiting_reply: 1, replied_to_host: 1, host_replied_need_response: 1, form_filled: 1,
   precall_booked: 2,
-  recording_booked: 3
+  recording_booked: 3,
+  episode_recorded: 4
 };
 
 function lastChangedTime(id){
