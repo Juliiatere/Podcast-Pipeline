@@ -419,6 +419,27 @@
     background: #ffffff;
   }
   .schedule-input:focus{ outline: none; border-color: var(--amber); }
+  .schedule-fields{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .schedule-fields .schedule-input{ width: auto; }
+  .schedule-date{ flex: 1 1 auto; min-width: 0; }
+  .schedule-hour{ width: 58px; flex: 0 0 auto; }
+  .schedule-minute{ width: 62px; flex: 0 0 auto; }
+  .schedule-ampm{ width: 68px; flex: 0 0 auto; }
+  .schedule-colon{
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    color: var(--ink-dim);
+    flex: 0 0 auto;
+  }
+
+  @media (max-width: 480px){
+    .schedule-fields{ flex-wrap: wrap; }
+    .schedule-date{ flex-basis: 100%; }
+  }
 
   .delete-row{
     display: flex;
@@ -887,13 +908,26 @@ function fmtDateTime(iso){
   return `${datePart}, ${timePart}`;
 }
 
-// Converts an ISO datetime string to the value a <input type="datetime-local">
-// expects (local time, no seconds/timezone), or "" if none set.
-function isoToLocalInputValue(iso){
+// Converts an ISO datetime string to the value a <input type="date"> expects
+// ("YYYY-MM-DD"), or "" if none set.
+function isoToDateInputValue(iso){
   if (!iso) return "";
   const d = new Date(iso);
   const pad = n => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+
+// Splits an ISO datetime into 12-hour-clock parts for the hour/minute/AM-PM
+// selects. Defaults to 9:00 AM when nothing is set yet, rather than "now".
+function isoToTimeParts(iso){
+  if (!iso) return { hour: 9, minute: "00", ampm: "AM" };
+  const d = new Date(iso);
+  let h = d.getHours();
+  const ampm = h >= 12 ? "PM" : "AM";
+  h = h % 12;
+  if (h === 0) h = 12;
+  const minute = d.getMinutes() < 30 ? "00" : "30";
+  return { hour: h, minute, ampm };
 }
 
 const openCards = new Set();
@@ -913,7 +947,7 @@ function render(){
     const statusMeta = STATUS_OPTIONS.find(o => o.value === resp) || null;
     const badgeCls = statusMeta ? statusMeta.cls : "skip";
     const scheduledAt = scheduledDates[p.id] || null;
-    const showsSchedule = resp === "recording_booked" || resp === "episode_recorded";
+    const showsSchedule = resp === "recording_booked" || resp === "episode_recorded" || resp === "precall_booked";
     const badgeLabel = statusMeta
       ? (showsSchedule && scheduledAt ? `${statusMeta.label} · ${fmtDateTime(scheduledAt)}` : statusMeta.label)
       : "Not set";
@@ -985,11 +1019,29 @@ function render(){
             <option value="" ${!resp ? "selected" : ""}>— select a status —</option>
             ${STATUS_OPTIONS.map(o => `<option value="${o.value}" ${resp===o.value ? "selected" : ""}>${o.label}</option>`).join("")}
           </select>
-          ${showsSchedule ? `
+          ${showsSchedule ? (() => {
+            const tp = isoToTimeParts(scheduledAt);
+            const hourOptions = Array.from({length: 12}, (_, i) => i + 1)
+              .map(h => `<option value="${h}" ${h === tp.hour ? "selected" : ""}>${h}</option>`).join("");
+            const scheduleLabel = resp === "precall_booked" ? "Pre-call date &amp; time" : "Recording date &amp; time";
+            return `
           <div class="schedule-row">
-            <label class="schedule-label" for="schedule-${p.id}">Recording date &amp; time</label>
-            <input type="datetime-local" id="schedule-${p.id}" class="schedule-input" data-schedule-id="${p.id}" value="${isoToLocalInputValue(scheduledAt)}" />
-          </div>` : ""}
+            <label class="schedule-label" for="schedule-date-${p.id}">${scheduleLabel}</label>
+            <div class="schedule-fields">
+              <input type="date" id="schedule-date-${p.id}" class="schedule-input schedule-date" data-schedule-part="date" data-schedule-id="${p.id}" value="${isoToDateInputValue(scheduledAt)}" />
+              <select class="schedule-input schedule-hour" data-schedule-part="hour" data-schedule-id="${p.id}">${hourOptions}</select>
+              <span class="schedule-colon">:</span>
+              <select class="schedule-input schedule-minute" data-schedule-part="minute" data-schedule-id="${p.id}">
+                <option value="00" ${tp.minute === "00" ? "selected" : ""}>00</option>
+                <option value="30" ${tp.minute === "30" ? "selected" : ""}>30</option>
+              </select>
+              <select class="schedule-input schedule-ampm" data-schedule-part="ampm" data-schedule-id="${p.id}">
+                <option value="AM" ${tp.ampm === "AM" ? "selected" : ""}>AM</option>
+                <option value="PM" ${tp.ampm === "PM" ? "selected" : ""}>PM</option>
+              </select>
+            </div>
+          </div>`;
+          })() : ""}
           ${timelineHTML}
           ${notesHTML}
           <div class="delete-row">
@@ -1026,9 +1078,21 @@ function render(){
     el.addEventListener("change", async (e) => {
       e.stopPropagation();
       const id = el.dataset.scheduleId;
-      // datetime-local gives local time with no timezone; store as an ISO string.
-      const localVal = el.value; // "YYYY-MM-DDTHH:MM"
-      scheduledDates[id] = localVal ? new Date(localVal).toISOString() : null;
+      const card = el.closest(".card-body-inner");
+      const dateEl = card.querySelector(`[data-schedule-id="${id}"][data-schedule-part="date"]`);
+      const hourEl = card.querySelector(`[data-schedule-id="${id}"][data-schedule-part="hour"]`);
+      const minuteEl = card.querySelector(`[data-schedule-id="${id}"][data-schedule-part="minute"]`);
+      const ampmEl = card.querySelector(`[data-schedule-id="${id}"][data-schedule-part="ampm"]`);
+      const dateVal = dateEl.value; // "YYYY-MM-DD"
+      if (!dateVal) {
+        scheduledDates[id] = null;
+      } else {
+        let h = parseInt(hourEl.value, 10) % 12;
+        if (ampmEl.value === "PM") h += 12;
+        const [y, mo, da] = dateVal.split("-").map(Number);
+        const d = new Date(y, mo - 1, da, h, parseInt(minuteEl.value, 10));
+        scheduledDates[id] = d.toISOString();
+      }
       render();
       try { await saveRow(id); } catch (err) { console.error("save error", err); }
     });
