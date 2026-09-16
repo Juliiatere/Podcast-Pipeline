@@ -399,6 +399,27 @@
   }
   .status-select:focus{ outline: none; border-color: var(--amber); }
 
+  .schedule-row{ margin-top: 8px; margin-bottom: 4px; }
+  .schedule-label{
+    display: block;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-dim);
+    margin-bottom: 5px;
+  }
+  .schedule-input{
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--panel-border);
+    border-radius: 9px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px;
+    color: var(--body);
+    background: #ffffff;
+  }
+  .schedule-input:focus{ outline: none; border-color: var(--amber); }
+
   .delete-row{
     display: flex;
     justify-content: flex-end;
@@ -487,7 +508,8 @@
     <p class="sub">Here's where things stand with the podcasts we're pitching for you. Tap any row to see the details — and let us know when there's an update on your end.</p>
 
     <div class="status-chip-row">
-      <span class="status-chip chip-done"><span class="dot"></span><span id="statusChipDone"></span></span>
+      <span class="status-chip chip-done"><span class="dot"></span><span id="statusChipRecorded"></span></span>
+      <span class="status-chip chip-precall"><span class="dot"></span><span id="statusChipBooked"></span></span>
       <span class="status-chip chip-precall"><span class="dot"></span><span id="statusChipPrecall"></span></span>
       <span class="status-chip chip-action"><span class="dot"></span><span id="statusChipPending"></span></span>
     </div>
@@ -507,9 +529,10 @@ const responses = {};      // podcast_id -> current status value
 const notesText = {};      // podcast_id -> notes string
 const deletedFlags = {};   // podcast_id -> boolean (removed from the list)
 const statusHistory = {};  // podcast_id -> [{status, changed_at}, ...]
+const scheduledDates = {}; // podcast_id -> ISO datetime string or null (recording date/time)
 
 async function fetchAllRows(){
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/cahill_podcast_responses?select=podcast_id,response,notes,deleted`, {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/cahill_podcast_responses?select=podcast_id,response,notes,deleted,scheduled_at`, {
     headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
   });
   if (!res.ok) throw new Error("fetch failed: " + res.status);
@@ -548,12 +571,13 @@ async function notifyByEmail(podcastId, subjectSuffix, updateText){
   }
 }
 
-// Always writes the full known row (response + notes + deleted) so a partial
-// update never silently wipes out another field via Supabase's upsert behavior.
+// Always writes the full known row (response + notes + deleted + scheduled_at) so a
+// partial update never silently wipes out another field via Supabase's upsert behavior.
 async function saveRow(id){
   const response = responses[id] ?? null;
   const notes = notesText[id] ?? null;
   const deleted = !!deletedFlags[id];
+  const scheduled_at = scheduledDates[id] ?? null;
   await fetch(`${SUPABASE_URL}/rest/v1/cahill_podcast_responses`, {
     method: "POST",
     headers: {
@@ -562,7 +586,7 @@ async function saveRow(id){
       "Content-Type": "application/json",
       Prefer: "resolution=merge-duplicates"
     },
-    body: JSON.stringify([{ podcast_id: id, response, notes, deleted, updated_at: new Date().toISOString() }])
+    body: JSON.stringify([{ podcast_id: id, response, notes, deleted, scheduled_at, updated_at: new Date().toISOString() }])
   });
 }
 
@@ -853,7 +877,23 @@ function fieldHTML(f){
 
 function fmtDate(iso){
   const d = new Date(iso);
-  return d.toLocaleDateString("uk-UA", { day: "numeric", month: "short", year: "numeric" });
+  return d.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
+}
+
+function fmtDateTime(iso){
+  const d = new Date(iso);
+  const datePart = d.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
+  const timePart = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  return `${datePart}, ${timePart}`;
+}
+
+// Converts an ISO datetime string to the value a <input type="datetime-local">
+// expects (local time, no seconds/timezone), or "" if none set.
+function isoToLocalInputValue(iso){
+  if (!iso) return "";
+  const d = new Date(iso);
+  const pad = n => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
 const openCards = new Set();
@@ -872,7 +912,11 @@ function render(){
     const resp = responses[p.id] || null;
     const statusMeta = STATUS_OPTIONS.find(o => o.value === resp) || null;
     const badgeCls = statusMeta ? statusMeta.cls : "skip";
-    const badgeLabel = statusMeta ? statusMeta.label : "Not set";
+    const scheduledAt = scheduledDates[p.id] || null;
+    const showsSchedule = resp === "recording_booked" || resp === "episode_recorded";
+    const badgeLabel = statusMeta
+      ? (showsSchedule && scheduledAt ? `${statusMeta.label} · ${fmtDateTime(scheduledAt)}` : statusMeta.label)
+      : "Not set";
 
     const card = document.createElement("details");
     card.className = "card";
@@ -941,6 +985,11 @@ function render(){
             <option value="" ${!resp ? "selected" : ""}>— select a status —</option>
             ${STATUS_OPTIONS.map(o => `<option value="${o.value}" ${resp===o.value ? "selected" : ""}>${o.label}</option>`).join("")}
           </select>
+          ${showsSchedule ? `
+          <div class="schedule-row">
+            <label class="schedule-label" for="schedule-${p.id}">Recording date &amp; time</label>
+            <input type="datetime-local" id="schedule-${p.id}" class="schedule-input" data-schedule-id="${p.id}" value="${isoToLocalInputValue(scheduledAt)}" />
+          </div>` : ""}
           ${timelineHTML}
           ${notesHTML}
           <div class="delete-row">
@@ -969,6 +1018,19 @@ function render(){
       render();
       updateStatusChip();
       try { await saveResponse(id, val); } catch (err) { console.error("save error", err); }
+    });
+  });
+
+  document.querySelectorAll(".schedule-input").forEach(el => {
+    el.addEventListener("click", (e) => e.stopPropagation());
+    el.addEventListener("change", async (e) => {
+      e.stopPropagation();
+      const id = el.dataset.scheduleId;
+      // datetime-local gives local time with no timezone; store as an ISO string.
+      const localVal = el.value; // "YYYY-MM-DDTHH:MM"
+      scheduledDates[id] = localVal ? new Date(localVal).toISOString() : null;
+      render();
+      try { await saveRow(id); } catch (err) { console.error("save error", err); }
     });
   });
 
@@ -1043,28 +1105,23 @@ function render(){
   });
 }
 
-function classifyPodcast(p){
-  if (deletedFlags[p.id]) return "excluded";
-  const r = responses[p.id];
-  const meta = STATUS_OPTIONS.find(o => o.value === r);
-  if (!meta) return "amber";
-  if (meta.cls === "done") return "green";
-  if (meta.cls === "precall") return "blue";
-  if (meta.cls === "skip") return "excluded";
-  return "amber";
-}
-
 function updateStatusChip(){
-  let green = 0, blue = 0, amber = 0;
+  let recorded = 0, booked = 0, waiting = 0, action = 0;
   PODCASTS.forEach(p => {
-    const c = classifyPodcast(p);
-    if (c === "green") green++;
-    else if (c === "blue") blue++;
-    else if (c === "amber") amber++;
+    if (deletedFlags[p.id]) return;
+    const r = responses[p.id];
+    if (r === "episode_recorded") recorded++;
+    else if (r === "recording_booked") booked++;
+    else {
+      const meta = STATUS_OPTIONS.find(o => o.value === r);
+      if (meta && meta.cls === "precall") waiting++;
+      else action++; // covers explicit "action" cls and unset/no status yet
+    }
   });
-  document.getElementById("statusChipDone").textContent = `${green} Successful`;
-  document.getElementById("statusChipPrecall").textContent = `${blue} Booked pre-call`;
-  document.getElementById("statusChipPending").textContent = `${amber} Waiting your response`;
+  document.getElementById("statusChipRecorded").textContent = `${recorded} Episode recorded`;
+  document.getElementById("statusChipBooked").textContent = `${booked} Recording booked`;
+  document.getElementById("statusChipPrecall").textContent = `${waiting} Waiting on reply`;
+  document.getElementById("statusChipPending").textContent = `${action} Need action`;
 }
 
 // Collapse an open card on any click that isn't on its own summary (header) —
@@ -1092,6 +1149,7 @@ async function loadResponses(){
       responses[row.podcast_id] = row.response;
       notesText[row.podcast_id] = row.notes;
       deletedFlags[row.podcast_id] = !!row.deleted;
+      scheduledDates[row.podcast_id] = row.scheduled_at || null;
     });
     const historyRows = await fetchAllHistory();
     historyRows.forEach(row => {
