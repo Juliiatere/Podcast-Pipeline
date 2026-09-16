@@ -812,11 +812,11 @@ const PODCASTS = [
 // Ordered progression of statuses you can mark on a podcast. `cls` reuses the
 // existing done/action/precall/skip badge colors.
 const STATUS_OPTIONS = [
-  { value: "replied_to_host", label: "Replied to host", cls: "action" },
-  { value: "waiting_reply", label: "Waiting on reply", cls: "action" },
+  { value: "replied_to_host", label: "Replied to host", cls: "precall" },
+  { value: "waiting_reply", label: "Waiting on reply", cls: "precall" },
   { value: "host_replied_need_response", label: "Host replied, need to respond", cls: "action" },
   { value: "need_form", label: "Need to fill out form", cls: "action" },
-  { value: "form_filled", label: "Form filled out", cls: "action" },
+  { value: "form_filled", label: "Form filled out", cls: "precall" },
   { value: "need_precall", label: "Need to book pre-call", cls: "action" },
   { value: "precall_booked", label: "Pre-call booked", cls: "precall" },
   { value: "recording_booked", label: "Recording booked", cls: "done" },
