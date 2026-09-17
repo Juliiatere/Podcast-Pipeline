@@ -153,8 +153,9 @@
   .sidebar-event.cls-precall{ border-color: var(--status-precall-fg); }
   .sidebar-event.cls-done{ border-color: var(--status-done-fg); }
   .sidebar-event-title{
+    font-family: 'Inter', sans-serif;
     font-weight: 500;
-    font-size: 12.5px;
+    font-size: 14px;
     margin-bottom: 2px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -220,7 +221,17 @@
     font-family: 'DM Sans', sans-serif;
     font-weight:600;
     font-size:13.5px;
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    opacity: 0.55;
+    transition: opacity 0.12s, border-color 0.12s;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
   }
+  .status-chip:hover{ opacity: 0.85; }
+  .status-chip.active{ opacity: 1; border-color: currentColor; }
+  .status-chip.chip-all{ background: #f1f1f4; color: var(--heading); }
   .status-chip.chip-done{ background: var(--status-done-bg); color: var(--status-done-fg); }
   .status-chip.chip-action{ background: var(--status-action-bg); color: var(--status-action-fg); }
   .status-chip.chip-precall{ background: var(--status-precall-bg); color: var(--status-precall-fg); }
@@ -678,10 +689,11 @@
     <p class="sub">Here's where things stand with the podcasts we're pitching for you. Tap any row to see the details — and let us know when there's an update on your end.</p>
 
     <div class="status-chip-row">
-      <span class="status-chip chip-done"><span class="dot"></span><span id="statusChipRecorded"></span></span>
-      <span class="status-chip chip-precall"><span class="dot"></span><span id="statusChipBooked"></span></span>
-      <span class="status-chip chip-precall"><span class="dot"></span><span id="statusChipPrecall"></span></span>
-      <span class="status-chip chip-action"><span class="dot"></span><span id="statusChipPending"></span></span>
+      <button type="button" class="status-chip chip-all active" data-filter="all"><span id="statusChipAll"></span></button>
+      <button type="button" class="status-chip chip-done" data-filter="episode_recorded"><span class="dot"></span><span id="statusChipRecorded"></span></button>
+      <button type="button" class="status-chip chip-precall" data-filter="recording_booked"><span class="dot"></span><span id="statusChipBooked"></span></button>
+      <button type="button" class="status-chip chip-precall" data-filter="waiting"><span class="dot"></span><span id="statusChipPrecall"></span></button>
+      <button type="button" class="status-chip chip-action" data-filter="action"><span class="dot"></span><span id="statusChipPending"></span></button>
     </div>
   </div>
 
@@ -1121,10 +1133,22 @@ function isoToTimeParts(iso){
 }
 
 const openCards = new Set();
+let activeFilter = "all"; // "all" | "episode_recorded" | "recording_booked" | "waiting" | "action"
+
+// Shared classification used by both the status chips and the list filter,
+// so counts and filtering always agree with each other.
+function classifyForChip(p){
+  const r = responses[p.id];
+  if (r === "episode_recorded") return "episode_recorded";
+  if (r === "recording_booked") return "recording_booked";
+  const meta = STATUS_OPTIONS.find(o => o.value === r);
+  if (meta && meta.cls === "precall") return "waiting";
+  return "action"; // explicit "action" cls, or no status set yet
+}
 
 function render(){
   list.innerHTML = "";
-  const visiblePodcasts = PODCASTS.filter(p => !deletedFlags[p.id]);
+  const visiblePodcasts = PODCASTS.filter(p => !deletedFlags[p.id] && (activeFilter === "all" || classifyForChip(p) === activeFilter));
   visiblePodcasts.sort((a, b) => {
     const pa = STATUS_PRIORITY[responses[a.id]] ?? 0;
     const pb = STATUS_PRIORITY[responses[b.id]] ?? 0;
@@ -1427,7 +1451,8 @@ function renderSidebar(){
   `).join("");
 
   sidebarEl.querySelectorAll("[data-jump-id]").forEach(btn => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
       const id = btn.dataset.jumpId;
       const card = document.querySelector(`.card[data-id="${id}"]`);
       if (!card) return;
@@ -1439,23 +1464,34 @@ function renderSidebar(){
 }
 
 function updateStatusChip(){
-  let recorded = 0, booked = 0, waiting = 0, action = 0;
+  let all = 0, recorded = 0, booked = 0, waiting = 0, action = 0;
   PODCASTS.forEach(p => {
     if (deletedFlags[p.id]) return;
-    const r = responses[p.id];
-    if (r === "episode_recorded") recorded++;
-    else if (r === "recording_booked") booked++;
-    else {
-      const meta = STATUS_OPTIONS.find(o => o.value === r);
-      if (meta && meta.cls === "precall") waiting++;
-      else action++; // covers explicit "action" cls and unset/no status yet
-    }
+    all++;
+    const cat = classifyForChip(p);
+    if (cat === "episode_recorded") recorded++;
+    else if (cat === "recording_booked") booked++;
+    else if (cat === "waiting") waiting++;
+    else action++;
   });
+  document.getElementById("statusChipAll").textContent = `All (${all})`;
   document.getElementById("statusChipRecorded").textContent = `${recorded} Episode recorded`;
   document.getElementById("statusChipBooked").textContent = `${booked} Recording booked`;
   document.getElementById("statusChipPrecall").textContent = `${waiting} Waiting on reply`;
   document.getElementById("statusChipPending").textContent = `${action} Need action`;
+
+  document.querySelectorAll(".status-chip").forEach(chip => {
+    chip.classList.toggle("active", chip.dataset.filter === activeFilter);
+  });
 }
+
+document.querySelectorAll(".status-chip[data-filter]").forEach(chip => {
+  chip.addEventListener("click", () => {
+    activeFilter = chip.dataset.filter;
+    render();
+    updateStatusChip();
+  });
+});
 
 // Collapse an open card on any click that isn't on its own summary (header) —
 // this covers clicks fully outside the card, AND clicks inside the open card's
