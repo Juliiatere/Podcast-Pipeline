@@ -223,14 +223,13 @@
     font-size:13.5px;
     border: 1.5px solid transparent;
     cursor: pointer;
-    opacity: 0.55;
-    transition: opacity 0.12s, border-color 0.12s;
+    transition: border-color 0.12s;
     appearance: none;
     -webkit-appearance: none;
     outline: none;
   }
-  .status-chip:hover{ opacity: 0.85; }
-  .status-chip.active{ opacity: 1; border-color: currentColor; }
+  .status-chip.active{ border-color: currentColor; }
+  .status-chip:hover{ filter: brightness(0.96); }
   .status-chip.chip-all{ background: #f1f1f4; color: var(--heading); }
   .status-chip.chip-done{ background: var(--status-done-bg); color: var(--status-done-fg); }
   .status-chip.chip-action{ background: var(--status-action-bg); color: var(--status-action-fg); }
