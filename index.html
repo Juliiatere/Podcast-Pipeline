@@ -31,6 +31,10 @@
     --status-precall-bg: #eef1fc;
     --status-precall-fg: #5068d4;
     --status-precall-border: #c7d0f5;
+
+    --status-prebooked-bg: #e8f1fe;
+    --status-prebooked-fg: #1f6fd6;
+    --status-prebooked-border: #b9d7f9;
   }
 
   *{ box-sizing: border-box; }
@@ -151,6 +155,7 @@
   .sidebar-event:last-child{ margin-bottom: 0; }
   .sidebar-event:hover{ background: var(--amber-tint); }
   .sidebar-event.cls-precall{ border-color: var(--status-precall-fg); }
+  .sidebar-event.cls-prebooked{ border-color: var(--status-prebooked-fg); }
   .sidebar-event.cls-done{ border-color: var(--status-done-fg); }
   .sidebar-event-title{
     font-family: 'Inter', sans-serif;
@@ -164,6 +169,8 @@
   }
   .sidebar-event.cls-precall .sidebar-event-title,
   .sidebar-event.cls-precall .sidebar-event-meta{ color: var(--status-precall-fg); }
+  .sidebar-event.cls-prebooked .sidebar-event-title,
+  .sidebar-event.cls-prebooked .sidebar-event-meta{ color: var(--status-prebooked-fg); }
   .sidebar-event.cls-done .sidebar-event-title,
   .sidebar-event.cls-done .sidebar-event-meta{ color: var(--status-done-fg); }
   .sidebar-event-meta{
@@ -298,6 +305,7 @@
   .badge.done{ background: var(--status-done-bg); color: var(--status-done-fg); }
   .badge.action{ background: var(--status-action-bg); color: var(--status-action-fg); }
   .badge.precall{ background: var(--status-precall-bg); color: var(--status-precall-fg); }
+  .badge.prebooked{ background: var(--status-prebooked-bg); color: var(--status-prebooked-fg); }
   .badge.skip{ background: #f1f1f5; color: #676d77; }
 
   .card-body{ padding: 0 24px 24px; border-top: 1px solid var(--panel-border); }
@@ -361,6 +369,25 @@
     margin-bottom: 6px;
   }
   .precall-box .field-text{ color: var(--body); font-size: 14.5px; line-height: 1.6; }
+
+  .prebooked-box{
+    background: #ffffff;
+    border: 1px solid var(--status-prebooked-border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 16px 0;
+  }
+  .prebooked-box .field-label{
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1.4;
+    color: var(--status-prebooked-fg);
+    margin-bottom: 6px;
+  }
+  .prebooked-box .field-text{ color: var(--body); font-size: 14.5px; line-height: 1.6; }
 
   .skip-box{
     background: #f7f7f9;
@@ -645,6 +672,7 @@
   .timeline-item:last-child::after{ display: none; }
   .timeline-item.cls-done::before{ background: var(--status-done-fg); }
   .timeline-item.cls-precall::before{ background: var(--status-precall-fg); }
+  .timeline-item.cls-prebooked::before{ background: var(--status-prebooked-fg); }
   .timeline-item.cls-skip::before{ background: #8a8d9c; }
   .timeline-label{
     font-family: 'DM Sans', sans-serif;
@@ -690,7 +718,7 @@
     <div class="status-chip-row">
       <button type="button" class="status-chip chip-all active" data-filter="all"><span id="statusChipAll"></span></button>
       <button type="button" class="status-chip chip-done" data-filter="episode_recorded"><span class="dot"></span><span id="statusChipRecorded"></span></button>
-      <button type="button" class="status-chip chip-precall" data-filter="recording_booked"><span class="dot"></span><span id="statusChipBooked"></span></button>
+      <button type="button" class="status-chip chip-done" data-filter="recording_booked"><span class="dot"></span><span id="statusChipBooked"></span></button>
       <button type="button" class="status-chip chip-precall" data-filter="waiting"><span class="dot"></span><span id="statusChipPrecall"></span></button>
       <button type="button" class="status-chip chip-action" data-filter="action"><span class="dot"></span><span id="statusChipPending"></span></button>
     </div>
@@ -1064,12 +1092,12 @@ const STATUS_OPTIONS = [
   { value: "need_form", label: "Need to fill out form", cls: "action" },
   { value: "form_filled", label: "Form filled out", cls: "precall" },
   { value: "need_precall", label: "Need to book pre-call", cls: "action" },
-  { value: "precall_booked", label: "Pre-call booked", cls: "precall" },
+  { value: "precall_booked", label: "Pre-call booked", cls: "prebooked" },
   { value: "recording_booked", label: "Recording booked", cls: "done" },
   { value: "episode_recorded", label: "Episode recorded", cls: "done" }
 ];
 
-const BOX_CLASS_BY_CLS = { done: "info-box", action: "action-box", precall: "precall-box", skip: "skip-box" };
+const BOX_CLASS_BY_CLS = { done: "info-box", action: "action-box", precall: "precall-box", prebooked: "prebooked-box", skip: "skip-box" };
 
 // Sort tier: 0 = needs a first action (nothing started, or a form/pre-call to
 // book), 1 = in process (waiting on someone), 2 = pre-call booked, 3 = done.
@@ -1141,7 +1169,7 @@ function classifyForChip(p){
   if (r === "episode_recorded") return "episode_recorded";
   if (r === "recording_booked") return "recording_booked";
   const meta = STATUS_OPTIONS.find(o => o.value === r);
-  if (meta && meta.cls === "precall") return "waiting";
+  if (meta && (meta.cls === "precall" || meta.cls === "prebooked")) return "waiting";
   return "action"; // explicit "action" cls, or no status set yet
 }
 
