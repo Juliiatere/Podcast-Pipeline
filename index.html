@@ -43,42 +43,84 @@
     background: #f7f7f8;
     color: var(--body);
     font-family: 'DM Sans', sans-serif;
-    padding: 0 0 80px;
+    padding: 24px;
   }
 
-  .site-header{
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: #ffffff;
-    border-bottom: 1px solid var(--panel-border);
-  }
-  .site-header-inner{
-    max-width: 1280px;
+  .shell{
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 16px 24px;
-    display: flex;
-    justify-content: center;
+    background: #ffffff;
+    border: 1px solid #d3d9f6;
+    border-radius: 12px;
+    overflow: visible;
   }
+  .shell-topbar{
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 12px;
+    border-bottom: 1px solid #d3d9f6;
+    flex-wrap: wrap;
+  }
+  .shell-tabs{ display: flex; align-items: stretch; gap: 2px; }
+  .shell-tab{
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 21px;
+    color: #424239;
+    padding: 12px 8px;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    display: flex;
+    align-items: center;
+  }
+  .shell-tab.active{ color: var(--amber); border-bottom-color: var(--amber); }
+  .shell-search{
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 240px;
+    height: 32px;
+    padding: 8px 16px;
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    margin: 6px 0;
+  }
+  .shell-search svg{ width: 16px; height: 16px; color: var(--ink-dim); flex: 0 0 auto; }
+  .shell-search input{
+    border: none;
+    outline: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 16px;
+    color: var(--body);
+    width: 100%;
+    background: transparent;
+    padding: 0;
+  }
+  .shell-search input::placeholder{ color: var(--ink-dim); }
 
   .page-layout{
-    max-width: 1280px;
-    margin: 0 auto;
     display: flex;
     align-items: flex-start;
     gap: 24px;
-    padding: 0 16px;
+    padding: 16px;
   }
   .wrap{
     flex: 3 1 0;
-    max-width: 900px;
     min-width: 0;
-    margin: 32px 0 0;
-    padding: 28px 40px 32px;
-    background: #ffffff;
-    border: 1px solid rgba(83,74,183,0.08);
-    border-radius: 16px;
-    box-shadow: 0 4px 16px rgba(83,74,183,0.08), 0 1px 4px rgba(83,74,183,0.04);
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
   }
 
   .sidebar{
@@ -87,12 +129,12 @@
     max-width: 360px;
     position: sticky;
     top: 24px;
-    margin-top: 32px;
+    margin-top: 0;
     background: #ffffff;
     border: 1px solid rgba(83,74,183,0.08);
-    border-radius: 16px;
-    box-shadow: 0 4px 16px rgba(83,74,183,0.08), 0 1px 4px rgba(83,74,183,0.04);
-    padding: 28px 20px 20px;
+    border-radius: 12px;
+    box-shadow: none;
+    padding: 12px;
     max-height: calc(100vh - 48px);
     overflow-y: auto;
     scrollbar-width: none;
@@ -218,59 +260,85 @@
   }
   .sub{ color: var(--ink-dim); font-size: 15px; line-height: 1.5; max-width: none; font-weight: 400; }
 
-  .status-chip-row{ display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; }
+  .status-chip-row{ display:flex; gap:24px; margin-top:20px; flex-wrap:wrap; align-items:center; }
   .status-chip{
     display:inline-flex;
     align-items:center;
-    gap:8px;
-    padding:8px 16px;
-    border-radius:100px;
+    gap:4px;
+    padding:0;
+    border-radius:8px;
     font-family: 'DM Sans', sans-serif;
-    font-weight:600;
-    font-size:13.5px;
-    border: 1.5px solid transparent;
+    font-weight:400;
+    font-size:14px;
+    border: none;
+    background: transparent;
     cursor: pointer;
-    transition: border-color 0.12s;
     appearance: none;
     -webkit-appearance: none;
     outline: none;
   }
-  .status-chip.active{ border-color: currentColor; }
-  .status-chip:hover{ filter: brightness(0.96); }
-  .status-chip.chip-all{ background: #f1f1f4; color: var(--heading); }
-  .status-chip.chip-done{ background: var(--status-done-bg); color: var(--status-done-fg); }
-  .status-chip.chip-action{ background: var(--status-action-bg); color: var(--status-action-fg); }
-  .status-chip.chip-precall{ background: var(--status-precall-bg); color: var(--status-precall-fg); }
+  .status-chip.chip-all{
+    gap: 8px;
+    border: 1px solid #8e9195;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--heading);
+    font-weight: 400;
+    padding: 4px 12px;
+  }
+  .status-chip.active.chip-all{ border-color: var(--heading); }
+  .status-chip:hover:not(.chip-all){ background: #f7f7f8; }
+  .status-chip.chip-done{ color: #0c8f21; }
+  .status-chip.chip-recording-booked{ color: #007aff; }
+  .status-chip.chip-action{ color: #9e610c; }
+  .status-chip.chip-precall{ color: #5068d4; }
   .status-chip .dot{
     width:6px;height:6px;border-radius:50%;
     background: currentColor;
   }
 
-  .card{
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
+  .list{
+    background: #f7f7f7;
     border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 16px;
-    transition: border-color .15s ease;
+    padding: 12px 0;
   }
-  .card[open]{ border-color: var(--amber); }
+  .card{
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #d3d9f6;
+    border-radius: 0;
+    overflow: hidden;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    transition: background-color .15s ease;
+  }
+  .card:last-of-type{ border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+  .card[open]{ background: transparent; border-bottom: none; }
   .card summary{
     list-style: none;
     cursor: pointer;
-    padding: 24px;
+    padding: 0 12px;
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 16px;
   }
   .card summary::-webkit-details-marker{ display:none; }
+
+  .card-cover{
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex: 0 0 auto;
+    display: block;
+  }
 
   .card-content{
     flex: 1;
     min-width: 0;
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 16px;
   }
 
   .chev{
@@ -286,20 +354,20 @@
     font-family: 'Inter', sans-serif;
     font-weight: 500;
     font-size: 16px;
-    line-height: 1.25;
-    margin: 0 0 2px;
+    line-height: 1.3;
+    margin: 0;
     color: var(--heading);
     letter-spacing: -0.005em;
   }
-  .card-meta{ font-size: 13px; color: var(--ink-dim); font-weight: 400; }
+  .card-meta{ font-size: 14px; line-height: 1.5; color: #424239; font-weight: 400; margin: 0; }
 
   .badge{
     flex: 0 0 auto;
     font-family: 'DM Sans', sans-serif;
-    font-weight: 600;
-    font-size: 11.5px;
-    padding: 5px 10px;
-    border-radius: 100px;
+    font-weight: 400;
+    font-size: 14px;
+    padding: 4px 8px;
+    border-radius: 8px;
     white-space: nowrap;
   }
   .badge.done{ background: var(--status-done-bg); color: var(--status-done-fg); }
@@ -308,7 +376,7 @@
   .badge.prebooked{ background: var(--status-prebooked-bg); color: var(--status-prebooked-fg); }
   .badge.skip{ background: #f1f1f5; color: #676d77; }
 
-  .card-body{ padding: 0 24px 24px; border-top: 1px solid var(--panel-border); }
+  .card-body{ padding: 0 24px 24px; border-top: 1px solid #d3d9f6; }
   .card-body-inner{ padding-top: 20px; }
 
   .field{ margin-bottom: 28px; }
@@ -555,7 +623,7 @@
 
   .status-select{
     width: 100%;
-    padding: 11px 14px;
+    padding: 11px 34px 11px 14px;
     border: 1.5px solid var(--panel-border);
     border-radius: 9px;
     font-family: 'DM Sans', sans-serif;
@@ -611,9 +679,9 @@
   }
   .schedule-fields .schedule-input{ width: auto; }
   .schedule-date{ flex: 1 1 auto; min-width: 0; }
-  .schedule-hour{ width: 58px; flex: 0 0 auto; }
-  .schedule-minute{ width: 62px; flex: 0 0 auto; }
-  .schedule-ampm{ width: 68px; flex: 0 0 auto; }
+  .schedule-hour{ width: 66px; flex: 0 0 auto; padding-right: 20px; }
+  .schedule-minute{ width: 70px; flex: 0 0 auto; padding-right: 20px; }
+  .schedule-ampm{ width: 76px; flex: 0 0 auto; padding-right: 20px; }
   .schedule-colon{
     font-family: 'DM Sans', sans-serif;
     font-weight: 600;
@@ -700,25 +768,27 @@
 </head>
 <body>
 
-<header class="site-header">
-  <div class="site-header-inner">
-<svg width="150" height="35" viewBox="0 0 477 110" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
-<path d="M63.3945 27.7754C64.0522 27.3087 64.9514 27.3118 65.6094 27.8115C66.2735 27.944 66.8098 28.4279 67.0195 29.0605L94.0703 53.2256C94.4039 53.5207 94.8841 53.927 95.1055 53.9941C95.4165 54.0883 95.7525 54.0546 96.0391 53.9014C96.3257 53.7479 96.5406 53.4869 96.6348 53.1758C96.6531 53.1153 96.6645 53.0224 96.6738 52.9121V45.0859C96.6735 45.0747 96.6719 45.063 96.6719 45.0518C96.6719 45.0374 96.6734 45.023 96.6738 45.0088V44.9814C96.6739 44.9793 96.6747 44.9768 96.6748 44.9746C96.7106 44.3438 97.1793 43.8216 97.8145 43.751C99.2717 43.5892 102.107 43.3525 106.229 43.3525C110.352 43.3525 113.187 43.5892 114.645 43.751C115.285 43.8221 115.756 44.3529 115.784 44.9912C115.785 44.9972 115.789 45.0028 115.789 45.0088V80.5342C115.789 81.5697 114.95 82.3906 113.914 82.3906H100.208C99.5176 82.8792 98.562 82.8519 97.8984 82.2754C97.4459 82.111 97.077 81.7804 96.8662 81.3545L75.4355 62.2109L69.4746 56.8857L69.458 56.8711C69.1963 56.6583 68.9042 56.4353 68.7539 56.373C68.4535 56.2487 68.1158 56.2495 67.8154 56.374C67.5152 56.4985 67.2767 56.7369 67.1523 57.0371C67.1372 57.0737 67.1251 57.1228 67.1152 57.1807V80.5156C67.1152 81.5512 66.2758 82.3906 65.2402 82.3906H49.875C48.8395 82.3906 48 81.5512 48 80.5156V29.6504C48.0001 28.6149 48.8395 27.7754 49.875 27.7754H63.3945ZM208.401 37.4248C210.883 37.4248 213.138 37.8092 215.165 38.5781C217.192 39.3471 218.922 40.4833 220.355 41.9863C221.823 43.4893 222.942 45.3766 223.711 47.6484C224.515 49.8854 224.917 52.4722 224.917 55.4082C224.917 58.4491 224.498 61.106 223.659 63.3779C222.855 65.615 221.701 67.4853 220.198 68.9883C218.73 70.4913 216.965 71.6275 214.902 72.3965C212.84 73.1304 210.568 73.497 208.087 73.4971C205.57 73.4971 203.298 73.1127 201.271 72.3438C199.243 71.5748 197.495 70.4386 196.027 68.9355C194.594 67.4326 193.494 65.58 192.725 63.3779C191.956 61.1409 191.57 58.5543 191.57 55.6182C191.57 51.4937 192.288 48.1028 193.721 45.4463C195.189 42.7551 197.198 40.7452 199.75 39.417C202.302 38.0888 205.186 37.4248 208.401 37.4248ZM313.285 37.4248C315.942 37.4248 318.196 37.7568 320.049 38.4209C321.901 39.085 323.387 40.0109 324.506 41.1992C325.659 42.4226 326.498 43.8562 327.022 45.499C327.547 47.1418 327.826 48.9074 327.861 50.7949H320.555C320.264 49.5275 320.259 49.5185 319.84 48.3301C319.42 47.1416 318.703 46.1457 317.689 45.3418C316.711 44.5729 315.313 44.1885 313.495 44.1885C311.852 44.1885 310.349 44.5729 308.986 45.3418C307.623 46.1457 306.416 47.3488 305.647 49.0264C304.878 50.7041 304.478 52.9202 304.478 55.6465C304.478 55.7507 304.48 55.8544 304.481 55.957C304.543 58.3731 304.938 60.3599 305.642 61.8955C306.411 63.5731 307.617 64.7762 308.98 65.5801C310.344 66.349 311.847 66.7333 313.489 66.7334C315.307 66.7334 316.706 66.3491 317.685 65.5801C318.698 64.7762 319.415 63.7801 319.834 62.5918C320.253 61.4034 320.258 61.3944 320.549 60.127H327.855C327.821 62.0145 327.541 63.78 327.017 65.4229C326.492 67.0657 325.653 68.4993 324.5 69.7227C323.382 70.9109 321.896 71.8369 320.044 72.501C318.191 73.1651 315.937 73.497 313.28 73.4971C313.151 73.4971 313.022 73.4948 312.895 73.4932C312.833 73.4936 312.771 73.4971 312.709 73.4971C311.025 73.4971 309.443 73.3161 307.962 72.9561C307.263 72.8021 306.588 72.6163 305.939 72.3965C303.772 71.6625 301.92 70.5439 300.382 69.041C298.879 67.538 297.725 65.7023 296.921 63.5352C296.152 61.3332 295.768 58.7641 295.768 55.8281C295.768 55.616 295.769 55.4057 295.773 55.1973C295.773 55.1628 295.773 55.1283 295.773 55.0938C295.773 52.1578 296.158 49.5887 296.927 47.3867C297.731 45.2196 298.885 43.3839 300.388 41.8809C301.926 40.378 303.778 39.2594 305.945 38.5254C306.546 38.322 307.168 38.148 307.812 38.001C309.334 37.6171 310.964 37.4248 312.703 37.4248C312.766 37.4248 312.83 37.4272 312.893 37.4277C313.023 37.426 313.154 37.4248 313.285 37.4248ZM382.281 37.4248C385.322 37.4248 387.909 37.8615 390.041 38.7354C392.173 39.6091 393.815 40.8327 394.969 42.4053C396.122 43.9431 396.752 45.7436 396.856 47.8057L389.307 49.9561C389.307 48.9425 389.132 48.0511 388.782 47.2822C388.468 46.5132 388.013 45.8839 387.419 45.3945C386.825 44.8702 386.091 44.4859 385.217 44.2412C384.343 43.9616 383.347 43.8213 382.229 43.8213C380.9 43.8213 379.764 43.9784 378.82 44.293C377.912 44.6076 377.23 45.0274 376.775 45.5518C376.321 46.0411 376.094 46.6182 376.094 47.2822C376.094 48.1209 376.444 48.8197 377.143 49.3789C377.877 49.9032 378.856 50.3577 380.079 50.7422C381.337 51.0917 382.718 51.4415 384.221 51.791C385.724 52.1056 387.279 52.5078 388.887 52.9971C390.495 53.4515 391.998 54.063 393.396 54.832C394.795 55.601 395.913 56.6494 396.752 57.9775C397.626 59.2708 398.062 60.9139 398.062 62.9062C398.062 65.0384 397.486 66.9087 396.332 68.5166C395.214 70.0893 393.519 71.3128 391.247 72.1865C388.975 73.0604 386.16 73.4971 382.805 73.4971C380.568 73.497 378.54 73.2876 376.723 72.8682C374.905 72.4487 373.332 71.8193 372.004 70.9805C370.676 70.1067 369.627 69.0058 368.858 67.6777C368.089 66.3495 367.635 64.8112 367.495 63.0635L374.888 60.5996C374.993 62.0675 375.412 63.2909 376.146 64.2695C376.881 65.2482 377.86 65.9823 379.083 66.4717C380.341 66.926 381.74 67.1533 383.277 67.1533C384.745 67.1533 385.969 66.9784 386.947 66.6289C387.961 66.2444 388.713 65.7722 389.202 65.2129C389.726 64.6189 389.988 63.99 389.988 63.3262C389.988 62.5573 389.656 61.9278 388.992 61.4385C388.328 60.9142 387.419 60.4765 386.266 60.127C385.112 59.7425 383.766 59.3759 382.229 59.0264C380.481 58.6069 378.768 58.1524 377.09 57.6631C375.412 57.1737 373.891 56.5443 372.528 55.7754C371.165 54.9715 370.082 53.9577 369.278 52.7344C368.509 51.476 368.124 49.9031 368.124 48.0156C368.124 45.8835 368.666 44.0309 369.75 42.458C370.834 40.8853 372.424 39.6619 374.521 38.7881C376.618 37.8793 379.205 37.4248 382.281 37.4248ZM177.202 61.3857H177.832L177.308 38.1592H185.539V72.7637H175.63L159.743 48.2256H159.166L159.638 72.7637H151.406V38.1592H162.364L177.202 61.3857ZM243.488 65.6855H244.222L251.824 38.1592H260.947L249.675 72.7637H237.931L226.657 38.1592H235.886L243.488 65.6855ZM294.01 72.7637H284.782L282.858 66.2617H269.299L267.375 72.7637H258.147L269.892 38.1592H282.266L294.01 72.7637ZM365.335 72.7637H356.107L354.184 66.2617H340.624L338.7 72.7637H329.473L341.217 38.1592H353.591L365.335 72.7637ZM429.43 45.1846H419.258V72.7637H410.765V45.1846H400.697V38.1592H429.43V45.1846ZM208.139 44.3457C206.461 44.3458 205.028 44.7826 203.84 45.6562C202.686 46.4951 201.795 47.7539 201.166 49.4316C200.537 51.0745 200.222 53.1019 200.222 55.5137C200.222 57.3312 200.397 58.9566 200.746 60.3896C201.131 61.7878 201.655 62.9764 202.319 63.9551C202.983 64.8987 203.822 65.633 204.836 66.1572C205.884 66.6465 207.055 66.8906 208.349 66.8906C210.061 66.8906 211.495 66.4717 212.648 65.6328C213.837 64.759 214.728 63.518 215.322 61.9102C215.951 60.2673 216.266 58.2745 216.266 55.9326C216.266 53.4512 215.951 51.3542 215.322 49.6416C214.693 47.8939 213.766 46.5828 212.543 45.709C211.355 44.8003 209.886 44.3457 208.139 44.3457ZM270.974 60.5996H281.184L276.498 44.7646H275.659L270.974 60.5996ZM342.299 60.5996H352.509L347.823 44.7646H346.984L342.299 60.5996ZM67.1152 54.7832C67.1174 54.7837 67.1198 54.7836 67.1221 54.7842L67.1152 54.7783V54.7832ZM106.229 37.9775C110.352 37.9775 113.187 38.2142 114.645 38.376C115.306 38.4493 115.787 39.0117 115.787 39.6768C115.787 40.5077 115.05 41.1539 114.223 41.0723C112.615 40.9134 109.841 40.709 106.229 40.709C102.618 40.709 99.8435 40.9134 98.2363 41.0723C97.4095 41.1537 96.6719 40.5076 96.6719 39.6768C96.6721 39.0118 97.1536 38.4495 97.8145 38.376C99.2717 38.2142 102.107 37.9775 106.229 37.9775ZM106.229 32.6035C110.352 32.6035 113.187 32.8402 114.645 33.002C115.306 33.0753 115.787 33.6377 115.787 34.3027C115.787 35.1337 115.05 35.7799 114.223 35.6982C112.615 35.5394 109.841 35.335 106.229 35.335C102.618 35.335 99.8435 35.5394 98.2363 35.6982C97.4095 35.7797 96.6719 35.1336 96.6719 34.3027C96.6721 33.6378 97.1536 33.0755 97.8145 33.002C99.2717 32.8402 102.107 32.6035 106.229 32.6035ZM106.229 27.2295C110.352 27.2295 113.187 27.4662 114.645 27.6279C115.306 27.7013 115.787 28.2637 115.787 28.9287C115.787 29.7597 115.05 30.4059 114.223 30.3242C112.615 30.1654 109.841 29.9609 106.229 29.9609C102.618 29.9609 99.8435 30.1654 98.2363 30.3242C97.4095 30.4057 96.6719 29.7595 96.6719 28.9287C96.6721 28.2638 97.1536 27.7014 97.8145 27.6279C99.2717 27.4662 102.107 27.2295 106.229 27.2295Z" fill="#5068D4"/>
-</svg>
+<div class="shell">
+  <div class="shell-topbar">
+    <div class="shell-tabs">
+      <a class="shell-tab" href="#">AI Pitches</a>
+      <a class="shell-tab" href="#">Manual Pitches</a>
+      <a class="shell-tab active" href="#">Shortlist</a>
+    </div>
+    <div class="shell-search">
+      <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.4"/><path d="M17.5 17.5l-3.6-3.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <input type="text" placeholder="Search by name..." />
+    </div>
   </div>
-</header>
 
 <div class="page-layout">
 <div class="wrap">
 
   <div class="header">
-    <h1>Your podcast pipeline</h1>
-    <p class="sub">Here's where things stand with the podcasts we're pitching for you. Tap any row to see the details — and let us know when there's an update on your end.</p>
-
     <div class="status-chip-row">
       <button type="button" class="status-chip chip-all active" data-filter="all"><span id="statusChipAll"></span></button>
       <button type="button" class="status-chip chip-done" data-filter="episode_recorded"><span class="dot"></span><span id="statusChipRecorded"></span></button>
-      <button type="button" class="status-chip chip-done" data-filter="recording_booked"><span class="dot"></span><span id="statusChipBooked"></span></button>
+      <button type="button" class="status-chip chip-recording-booked" data-filter="recording_booked"><span class="dot"></span><span id="statusChipBooked"></span></button>
       <button type="button" class="status-chip chip-precall" data-filter="waiting"><span class="dot"></span><span id="statusChipPrecall"></span></button>
       <button type="button" class="status-chip chip-action" data-filter="action"><span class="dot"></span><span id="statusChipPending"></span></button>
     </div>
@@ -734,6 +804,7 @@
   <div class="sidebar-today-date" id="sidebarTodayDate"></div>
   <div class="sidebar-events" id="sidebarEvents"></div>
 </aside>
+</div>
 </div>
 
 
@@ -837,6 +908,8 @@ async function saveNotes(id, text){
 
 // Each podcast's current status lives in Supabase (see STATUS_OPTIONS below);
 // this array only holds the static reference info shown in the card.
+const COVER_IMG = "data:image/jpeg;base64,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";
+
 const PODCASTS = [
   {
     id: "marketing-in-progress",
@@ -1237,9 +1310,10 @@ function render(){
 
     card.innerHTML = `
       <summary>
+        <img class="card-cover" src="${COVER_IMG}" alt="" />
         <div class="card-content">
           <div class="card-title-block">
-            <p class="card-title">${idx+1}. ${p.name}</p>
+            <p class="card-title">${p.name}</p>
             <p class="card-meta">${p.host}</p>
           </div>
           <span class="badge ${badgeCls}">${badgeLabel}</span>
@@ -1502,10 +1576,10 @@ function updateStatusChip(){
     else action++;
   });
   document.getElementById("statusChipAll").textContent = `All (${all})`;
-  document.getElementById("statusChipRecorded").textContent = `${recorded} Episode recorded`;
-  document.getElementById("statusChipBooked").textContent = `${booked} Recording booked`;
-  document.getElementById("statusChipPrecall").textContent = `${waiting} Waiting on reply`;
-  document.getElementById("statusChipPending").textContent = `${action} Need action`;
+  document.getElementById("statusChipRecorded").textContent = `Episode recorded (${recorded})`;
+  document.getElementById("statusChipBooked").textContent = `Recording booked (${booked})`;
+  document.getElementById("statusChipPrecall").textContent = `Waiting on reply (${waiting})`;
+  document.getElementById("statusChipPending").textContent = `Need action (${action})`;
 
   document.querySelectorAll(".status-chip").forEach(chip => {
     chip.classList.toggle("active", chip.dataset.filter === activeFilter);
