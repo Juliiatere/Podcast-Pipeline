@@ -1020,6 +1020,25 @@
   }
   .next-step-link{ display: flex; flex-direction: column; gap: 6px; margin-top: 16px; max-width: 560px; }
   .next-step .next-step-cta{ margin-top: 16px; }
+  /* Client messages */
+  .client-msgs{ display: flex; flex-direction: column; gap: 12px; }
+  .client-msg{ border: 1px solid #e0e2e7; border-radius: 12px; padding: 12px 16px; background: #ffffff; }
+  .client-msg-head{ display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .client-msg-label{ margin: 0; font-family: 'Inter', sans-serif; font-weight: 500; font-size: 14px; line-height: 1.3; color: var(--heading); }
+  .client-msg-meta{ margin: 2px 0 0; font-family: 'DM Sans', sans-serif; font-size: 12px; line-height: 16px; color: var(--ink-dim); }
+  .client-msg .client-msg-copy{ margin-top: 0; flex: 0 0 auto; }
+  .client-msg-text{
+    margin: 10px 0 0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #f7f7f8;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 21px;
+    color: var(--body);
+    white-space: pre-line;
+  }
+
   /* Options the host offered (time slots etc.) — extracted from the thread by AI on the platform */
   .next-step-options{ margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
   .next-step-options-title{ margin: 0; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; line-height: 21px; color: var(--heading); }
@@ -2166,6 +2185,72 @@ function nextStepCtaHTML(ns, extraClass){
   </a>`;
 }
 
+// ---------- Client messages (simple version) ----------
+// Two short messages built from the card: one to send right after booking, one reminder for the
+// day of the call (2 hours before, with the prep doc). Copy-only for now.
+// Platform next: "Sent / Scheduled" state per message and scheduling via Slack.
+// Time uses the same value as Call details (see the time zone note in the handoff doc).
+function fmtMsgTime(d){
+  const h = d.getHours(), m = d.getMinutes();
+  return `${h % 12 || 12}${m ? ":" + String(m).padStart(2, "0") : ""}${h >= 12 ? "pm" : "am"}`;
+}
+function clientMessages(p){
+  const status = responses[p.id];
+  if (status !== "precall_booked" && status !== "recording_booked") return null;
+  const iso = scheduledDates[p.id];
+  if (!iso) return { missingDate: true };
+  const d = new Date(iso);
+  const kind = status === "precall_booked" ? "pre-call" : "podcast recording";
+  const host = (p.host || "").split(" · ")[0] || "the host";
+  const client = CLIENT_PROFILE.name.split(" ")[0];
+  const day = d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+  const when = `${day} at ${fmtMsgTime(d)} ET`;
+  const remindAt = new Date(d.getTime() - 2 * 3600 * 1000);
+  return {
+    booking: `Hey ${client}, booked a ${kind} for you — you'll see it in your calendar:\n\n${when} with ${host} (${p.name})`,
+    reminder: `Hey ${client}! Reminder — today you have the ${kind} with ${host} (${p.name}) at ${fmtMsgTime(d)} ET. Prep doc attached.`,
+    reminderMeta: `Send ${day} at ${fmtMsgTime(remindAt)} ET · attach the prep doc`,
+  };
+}
+function clientMessagesHTML(p){
+  const m = clientMessages(p);
+  if (!m) return "";
+  const card = (key, label, meta, text) => `
+    <div class="client-msg">
+      <div class="client-msg-head">
+        <div>
+          <p class="client-msg-label">${label}</p>
+          ${meta ? `<p class="client-msg-meta">${escHTML(meta)}</p>` : ""}
+        </div>
+        <button type="button" class="btn secondary client-msg-copy" data-copy-msg="${key}">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1" stroke="currentColor"/><path d="M10.5 5.5V3a.5.5 0 0 0-.5-.5H3a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .5.5h2.5" stroke="currentColor" stroke-linecap="round"/></svg>
+          <span>Copy</span>
+        </button>
+      </div>
+      <p class="client-msg-text" data-msg-text="${key}">${escHTML(text)}</p>
+    </div>`;
+  return `
+    <div class="divider"></div>
+    <div class="response-header"><span class="response-title">Client messages</span></div>
+    ${m.missingDate
+      ? `<p class="form-hint">Add the call date above to generate the messages.</p>`
+      : `<div class="client-msgs">
+          ${card("booking", "After booking", "", m.booking)}
+          ${card("reminder", "Day-of reminder", m.reminderMeta, m.reminder)}
+        </div>`}`;
+}
+async function copyText(text){
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch (err) {
+    const ta = document.createElement("textarea");
+    ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    const ok = document.execCommand("copy");
+    ta.remove();
+    return ok;
+  }
+}
+
 function fieldHTML(f){
   return `<div class="field">
     <div class="field-label">${f.label}</div>
@@ -2352,6 +2437,7 @@ function render(){
             </div>
           </div>`;
           })() : ""}
+          ${clientMessagesHTML(p)}
           ${showsPrepDoc ? `
           <div class="divider"></div>
           <div class="response-header"><span class="response-title">Prep document</span></div>
@@ -2716,6 +2802,17 @@ function renderPodPanel(bodyHTML){
 
   document.querySelectorAll("#podPanelBody .pod-acc").forEach(acc => {
     acc.addEventListener("toggle", () => accordionState.set(acc.dataset.accKey, acc.open));
+  });
+
+  document.querySelectorAll("#podPanel [data-copy-msg]").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const textEl = btn.closest(".client-msg").querySelector("[data-msg-text]");
+      const ok = await copyText(textEl.textContent);
+      const label = btn.querySelector("span");
+      label.textContent = ok ? "Copied" : "Copy failed";
+      setTimeout(() => { label.textContent = "Copy"; }, 1500);
+    });
   });
 
   // Prototype: "Reply to host" opens the Conversation section. Platform: go to the thread's reply box.
