@@ -769,13 +769,15 @@
   .schedule-fields{
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 6px;
   }
   .schedule-fields .schedule-input{ width: auto; }
-  .schedule-date{ flex: 1 1 auto; min-width: 0; }
+  .schedule-date{ flex: 1 1 160px; min-width: 0; }
   .schedule-hour{ width: 72px; flex: 0 0 auto; }
   .schedule-minute{ width: 76px; flex: 0 0 auto; }
   .schedule-ampm{ width: 84px; flex: 0 0 auto; }
+  .schedule-tz{ width: auto; flex: 0 1 auto; min-width: 0; }
 
   /* Custom chevron for all card dropdowns: native arrows sit flush to the edge
      and differ per browser. 14px from the right edge, text never runs under it. */
@@ -1616,7 +1618,7 @@
           <option value="America/Toronto">Eastern Time (Toronto, New York)</option>
           <option value="America/Chicago">Central Time (Chicago)</option>
           <option value="America/Denver">Mountain Time (Denver)</option>
-          <option value="America/Los_Angeles">Pacific Time (Los Angeles)</option>
+          <option value="America/Vancouver">Pacific Time (Vancouver, Los Angeles)</option>
           <option value="Europe/London">UK (London)</option>
           <option value="Europe/Berlin">Central Europe (Berlin, Warsaw)</option>
           <option value="Europe/Kyiv">Eastern Europe (Kyiv)</option>
@@ -2167,27 +2169,27 @@ function nextStepCtaHTML(ns, extraClass){
 // Two short messages built from the card: one to send right after booking, one reminder for the
 // day of the call (2 hours before, with the prep doc). Copy-only for now.
 // Platform next: "Sent / Scheduled" state per message and scheduling via Slack.
-// Time uses the same value as Call details (see the time zone note in the handoff doc).
-function fmtMsgTime(d){
-  const h = d.getHours(), m = d.getMinutes();
-  return `${h % 12 || 12}${m ? ":" + String(m).padStart(2, "0") : ""}${h >= 12 ? "pm" : "am"}`;
+// Times are shown in the call's time zone (Call details), the client's by default.
+function fmtMsgTime(iso, tz){
+  const z = zonedParts(iso, tz);
+  return `${fmtClock(z.h, z.min, true)} ${tzShort(tz)}`;
 }
 function clientMessages(p){
   const status = responses[p.id];
   if (status !== "precall_booked" && status !== "recording_booked") return null;
   const iso = scheduledDates[p.id];
   if (!iso) return { missingDate: true };
-  const d = new Date(iso);
+  const tz = callTz(p.id);
   const kind = status === "precall_booked" ? "pre-call" : "podcast recording";
   const host = (p.host || "").split(" · ")[0] || "the host";
   const client = CLIENT_PROFILE.name.split(" ")[0];
-  const day = d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
-  const when = `${day} at ${fmtMsgTime(d)} ET`;
-  const remindAt = new Date(d.getTime() - 2 * 3600 * 1000);
+  const day = fmtDay(iso, tz, { weekday: "short", month: "short", day: "numeric" });
+  const when = `${day} at ${fmtMsgTime(iso, tz)}`;
+  const remindIso = new Date(new Date(iso).getTime() - 2 * 3600 * 1000).toISOString();
   return {
     booking: `Hey ${client}, booked a ${kind} for you — you'll see it in your calendar:\n\n${when} with ${host} (${p.name})`,
-    reminder: `Hey ${client}! Reminder — today you have the ${kind} with ${host} (${p.name}) at ${fmtMsgTime(d)} ET. Prep doc attached.`,
-    reminderMeta: `Send ${day} at ${fmtMsgTime(remindAt)} ET · attach the prep doc`,
+    reminder: `Hey ${client}! Reminder — today you have the ${kind} with ${host} (${p.name}) at ${fmtMsgTime(iso, tz)}. Prep doc attached.`,
+    reminderMeta: `Send ${fmtDay(remindIso, tz, { weekday: "short", month: "short", day: "numeric" })} at ${fmtMsgTime(remindIso, tz)} · attach the prep doc`,
   };
 }
 function clientMessagesHTML(p){
@@ -2241,32 +2243,78 @@ function fmtDate(iso){
   return d.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
 }
 
-function fmtDateTime(iso){
-  const d = new Date(iso);
-  const datePart = d.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
-  const timePart = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-  return `${datePart}, ${timePart}`;
+// ---------- Time zones ----------
+// Call times are stored as UTC ISO strings and entered / shown in the call's time zone.
+// Default = the client's time zone (CLIENT_PROFILE.timezone); a call can override it in Call details.
+// Prototype storage: per-call override in localStorage "call:tz:<podcast_id>". Platform: call_timezone column.
+const TZ_OPTIONS = [
+  { id: "America/Toronto",   short: "ET",   label: "ET · Toronto, New York" },
+  { id: "America/Chicago",   short: "CT",   label: "CT · Chicago" },
+  { id: "America/Denver",    short: "MT",   label: "MT · Denver" },
+  { id: "America/Vancouver", short: "PT",   label: "PT · Vancouver, Los Angeles" },
+  { id: "Europe/London",     short: "UK",   label: "UK · London" },
+  { id: "Europe/Berlin",     short: "CET",  label: "CET · Berlin, Warsaw" },
+  { id: "Europe/Kyiv",       short: "Kyiv", label: "Kyiv" },
+];
+function tzShort(tz){ const o = TZ_OPTIONS.find(x => x.id === tz); return o ? o.short : tz; }
+function callTz(id){
+  try { return localStorage.getItem(`call:tz:${id}`) || CLIENT_PROFILE.timezone; }
+  catch (err) { return CLIENT_PROFILE.timezone; }
+}
+function setCallTz(id, tz){
+  try {
+    if (tz === CLIENT_PROFILE.timezone) localStorage.removeItem(`call:tz:${id}`);
+    else localStorage.setItem(`call:tz:${id}`, tz);
+  } catch (err) { console.error("Could not save time zone:", err); }
+}
+// Wall-clock parts of an instant in a time zone
+function zonedParts(iso, tz){
+  const f = new Intl.DateTimeFormat("en-US", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
+  const o = {};
+  f.formatToParts(new Date(iso)).forEach(x => { if (x.type !== "literal") o[x.type] = Number(x.value); });
+  return { y: o.year, m: o.month, d: o.day, h: o.hour % 24, min: o.minute };
+}
+// Wall-clock time in a time zone -> UTC ISO (handles DST)
+function zonedToIso(y, m, d, h, min, tz){
+  let guess = Date.UTC(y, m - 1, d, h, min);
+  for (let i = 0; i < 2; i++){
+    const z = zonedParts(new Date(guess).toISOString(), tz);
+    const asUtc = Date.UTC(z.y, z.m - 1, z.d, z.h, z.min);
+    guess -= asUtc - Date.UTC(y, m - 1, d, h, min);
+  }
+  return new Date(guess).toISOString();
+}
+function fmtClock(h, min, compact){
+  const ap = h >= 12 ? (compact ? "pm" : "PM") : (compact ? "am" : "AM");
+  const mm = String(min).padStart(2, "0");
+  return compact ? `${h % 12 || 12}${min ? ":" + mm : ""}${ap}` : `${h % 12 || 12}:${mm} ${ap}`;
+}
+function fmtDay(iso, tz, opts){ return new Date(iso).toLocaleDateString("en-US", { timeZone: tz, ...opts }); }
+
+function fmtDateTime(iso, tz){
+  const z = zonedParts(iso, tz);
+  return `${fmtDay(iso, tz, { day: "numeric", month: "short", year: "numeric" })}, ${fmtClock(z.h, z.min)} ${tzShort(tz)}`;
 }
 
 // Converts an ISO datetime string to the value a <input type="date"> expects
 // ("YYYY-MM-DD"), or "" if none set.
-function isoToDateInputValue(iso){
+function isoToDateInputValue(iso, tz){
   if (!iso) return "";
-  const d = new Date(iso);
+  const z = zonedParts(iso, tz);
   const pad = n => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  return `${z.y}-${pad(z.m)}-${pad(z.d)}`;
 }
 
 // Splits an ISO datetime into 12-hour-clock parts for the hour/minute/AM-PM
 // selects. Defaults to 9:00 AM when nothing is set yet, rather than "now".
-function isoToTimeParts(iso){
+function isoToTimeParts(iso, tz){
   if (!iso) return { hour: 9, minute: "00", ampm: "AM" };
-  const d = new Date(iso);
-  let h = d.getHours();
+  const z = zonedParts(iso, tz);
+  let h = z.h;
   const ampm = h >= 12 ? "PM" : "AM";
   h = h % 12;
   if (h === 0) h = 12;
-  const minute = d.getMinutes() < 30 ? "00" : "30";
+  const minute = z.min < 30 ? "00" : "30";
   return { hour: h, minute, ampm };
 }
 
@@ -2315,7 +2363,7 @@ function render(){
     const showsPrepDoc = resp === "precall_booked" || resp === "recording_booked";
     const prepFile = showsPrepDoc ? readPrepFile(p.id) : null;
     const badgeLabel = statusMeta
-      ? (showsSchedule && scheduledAt ? `${statusMeta.label} · ${fmtDateTime(scheduledAt)}` : statusMeta.label)
+      ? (showsSchedule && scheduledAt ? `${statusMeta.label} · ${fmtDateTime(scheduledAt, callTz(p.id))}` : statusMeta.label)
       : "Not set";
 
     const card = document.createElement("div");
@@ -2402,7 +2450,8 @@ function render(){
           ${showsSchedule ? `<div class="divider"></div>
           <div class="response-header"><span class="response-title">Call details</span></div>` : ""}
           ${showsSchedule ? (() => {
-            const tp = isoToTimeParts(scheduledAt);
+            const tz = callTz(p.id);
+            const tp = isoToTimeParts(scheduledAt, tz);
             const hourOptions = Array.from({length: 12}, (_, i) => i + 1)
               .map(h => `<option value="${h}" ${h === tp.hour ? "selected" : ""}>${h}</option>`).join("");
             const scheduleLabel = resp === "precall_booked" ? "Pre-call date &amp; time" : "Recording date &amp; time";
@@ -2410,7 +2459,7 @@ function render(){
           <div class="schedule-row">
             <label class="schedule-label" for="schedule-date-${p.id}">${scheduleLabel}</label>
             <div class="schedule-fields">
-              <input type="date" id="schedule-date-${p.id}" class="schedule-input schedule-date" data-schedule-part="date" data-schedule-id="${p.id}" value="${isoToDateInputValue(scheduledAt)}" />
+              <input type="date" id="schedule-date-${p.id}" class="schedule-input schedule-date" data-schedule-part="date" data-schedule-id="${p.id}" value="${isoToDateInputValue(scheduledAt, tz)}" />
               <select class="schedule-input schedule-hour" data-schedule-part="hour" data-schedule-id="${p.id}">${hourOptions}</select>
               <span class="schedule-colon">:</span>
               <select class="schedule-input schedule-minute" data-schedule-part="minute" data-schedule-id="${p.id}">
@@ -2420,6 +2469,9 @@ function render(){
               <select class="schedule-input schedule-ampm" data-schedule-part="ampm" data-schedule-id="${p.id}">
                 <option value="AM" ${tp.ampm === "AM" ? "selected" : ""}>AM</option>
                 <option value="PM" ${tp.ampm === "PM" ? "selected" : ""}>PM</option>
+              </select>
+              <select class="schedule-input schedule-tz" data-schedule-part="tz" data-schedule-id="${p.id}" aria-label="Time zone">
+                ${TZ_OPTIONS.map(o => `<option value="${o.id}" ${o.id === tz ? "selected" : ""}>${o.label}${o.id === CLIENT_PROFILE.timezone ? " (client)" : ""}</option>`).join("")}
               </select>
             </div>
           </div>
@@ -2505,6 +2557,10 @@ function render(){
       const hourEl = card.querySelector(`[data-schedule-id="${id}"][data-schedule-part="hour"]`);
       const minuteEl = card.querySelector(`[data-schedule-id="${id}"][data-schedule-part="minute"]`);
       const ampmEl = card.querySelector(`[data-schedule-id="${id}"][data-schedule-part="ampm"]`);
+      const tzEl = card.querySelector(`[data-schedule-id="${id}"][data-schedule-part="tz"]`);
+      // Changing the time zone keeps the wall-clock time ("9:00") and moves the instant.
+      if (tzEl) setCallTz(id, tzEl.value);
+      const tz = callTz(id);
       const dateVal = dateEl.value; // "YYYY-MM-DD"
       if (!dateVal) {
         scheduledDates[id] = null;
@@ -2512,8 +2568,7 @@ function render(){
         let h = parseInt(hourEl.value, 10) % 12;
         if (ampmEl.value === "PM") h += 12;
         const [y, mo, da] = dateVal.split("-").map(Number);
-        const d = new Date(y, mo - 1, da, h, parseInt(minuteEl.value, 10));
-        scheduledDates[id] = d.toISOString();
+        scheduledDates[id] = zonedToIso(y, mo, da, h, parseInt(minuteEl.value, 10), tz);
       }
       render();
       try { await saveRow(id); } catch (err) { console.error("save error", err); }
@@ -2685,10 +2740,11 @@ function renderSidebar(){
 
   const groups = [];
   events.forEach(ev => {
-    const dayKey = new Date(ev.date).toDateString();
+    const tz = callTz(ev.id);
+    const dayKey = isoToDateInputValue(ev.date, tz);
     let group = groups.find(g => g.dayKey === dayKey);
     if (!group) {
-      group = { dayKey, label: new Date(ev.date).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }), items: [] };
+      group = { dayKey, label: fmtDay(ev.date, tz, { weekday: "short", month: "short", day: "numeric" }), items: [] };
       groups.push(group);
     }
     group.items.push(ev);
@@ -2700,7 +2756,7 @@ function renderSidebar(){
       ${g.items.map(ev => `
         <button type="button" class="sidebar-event cls-${ev.cls}" data-jump-id="${ev.id}">
           <div class="sidebar-event-title">${ev.name}</div>
-          <div class="sidebar-event-meta">${ev.label} · ${new Date(ev.date).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}</div>
+          <div class="sidebar-event-meta">${ev.label} · ${(z => fmtClock(z.h, z.min))(zonedParts(ev.date, callTz(ev.id)))} ${tzShort(callTz(ev.id))}</div>
           ${ev.showsDetails ? `<div class="sidebar-event-details ${ev.detailsSent ? "sent" : "not-sent"}">${ev.detailsSent ? "✓ Details sent" : "Details not sent yet"}</div>` : ""}
         </button>
       `).join("")}
@@ -2771,7 +2827,7 @@ function renderPodPanel(bodyHTML){
   const badgeCls = statusMeta ? statusMeta.cls : "skip";
   const scheduledAt = scheduledDates[p.id] || null;
   const showsSchedule = resp === "recording_booked" || resp === "episode_recorded" || resp === "precall_booked";
-  const badgeLabel = statusMeta ? (showsSchedule && scheduledAt ? `${statusMeta.label} · ${fmtDateTime(scheduledAt)}` : statusMeta.label) : "Not set";
+  const badgeLabel = statusMeta ? (showsSchedule && scheduledAt ? `${statusMeta.label} · ${fmtDateTime(scheduledAt, callTz(p.id))}` : statusMeta.label) : "Not set";
   const hist = statusHistory[p.id] || [];
   const updated = aiSuggestedStatus.has(p.id) ? "Status suggested by AI"
     : (hist.length ? `Updated ${relTime(hist[hist.length - 1].changed_at)}` : "");
@@ -2950,13 +3006,13 @@ function writePrepForm(id, data){
   catch (err) { console.error("Could not save prep doc form:", err); }
 }
 
-function prepTimeParts(iso){
+function prepTimeParts(iso, tz){
   if (!iso) return { hour: 9, minute: "00", ampm: "AM" };
-  const d = new Date(iso);
-  let h = d.getHours();
+  const z = zonedParts(iso, tz);
+  let h = z.h;
   const ampm = h >= 12 ? "PM" : "AM";
   h = h % 12 || 12;
-  const m = d.getMinutes();
+  const m = z.min;
   const minute = m < 8 ? "00" : m < 23 ? "15" : m < 38 ? "30" : m < 53 ? "45" : "00";
   return { hour: h, minute, ampm };
 }
@@ -2976,17 +3032,19 @@ function openPrepDocModal(id, trigger, opts = {}){
   badge.textContent = isPrecall ? "Pre-call" : "Recording";
   badge.className = "call-type-badge prebooked"; // both call types share the "Booked" blue
 
-  // Date & time: saved form wins, otherwise prefill from the card's scheduled date.
   const iso = scheduledDates[id];
-  const tp = prepTimeParts(iso);
+  const tz = callTz(id);
+  const tp = prepTimeParts(iso, tz);
   const hourSel = document.getElementById("prepHour");
   hourSel.innerHTML = Array.from({ length: 12 }, (_, i) => i + 1).map(h => `<option value="${h}">${h}</option>`).join("");
-  document.getElementById("prepDate").value = saved?.date ?? isoToDateInputValue(iso);
-  hourSel.value = String(saved?.hour ?? tp.hour);
-  document.getElementById("prepMinute").value = saved?.minute ?? tp.minute;
-  document.getElementById("prepAmPm").value = saved?.ampm ?? tp.ampm;
+  // Date, time and zone always follow the card's Call details (the doc must match the calendar);
+  // only duration, link and notes come from the saved form.
+  document.getElementById("prepDate").value = isoToDateInputValue(iso, tz) || saved?.date || "";
+  hourSel.value = String(iso ? tp.hour : (saved?.hour ?? tp.hour));
+  document.getElementById("prepMinute").value = iso ? tp.minute : (saved?.minute ?? tp.minute);
+  document.getElementById("prepAmPm").value = iso ? tp.ampm : (saved?.ampm ?? tp.ampm);
   document.getElementById("prepDuration").value = saved?.duration ?? (PREP_DEFAULT_DURATION[status] || "30");
-  document.getElementById("prepTimezone").value = saved?.timezone ?? "America/Toronto";
+  document.getElementById("prepTimezone").value = iso ? tz : (saved?.timezone ?? tz);
   document.getElementById("prepLink").value = saved?.link ?? "";
   document.getElementById("prepClientNotes").value = saved?.clientNotes ?? "";
   clearPrepErrors();
@@ -3110,6 +3168,8 @@ const CLIENT_PROFILE = {
   name: "Cahill Camden",
   headline: "two 8-figure exits ($52M+ combined) as CMO and Operations Advisor",
   product: "Novacast.ai",
+  // Default time zone for all of this client's calls. Cahill is moving to Vancouver → "America/Vancouver".
+  timezone: "America/Toronto",
 };
 
 const TZ_LABELS = {
@@ -3117,6 +3177,7 @@ const TZ_LABELS = {
   "America/Chicago": "CT (Chicago time)",
   "America/Denver": "MT (Denver time)",
   "America/Los_Angeles": "PT (Los Angeles time)",
+  "America/Vancouver": "PT (Vancouver time)",
   "Europe/London": "UK time",
   "Europe/Berlin": "CET (Berlin time)",
   "Europe/Kyiv": "Kyiv time",
