@@ -1020,6 +1020,20 @@
   }
   .next-step-link{ display: flex; flex-direction: column; gap: 6px; margin-top: 16px; max-width: 560px; }
   .next-step .next-step-cta{ margin-top: 16px; }
+  /* Options the host offered (time slots etc.) — extracted from the thread by AI on the platform */
+  .next-step-options{ margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+  .next-step-options-title{ margin: 0; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; line-height: 21px; color: var(--heading); }
+  .next-step-options-list{ margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+  .next-step-options-list li{
+    padding: 4px 10px;
+    border: 1px solid #e0e2e7;
+    border-radius: 8px;
+    background: #ffffff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    line-height: 20px;
+    color: var(--body);
+  }
   .next-step-cta-top{ margin-top: 0; white-space: nowrap; }
   .next-step-cta-inline{ display: none; }
   @media (max-width: 1100px){ .pod-panel-meta{ display: none; } }
@@ -2019,7 +2033,15 @@ const PODCASTS = [
       { label: "Who's coordinating on their end", text: "Connor Rafferty (Guardian Owl Digital). He replied from his own address, not team@guardianowldigital.com, so his email is not in the Novacast thread — reply to him directly." }
     ],
     action: "Connor offered October recording slots (EST, about 30 minutes). Pick one and reply to Connor directly — his email didn't reach the Novacast thread.",
-    link: { action: "reply", label: "Reply to host" }
+    link: { action: "reply", label: "Reply to host" },
+    suggestedStatus: "host_replied_need_response",
+    hostOptions: {
+      title: "Times Connor offered (EST)",
+      items: ["Mon Oct 5, 12:30–1:30 PM", "Tue Oct 6, before noon", "Mon Oct 12, afternoon (until 3 PM)", "Tue Oct 13, before noon",
+              "Mon Oct 19, afternoon (until 3 PM)", "Tue Oct 20, before 11 AM", "Thu Oct 22, before noon",
+              "Mon Oct 26, afternoon (until 3 PM)", "Tue Oct 27, before noon", "Thu Oct 29, before 11 AM"],
+      note: "Recordings typically last 30 minutes."
+    }
   },
   {
     id: "exit-algorithms",
@@ -2034,7 +2056,9 @@ const PODCASTS = [
       { label: "What Pete said back", text: "\"I agree, glad you found me! Please find a time that works for you here: <a href=\"https://calendar.app.google/sNRu7Z6EfF9n6Fqb9\" target=\"_blank\">calendar.app.google/sNRu7Z6EfF9n6Fqb9</a>\"" }
     ],
     action: "Pete agreed and shared his podcast booking link. Pick a time on his calendar.",
-    link: { url: "https://calendar.app.google/sNRu7Z6EfF9n6Fqb9", label: "Book a time with Pete" }
+    link: { url: "https://calendar.app.google/sNRu7Z6EfF9n6Fqb9", label: "Book a time with Pete" },
+    // Pete's signature calls it a "Podcast booking link" and there's no screening step mentioned → recording.
+    suggestedStatus: "need_recording"
   }
 ];
 
@@ -2047,6 +2071,7 @@ const STATUS_OPTIONS = [
   { value: "need_form", label: "Need to fill out form", cls: "action" },
   { value: "form_filled", label: "Form filled out", cls: "precall" },
   { value: "need_precall", label: "Need to book pre-call", cls: "action" },
+  { value: "need_recording", label: "Need to book recording", cls: "action" },
   { value: "precall_booked", label: "Pre-call booked", cls: "prebooked" },
   { value: "recording_booked", label: "Recording booked", cls: "done" },
   { value: "episode_recorded", label: "Episode recorded", cls: "done" }
@@ -2058,7 +2083,7 @@ const BOX_CLASS_BY_CLS = { done: "info-box", action: "action-box", precall: "pre
 // book), 1 = in process (waiting on someone), 2 = pre-call booked, 3 = done.
 // Unset status defaults to tier 0 since it also needs a first action.
 const STATUS_PRIORITY = {
-  need_form: 0, need_precall: 0,
+  need_form: 0, need_precall: 0, need_recording: 0,
   waiting_reply: 1, replied_to_host: 1, host_replied_need_response: 1, form_filled: 1,
   precall_booked: 2,
   recording_booked: 3,
@@ -2094,8 +2119,13 @@ function accordionHTML(podcastId, key, title, innerHTML, openByDefault){
 // another address, so it never reaches the thread. Prototype storage: localStorage
 // "nextstep:link:<podcast_id>". Platform: a next_step_url column on the pipeline item.
 const NEXT_STEP_EDITABLE = {
-  need_precall: { field: "Booking link", fallbackLabel: "Book pre-call", placeholder: "https://calendly.com/..." },
-  need_form:    { field: "Form link",    fallbackLabel: "Fill out form", placeholder: "https://docs.google.com/forms/..." },
+  need_precall:   { field: "Booking link", fallbackLabel: "Book pre-call",  placeholder: "https://calendly.com/..." },
+  need_recording: { field: "Booking link", fallbackLabel: "Book recording", placeholder: "https://calendar.app.google/..." },
+  need_form:      { field: "Form link",    fallbackLabel: "Fill out form",  placeholder: "https://docs.google.com/forms/..." },
+  // Episode recorded: a place to keep the published episode link. Never falls back to the
+  // conversation link (that would be the booking/recording room, not the episode).
+  episode_recorded: { field: "Episode link", fallbackLabel: "Open episode", placeholder: "https://open.spotify.com/episode/...", ownLinkOnly: true,
+                      emptyHint: "Save the episode link here once it's published." },
 };
 function readNextStepLink(id){
   try { const raw = localStorage.getItem(`nextstep:link:${id}`); return raw ? JSON.parse(raw).url || "" : ""; }
@@ -2116,8 +2146,10 @@ function nextStepFor(p){
   }
   const editable = NEXT_STEP_EDITABLE[status] || null;
   const custom = editable ? readNextStepLink(p.id) : "";
-  const url = custom || (p.link ? p.link.url : "");
-  const label = (p.link && p.link.label) || (editable ? editable.fallbackLabel : "Open link");
+  const convUrl = (editable && editable.ownLinkOnly) ? "" : (p.link && p.link.url ? p.link.url : "");
+  const url = custom || convUrl;
+  const label = (editable && editable.ownLinkOnly) ? editable.fallbackLabel
+    : ((p.link && p.link.label) || (editable ? editable.fallbackLabel : "Open link"));
   return { url, label, editable, custom: !!custom };
 }
 function nextStepCtaHTML(ns, extraClass){
@@ -2176,6 +2208,7 @@ function isoToTimeParts(iso){
 }
 
 let podPanelId = null; // podcast currently shown in the side panel
+const aiSuggestedStatus = new Set(); // podcasts whose current status was suggested by AI, not set by a person
 let activeFilter = "all"; // "all" | "episode_recorded" | "recording_booked" | "waiting" | "action"
 
 // Shared classification used by both the status chips and the list filter,
@@ -2275,13 +2308,21 @@ function render(){
           <section class="${boxClass} next-step" aria-labelledby="nextStepTitle">
             <div class="field-label" id="nextStepTitle">Next step</div>
             <div class="field-text">${p.action}</div>
+            ${p.hostOptions ? `
+            <div class="next-step-options">
+              <p class="next-step-options-title">${escHTML(p.hostOptions.title)}</p>
+              <ul class="next-step-options-list">
+                ${p.hostOptions.items.map(o => `<li>${escHTML(o)}</li>`).join("")}
+              </ul>
+              ${p.hostOptions.note ? `<p class="form-hint">${escHTML(p.hostOptions.note)}</p>` : ""}
+            </div>` : ""}
             ${ns.editable ? `
             <div class="next-step-link">
               <label class="form-label" for="nextStepLink-${p.id}">${ns.editable.field}</label>
               <div class="next-step-link-row">
                 <input type="url" class="prep-input" id="nextStepLink-${p.id}" data-next-link-id="${p.id}" value="${escHTML(ns.url)}" placeholder="${ns.editable.placeholder}" inputmode="url" />
               </div>
-              <p class="form-hint" data-next-link-hint="${p.id}">${ns.custom ? "Added manually." : (ns.url ? "Taken from the conversation. Paste a new one if the host sent it from another address." : "No link in the conversation yet. Paste it here to enable the button.")}</p>
+              <p class="form-hint" data-next-link-hint="${p.id}">${ns.custom ? (ns.editable.ownLinkOnly ? "Saved." : "Added manually.") : (ns.url ? "Taken from the conversation. Paste a new one if the host sent it from another address." : (ns.editable.emptyHint || "No link in the conversation yet. Paste it here to enable the button."))}</p>
               <p class="form-error" data-next-link-error="${p.id}"></p>
             </div>` : ""}
             ${nextStepCtaHTML(ns, "next-step-cta-inline")}
@@ -2343,6 +2384,7 @@ function render(){
       const id = el.dataset.statusId;
       const val = el.value || null;
       responses[id] = val;
+      aiSuggestedStatus.delete(id); // a person confirmed or changed it
       if (val) {
         if (!statusHistory[id]) statusHistory[id] = [];
         statusHistory[id].push({ status: val, changed_at: new Date().toISOString() });
@@ -2630,7 +2672,8 @@ function renderPodPanel(bodyHTML){
   const showsSchedule = resp === "recording_booked" || resp === "episode_recorded" || resp === "precall_booked";
   const badgeLabel = statusMeta ? (showsSchedule && scheduledAt ? `${statusMeta.label} · ${fmtDateTime(scheduledAt)}` : statusMeta.label) : "Not set";
   const hist = statusHistory[p.id] || [];
-  const updated = hist.length ? `Updated ${relTime(hist[hist.length - 1].changed_at)}` : "";
+  const updated = aiSuggestedStatus.has(p.id) ? "Status suggested by AI"
+    : (hist.length ? `Updated ${relTime(hist[hist.length - 1].changed_at)}` : "");
   const [hostName, ...hostRest] = (p.host || "").split(" · ");
   const menuOpen = !document.getElementById("podMenuList")?.hidden && document.getElementById("podMenuList") !== null;
 
@@ -3443,6 +3486,11 @@ async function loadResponses(){
       deletedFlags[row.podcast_id] = !!row.deleted;
       scheduledDates[row.podcast_id] = row.scheduled_at || null;
       detailsSent[row.podcast_id] = !!row.details_sent;
+    });
+    // Status suggested by AI from the thread (prototype: `suggestedStatus` in the data). Applied only
+    // when there is no saved status yet; it is saved to the DB the first time someone changes it.
+    PODCASTS.forEach(p => {
+      if (p.suggestedStatus && !responses[p.id]){ responses[p.id] = p.suggestedStatus; aiSuggestedStatus.add(p.id); }
     });
     const historyRows = await fetchAllHistory();
     historyRows.forEach(row => {
