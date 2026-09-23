@@ -4,9 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Novacast — Podcast Pipeline (Cahill)</title>
+<meta name="description" content="Novacast Podcast Pipeline: track podcast bookings from host reply to published episode — status, call details, prep docs and next steps.">
+<!-- Internal tool with private client data: keep it out of search engines.
+     OG / Twitter preview tags are intentionally omitted (the page must not be shared publicly). -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#5068d4">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap">
+<!-- Analytics (GA4 / Meta Pixel) intentionally not added: internal tool. -->
 <link rel="icon" type="image/jpeg" href="data:image/jpeg;base64,/9j/4AAQSkZJRgABAgEAkACQAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/2wBDAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wAARCAGEAYQDAREAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD+/igAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKACgAoAKAPjj4mf8FBf2MvhDr994W8e/tA+CdO8Q6ZcNZ6ppGjjW/GN7pd5GcS2Wpx+DNJ8Qf2feQN8lxaXhhuLdwY5oo3UqP0/IfBfxS4mwdLMMn4MzWvgsRBVcPicU8JldLEUpfDVoSzXE4L21Ka1hUpc8JrWEmnc8PF8S5FgasqOJzLDxqwfLOEPaV5Qkt4zVCFXlkusZWaejR5r/wAPYP8Agn3/ANHEab/4QPxY/wDmDr3v+JcvGf8A6Imv/wCHnhz/AOfByf65cNf9DOH/AITY3/5mD/h7B/wT7/6OI03/AMIH4sf/ADB0f8S5eM//AERNf/w88Of/AD4D/XLhr/oZw/8ACbG//Mwf8PYP+Cff/RxGm/8AhA/Fj/5g6P8AiXLxn/6Imv8A+Hnhz/58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eLa2ae+zT6nwTi4u0k0+zTT/ABK9WIKACgAoAciPI6Rxo0kkjKkcaKXd3chVRFUFmZmICqASSQAM0NqKcpNJJNtt2SS1bbeiSWrb2DfRatn6/f8ABNf/AIJvfFD45fFTwf8AFP4oeDtY8G/AzwPrmmeJ7ufxVpl5pNz8SL3R7uK+0/wz4c0+9S2vL7Rby8giTxBryImmRacl7p9neS6tIsUH8z+O3jnw/wAJcO5nw9w/meFzTi7N8JXwFOGXYiliYZFSxVOVGtj8dXpOpSo4qlSnJ4LBtvESrulWq0o4aLlP7bhXhbGZhjKGMxlCdDL8PUhVk60JQeKlBqUaVKMrSlTlJL2tS3Ioc0Yyc3Zf2H1/mOfuAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAUAFABQAD/2Q==">
+<!-- Platform: replace the inline favicon with /favicon.ico + /apple-touch-icon.png (180×180). -->
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
 
   :root{
     --bg: #ffffff;
@@ -103,6 +112,14 @@
     width: 100%;
     background: transparent;
     padding: 0;
+  }
+  /* Visually hidden, still read by screen readers and parsers */
+  .sr-only{
+    position: absolute !important;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0);
+    white-space: nowrap; border: 0;
   }
   .shell-search input::placeholder{ color: var(--ink-dim); }
   .shell-actions{ display: flex; align-items: center; gap: 8px; }
@@ -341,7 +358,6 @@
     letter-spacing: -0.01em;
     color: var(--heading);
   }
-  .sub{ color: var(--ink-dim); font-size: 15px; line-height: 1.5; max-width: none; font-weight: 400; }
 
   .status-chip-row{
     display:flex;
@@ -386,7 +402,7 @@
     .status-chip-row{ column-gap: 8px; row-gap: 4px; }
   }
   .status-chip.chip-done{ color: #0c8f21; }
-  .status-chip.chip-recording-booked{ color: #007aff; }
+  .status-chip.chip-booked{ color: var(--status-prebooked-fg); }
   .status-chip.chip-action{ color: #9e610c; }
   .status-chip.chip-precall{ color: #5068d4; }
   .status-chip .dot{
@@ -480,7 +496,6 @@
   .badge.prebooked{ background: var(--status-prebooked-bg); color: var(--status-prebooked-fg); }
   .badge.skip{ background: #f1f1f5; color: #676d77; }
 
-  .card-body{ padding: 0 24px 24px; border-top: none; }
   .card-body-inner{ padding-top: 20px; }
 
   .field{ margin-bottom: 28px; }
@@ -634,19 +649,6 @@
   .btn-small{ }
   .btn:disabled{ opacity: 0.4; cursor: not-allowed; pointer-events: none; }
 
-  .step-list{ display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
-  .step-list-item{ display: flex; align-items: center; gap: 12px; }
-  .step-list-num{
-    flex: 0 0 auto;
-    width: 22px; height: 22px;
-    border-radius: 50%;
-    border: 1.5px solid var(--status-action-fg);
-    color: var(--status-action-fg);
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    font-size: 12px;
-    display: flex; align-items: center; justify-content: center;
-  }
 
   .divider{ height: 1px; background: var(--panel-border); margin: 24px 0 20px; }
 
@@ -679,31 +681,6 @@
   }
   .clear-response:hover{ color: var(--amber); }
 
-  .response-row{ display:flex; gap:10px; flex-wrap:wrap; }
-  .choice{
-    flex: 1;
-    min-width: 140px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 11px 14px;
-    border-radius: 9px;
-    border: 1.5px solid var(--panel-border);
-    background: #ffffff;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 400;
-    font-size: 13.5px;
-    color: var(--ink-dim);
-    transition: all .15s ease;
-    user-select: none;
-  }
-  .choice:hover{ border-color: var(--amber); }
-  .active-done{ background: var(--status-done-bg); border-color: var(--status-done-fg); color: var(--status-done-fg); }
-  .active-action{ background: var(--status-action-bg); border-color: var(--status-action-fg); color: var(--status-action-fg); }
-  .active-precall{ background: var(--status-precall-bg); border-color: var(--status-precall-fg); color: var(--status-precall-fg); }
-  .active-skip{ background: #f1f1f5; border-color: #8a8d9c; color: #5b5f72; }
 
   .notes-block{ margin-top: 16px; }
   .notes-textarea{
@@ -1020,6 +997,10 @@
   }
   .next-step-link{ display: flex; flex-direction: column; gap: 6px; margin-top: 16px; max-width: 560px; }
   .next-step .next-step-cta{ margin-top: 16px; }
+  .call-cancel-row{ display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+  .prep-link-btn.call-cancel-btn{ color: var(--danger); }
+  .prep-link-btn.call-cancel-btn:hover{ background: #fdecec; }
+
   /* Client messages */
   .client-msgs{ display: flex; flex-direction: column; gap: 12px; }
   .client-msg{ border: 1px solid #e0e2e7; border-radius: 12px; padding: 12px 16px; background: #ffffff; }
@@ -1287,7 +1268,7 @@
   .modal[data-mode="preview"]{ max-width: 760px; }
   .modal-footer-split{ justify-content: space-between; }
 
-  /* Step 3: generating state (matches the outreach loading pattern) */
+  /* Prep doc — generating state (matches the outreach loading pattern) */
   .prep-loading{
     display: flex;
     flex-direction: column;
@@ -1318,7 +1299,7 @@
     .prep-progress-fill{ transition: none; }
   }
 
-  /* Step 4: preview & edit */
+  /* Prep doc — preview & edit */
   .modal-body[data-view="preview"]{ background: #f7f7f8; }
   .prep-preview-hint{ margin: 0; font-family: 'DM Sans', sans-serif; font-size: 13px; line-height: 20px; color: var(--body); }
   .src-tag{
@@ -1399,7 +1380,7 @@
     .modal-footer .btn{ flex: 1 1 0; justify-content: center; }
   }
 
-  /* Step 5: saved prep doc in the card */
+  /* Prep doc — saved file row in the card */
   .prep-file{
     border: 1px solid #d3d9f6;
     border-radius: 12px;
@@ -1478,12 +1459,6 @@
     .prep-file-actions .btn{ order: -1; flex: 1 1 100%; justify-content: center; }
   }
 
-  .delete-row{
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 24px;
-  }
-  .delete-btn{ margin-top: 0; }
 
   .timeline{ margin-top: 4px; }
   .timeline-item{
@@ -1534,6 +1509,7 @@
 </head>
 <body>
 
+<h1 class="sr-only">Podcast Pipeline</h1>
 <div class="shell">
   <div class="shell-topbar">
     <div class="shell-tabs">
@@ -1559,7 +1535,7 @@
     <div class="status-chip-row">
       <button type="button" class="status-chip chip-all active" data-filter="all"><span id="statusChipAll"></span></button>
       <button type="button" class="status-chip chip-done" data-filter="episode_recorded"><span class="dot"></span><span id="statusChipRecorded"></span></button>
-      <button type="button" class="status-chip chip-recording-booked" data-filter="recording_booked"><span class="dot"></span><span id="statusChipBooked"></span></button>
+      <button type="button" class="status-chip chip-booked" data-filter="booked"><span class="dot"></span><span id="statusChipBooked"></span></button>
       <button type="button" class="status-chip chip-precall" data-filter="waiting"><span class="dot"></span><span id="statusChipPrecall"></span></button>
       <button type="button" class="status-chip chip-action" data-filter="action"><span class="dot"></span><span id="statusChipPending"></span></button>
     </div>
@@ -1567,7 +1543,7 @@
 
   <div class="list" id="list"></div>
 
-  <footer>Maintained by Novacast · Last updated August 28, 2026</footer>
+  <footer>Maintained by Novacast · Last updated September 23, 2026</footer>
 </div>
 
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -1581,7 +1557,7 @@
 
 
 
-<!-- Prep doc modal (step 2: form). Steps 3-5 add loading, preview/edit, and saved PDF. -->
+<!-- Prep doc modal: form → generating → preview & edit (views switch via data-mode) -->
 
 <!-- Podcast side panel (same pattern as the Kanban podcast canvas) -->
 <div class="pod-panel-overlay" id="podPanelOverlay"></div>
@@ -1659,7 +1635,7 @@
         <p class="form-hint">Goes into the PDF as is. Internal team notes are not included.</p>
       </div>
     </div>
-    <!-- Step 3: generating -->
+    <!-- View: generating -->
     <div class="modal-body" data-view="loading">
       <div class="prep-loading" role="status" aria-live="polite">
         <div class="prep-loading-icon" aria-hidden="true">
@@ -1671,7 +1647,7 @@
         <p class="prep-loading-sub">Preparing your prep doc. This won't take long.</p>
       </div>
     </div>
-    <!-- Step 4: preview & edit -->
+    <!-- View: preview & edit -->
     <div class="modal-body" data-view="preview">
       <p class="prep-preview-hint">Check the draft before saving. Blocks marked <span class="src-tag src-ai">AI draft</span> and your notes can be edited. Details <span class="src-tag src-system">From pipeline</span> come from the podcast card, <span class="src-tag src-conversation">From conversation</span> from the outreach thread.</p>
       <article class="prep-doc" id="prepDocPreview"></article>
@@ -1693,16 +1669,36 @@
   </div>
 </div>
 <script>
+/* =====================================================================
+   Podcast Pipeline — prototype (behaviour + UI reference, not production code)
+   Handoff notes: "Podcast Pipeline — Developer Handoff Notes" (Claude Doc).
+
+   File map
+   1. Config & state ............ Supabase, in-memory stores
+   2. Persistence ............... saveRow / saveResponse / notes (Supabase)
+   3. Data ...................... PODCASTS (prototype data; platform: DB + thread + AI)
+   4. Statuses .................. STATUS_OPTIONS, priority, chip groups
+   5. Next step & messages ...... CTA, editable links, client messages
+   6. Render .................... list, panel body, event binding
+   7. Sidebar calendar .......... "Upcoming"
+   8. Side panel ................ open/close, header, menu, accordions
+   9. Prep doc .................. modal, generating, preview, saved file, PDF
+   10. Mobile & boot ............ drawer, tabs, loadResponses()
+
+   Search for "Platform:" for places that need a real backend,
+   and "Prototype storage:" for localStorage stand-ins.
+   ===================================================================== */
+
+// ---------- 1. Config & state ----------
 const SUPABASE_URL = "https://huogkifyzaybppnhzayc.supabase.co";
 const SUPABASE_KEY = "sb_publishable_IR37FVvE-vcguWs9RgATuw_WkvpUSu3";
-const FORMSPREE_ENDPOINT = "https://formspree.io/f/myegvkqd";
 
 const responses = {};      // podcast_id -> current status value
 const notesText = {};      // podcast_id -> notes string
 const deletedFlags = {};   // podcast_id -> boolean (removed from the list)
 const statusHistory = {};  // podcast_id -> [{status, changed_at}, ...]
 const scheduledDates = {}; // podcast_id -> ISO datetime string or null (recording date/time)
-const detailsSent = {};    // podcast_id -> boolean (Slack reminder w/ call details sent to client)
+const detailsSent = {};    // podcast_id -> boolean: call details / prep doc sent (any channel: Slack, email, to self)
 
 async function fetchAllRows(){
   const res = await fetch(`${SUPABASE_URL}/rest/v1/cahill_podcast_responses?select=podcast_id,response,notes,deleted,scheduled_at,details_sent`, {
@@ -1720,32 +1716,9 @@ async function fetchAllHistory(){
   return res.json();
 }
 
-function describeResponseValue(value){
-  if (!value) return "(not set)";
-  const opt = STATUS_OPTIONS.find(o => o.value === value);
-  return opt ? opt.label : value;
-}
-
-async function notifyByEmail(podcastId, subjectSuffix, updateText){
-  const podcast = PODCASTS.find(p => p.id === podcastId);
-  const podcastName = podcast ? podcast.name : podcastId;
-  try {
-    await fetch(FORMSPREE_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify({
-        _subject: `Podcast pipeline ${subjectSuffix}: ${podcastName}`,
-        podcast: podcastName,
-        update: updateText
-      })
-    });
-  } catch (e) {
-    console.error("email notify failed", e);
-  }
-}
-
 // Always writes the full known row (response + notes + deleted + scheduled_at) so a
 // partial update never silently wipes out another field via Supabase's upsert behavior.
+// ---------- 2. Persistence ----------
 async function saveRow(id){
   const response = responses[id] ?? null;
   const notes = notesText[id] ?? null;
@@ -1780,20 +1753,19 @@ async function saveResponse(id, value){
   responses[id] = value;
   await saveRow(id);
   if (value) await logStatusChange(id, value);
-  notifyByEmail(id, "status update", describeResponseValue(value));
 }
 
 async function saveNotes(id, text){
   const trimmed = (text || "").trim();
   notesText[id] = trimmed || null;
   await saveRow(id);
-  notifyByEmail(id, trimmed ? "note updated" : "note cleared", trimmed || "(note cleared)");
 }
 
 // Each podcast's current status lives in Supabase (see STATUS_OPTIONS below);
 // this array only holds the static reference info shown in the card.
 const COVER_IMG = "data:image/jpeg;base64,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";
 
+// ---------- 3. Data ----------
 const PODCASTS = [
   {
     id: "marketing-in-progress",
@@ -1802,11 +1774,11 @@ const PODCASTS = [
     niche: "Marketing & growth leaders — CMO/operator scaling stories",
     fields: [
       { label: "Timeline", text: "✓ We pitched Gayle directly&nbsp;&nbsp;→&nbsp;&nbsp;✓ Creo Collective confirmed they want to move forward&nbsp;&nbsp;→&nbsp;&nbsp;✓ Producer Patrice reached out&nbsp;&nbsp;→&nbsp;&nbsp;✓ Recording booked" },
-      { label: "Recording", text: "Thursday, Sep 10, 2:00–2:45 PM with Gayle. Recorded remotely via Riverside: <a href=\"https://riverside.com/studio/creo-collective\" target=\"_blank\">riverside.com/studio/creo-collective</a>" },
-      { label: "Podcast", text: "<a href=\"https://open.spotify.com/show/3nGz1edwVDc4h4a4631hiw\" target=\"_blank\">Spotify</a>" },
+      { label: "Recording", text: "Thursday, Sep 10, 2:00–2:45 PM with Gayle. Recorded remotely via Riverside: <a href=\"https://riverside.com/studio/creo-collective\" target=\"_blank\" rel=\"noopener noreferrer\">riverside.com/studio/creo-collective</a>" },
+      { label: "Podcast", text: "<a href=\"https://open.spotify.com/show/3nGz1edwVDc4h4a4631hiw\" target=\"_blank\" rel=\"noopener noreferrer\">Spotify</a>" },
       { label: "What we pitched Gayle", text: "\"Wanted to see if you're open to guests on Marketing in Progress? There are a number of actionable takeaways your audience would get from my experience scaling two companies to 8-figure exits ($38M and $14M acquisitions) as CMO and Operations Advisor. I've also spent the last few years building Novacast.ai.\"" },
       { label: "What Creo Collective said", text: "\"Thanks so much for reaching out and for your interest in being a guest on the Marketing in Progress podcast! We'd love to move forward and make an episode happen.\" They flagged that producer Patrice Punzalan would follow up with scheduling — which she then did." },
-      { label: "About the host", text: "Gayle Kalvert — Founder & CEO of Creo Collective, a full-service B2B tech marketing agency. 25+ years in B2B marketing and alliances, previously at Qlik and Deloitte. <a href=\"https://www.linkedin.com/in/gaylekalvert/\" target=\"_blank\">LinkedIn</a>" },
+      { label: "About the host", text: "Gayle Kalvert — Founder & CEO of Creo Collective, a full-service B2B tech marketing agency. 25+ years in B2B marketing and alliances, previously at Qlik and Deloitte. <a href=\"https://www.linkedin.com/in/gaylekalvert/\" target=\"_blank\" rel=\"noopener noreferrer\">LinkedIn</a>" },
       { label: "About the show", text: "Marketing in Progress is a spinoff of Work in Progress that digs into what's moving the needle in B2B — marketing leaders, sales leaders, and agency owners sharing real stories and no-filter perspectives." },
       { label: "Who's coordinating on their end", text: "Patrice Punzalan, Podcast Producer at Creo Collective." },
       { label: "Why you're a fit", text: "In 8 years you scaled two tech companies to 8-figure exits ($52M+), including a $38M and a $14M acquisition, as CMO and Operations Advisor — and now you're building Novacast.ai, the first podcast-booking AI agent. That's a concrete growth-and-AI story that fits Gayle's marketing-leader audience well." }
@@ -1820,8 +1792,8 @@ const PODCASTS = [
     host: "Nancy Nash & Spencer Walker-Fooks",
     niche: "Entrepreneurship — unfiltered founder stories",
     fields: [
-      { label: "Podcast", text: "<a href=\"https://foundersvoyage.org/\" target=\"_blank\">foundersvoyage.org</a> · <a href=\"https://podcasts.apple.com/us/podcast/founders-voyage/id1522860490\" target=\"_blank\">Apple Podcasts</a>" },
-      { label: "About the hosts", text: "Nancy Nash and Spencer Walker-Fooks. Spencer is a robotics engineer (currently Senior R&D Robotic Systems Engineer at Machnet Medical Robotics) and serial founder who co-created Founder's Voyage as an entrepreneurial community. <a href=\"https://uk.linkedin.com/in/spencer-walker-fooks\" target=\"_blank\">Spencer's LinkedIn</a>" },
+      { label: "Podcast", text: "<a href=\"https://foundersvoyage.org/\" target=\"_blank\" rel=\"noopener noreferrer\">foundersvoyage.org</a> · <a href=\"https://podcasts.apple.com/us/podcast/founders-voyage/id1522860490\" target=\"_blank\" rel=\"noopener noreferrer\">Apple Podcasts</a>" },
+      { label: "About the hosts", text: "Nancy Nash and Spencer Walker-Fooks. Spencer is a robotics engineer (currently Senior R&D Robotic Systems Engineer at Machnet Medical Robotics) and serial founder who co-created Founder's Voyage as an entrepreneurial community. <a href=\"https://uk.linkedin.com/in/spencer-walker-fooks\" target=\"_blank\" rel=\"noopener noreferrer\">Spencer's LinkedIn</a>" },
       { label: "About the show", text: "A weekly entrepreneurship podcast for \"the ones building in the dark, the ones failing forward, and the ones figuring it out as they go.\" Unfiltered conversations with founders about the highs and lows of building a company. Active since 2020, 150+ episodes." },
       { label: "How this got booked", text: "We had a pre-call with Nancy and Spencer. They confirmed availability for the week of Aug 17–21 (1pm–5pm UK time / 8am–12pm ET), and a specific slot was floated for Wed, Aug 19 — but after the call, the recording was actually locked in for February instead. The August 19 date/Google Meet link that came up earlier is no longer current." },
       { label: "Recording date", text: "February (exact date/time to be confirmed closer to the month — we'll update this card once it's locked)." },
@@ -1835,10 +1807,10 @@ const PODCASTS = [
     host: "Chad Burmeister",
     niche: "B2B sales & AI in sales — paid guest spot",
     fields: [
-      { label: "Podcast", text: "<a href=\"https://www.theaiforsalespodcast.com\" target=\"_blank\">theaiforsalespodcast.com</a>" },
+      { label: "Podcast", text: "<a href=\"https://www.theaiforsalespodcast.com\" target=\"_blank\" rel=\"noopener noreferrer\">theaiforsalespodcast.com</a>" },
       { label: "Cost", text: "$99 for a paid guest spot." },
       { label: "Audience", text: "30,000+ LinkedIn followers, 4,000+ newsletter subscribers, 2,500+ downloads/month." },
-      { label: "About the host", text: "Chad Burmeister — founder of BDR.ai, 25+ years in sales/business development (RingCentral, ON24, Cisco-WebEx, Riverbed, Informatica), named to Forbes Next 1000, author of 9 books, has hosted 250+ episodes. <a href=\"https://www.linkedin.com/in/chadburmeister/\" target=\"_blank\">LinkedIn</a>" },
+      { label: "About the host", text: "Chad Burmeister — founder of BDR.ai, 25+ years in sales/business development (RingCentral, ON24, Cisco-WebEx, Riverbed, Informatica), named to Forbes Next 1000, author of 9 books, has hosted 250+ episodes. <a href=\"https://www.linkedin.com/in/chadburmeister/\" target=\"_blank\" rel=\"noopener noreferrer\">LinkedIn</a>" },
       { label: "What's included", text: "A professionally produced episode, 3 short-form clips, a newsletter feature, and backlinks — published within days on Apple, Spotify, and YouTube." },
       { label: "Format", text: "30-minute remote recording." },
       { label: "Why you're a fit", text: "Chad's audience is B2B sales and AI-in-sales practitioners. Your story of scaling two companies to 8-figure exits ($52M+) as CMO/Operations Advisor, plus building Novacast.ai (AI-driven podcast booking), gives concrete, revenue-relevant takeaways for his listeners." }
@@ -1852,8 +1824,8 @@ const PODCASTS = [
     host: "Louis Fernandes · Co-Founder, Edge Partners AI",
     niche: "CRE/PropTech-leaning, but home services & systems-driven founders are an explicit target fit",
     fields: [
-      { label: "Podcast", text: "<a href=\"https://podcasts.apple.com/il/podcast/the-ai-edge-podcast-cre-ai/id1867613089\" target=\"_blank\">Apple Podcasts</a>" },
-      { label: "About the host", text: "Louis Fernandes — Co-Founder, Edge Partners AI. <a href=\"https://www.linkedin.com/in/louis-fernandes-011860286\" target=\"_blank\">LinkedIn</a>" },
+      { label: "Podcast", text: "<a href=\"https://podcasts.apple.com/il/podcast/the-ai-edge-podcast-cre-ai/id1867613089\" target=\"_blank\" rel=\"noopener noreferrer\">Apple Podcasts</a>" },
+      { label: "About the host", text: "Louis Fernandes — Co-Founder, Edge Partners AI. <a href=\"https://www.linkedin.com/in/louis-fernandes-011860286\" target=\"_blank\" rel=\"noopener noreferrer\">LinkedIn</a>" },
       { label: "About the show", text: "Active since January 2026 — a newer show (102 episodes so far). Currently leans commercial real estate / PropTech, but \"home services\" and \"founders who scaled through systems\" are explicitly listed as part of the target audience and guest mix." },
       { label: "Fit score", text: "PCI Score: 56.85% — a moderate match, not a perfect niche fit, but worth pursuing given the guest criteria." },
       { label: "How it works", text: "Free — no guest fee — but gated by a 15-minute screening call before a recording slot is confirmed." },
@@ -1869,8 +1841,8 @@ const PODCASTS = [
     host: "Anika Jackson",
     niche: "Branding, marketing & entrepreneurship",
     fields: [
-      { label: "Podcast", text: "<a href=\"https://yourbrandamplified.com/\" target=\"_blank\">yourbrandamplified.com</a> · <a href=\"https://open.spotify.com/show/2EHYqYZyleQSyZy58kyo4S\" target=\"_blank\">Spotify</a>" },
-      { label: "About the host", text: "Anika Jackson — a communications and marketing professional with 25+ years of experience, VP of PR at Full Capacity Marketing, and a faculty member at USC Annenberg. Her podcast ranks in the top 0.5% globally on Listen Notes and top 50 on Apple Podcasts for Marketing. <a href=\"https://www.linkedin.com/in/anikajackson/\" target=\"_blank\">LinkedIn</a>" },
+      { label: "Podcast", text: "<a href=\"https://yourbrandamplified.com/\" target=\"_blank\" rel=\"noopener noreferrer\">yourbrandamplified.com</a> · <a href=\"https://open.spotify.com/show/2EHYqYZyleQSyZy58kyo4S\" target=\"_blank\" rel=\"noopener noreferrer\">Spotify</a>" },
+      { label: "About the host", text: "Anika Jackson — a communications and marketing professional with 25+ years of experience, VP of PR at Full Capacity Marketing, and a faculty member at USC Annenberg. Her podcast ranks in the top 0.5% globally on Listen Notes and top 50 on Apple Podcasts for Marketing. <a href=\"https://www.linkedin.com/in/anikajackson/\" target=\"_blank\" rel=\"noopener noreferrer\">LinkedIn</a>" },
       { label: "About the show", text: "Anika sits down with successful business leaders, marketers, sales experts, and innovators to dig into the real decisions, failures, pivots, and breakthroughs behind their growth — covering entrepreneurship, brand-building, and scaling sales systems." },
       { label: "How it works", text: "Guests are selected via an application form rather than a direct pitch — no fee involved." },
       { label: "Why you're a fit", text: "Anika's show is about brand-building, marketing, and the mindsets behind thriving entrepreneurs. Your run scaling two companies to 8-figure exits ($52M+) as CMO/Operations Advisor, and now building Novacast.ai, covers both the brand-and-marketing angle and a fresh AI-and-podcasting story her audience hasn't heard yet." }
@@ -1884,8 +1856,8 @@ const PODCASTS = [
     host: "Laurent Cochet",
     niche: "Proptech, B2B tech & AI-native entrepreneurship",
     fields: [
-      { label: "Podcast", text: "<a href=\"https://podcasts.apple.com/us/podcast/ai-interconnect-podcast/id1805805571\" target=\"_blank\">Apple Podcasts</a> · <a href=\"https://creators.spotify.com/pod/profile/laurent-cochet\" target=\"_blank\">Spotify</a>" },
-      { label: "About the host", text: "Laurent Cochet — a Proptech operator turned AI agency founder, based in Barcelona. Previously with ProptBase, Flow Living, and ListGlobally. <a href=\"https://www.linkedin.com/in/laurentcochet/\" target=\"_blank\">LinkedIn</a>" },
+      { label: "Podcast", text: "<a href=\"https://podcasts.apple.com/us/podcast/ai-interconnect-podcast/id1805805571\" target=\"_blank\" rel=\"noopener noreferrer\">Apple Podcasts</a> · <a href=\"https://creators.spotify.com/pod/profile/laurent-cochet\" target=\"_blank\" rel=\"noopener noreferrer\">Spotify</a>" },
+      { label: "About the host", text: "Laurent Cochet — a Proptech operator turned AI agency founder, based in Barcelona. Previously with ProptBase, Flow Living, and ListGlobally. <a href=\"https://www.linkedin.com/in/laurentcochet/\" target=\"_blank\" rel=\"noopener noreferrer\">LinkedIn</a>" },
       { label: "About the show", text: "AI InterConnect Podcast is where business builders, Proptech pioneers, and AI-native entrepreneurs share raw insights, real struggles, and breakthrough ideas — a deep-dive into what's actually working in real estate tech, logistics, automation, and AI adoption." },
       { label: "What we pitched Laurent", text: "\"Wanted to see if you're open to guests on the AI InterConnect Podcast? There are a number of actionable takeaways your audience would get from my experience scaling two tech companies to 8-figure exits (a $38M and a $14M acquisition) and building companies from scratch, losing them, and rebuilding again. I've also spent the last few years building Novacast.ai.\"" },
       { label: "What Laurent flagged before recording", text: "Laurent confirmed the interview but wanted to clarify upfront that he treats the podcast as the start of an ongoing relationship, not the end of it — he likes to stay in direct contact with guests afterward around ideas, introductions, or business opportunities. He specifically called out interest in Novacast, since he sees possible complementarity between what Novacast does (helping founders secure the right podcast conversations) and what AI InterConnect is building (what happens after: relationship intelligence, qualified opportunities, pipeline development). He floated exploring a collaboration — referrals, shared clients, integrations, or another model — but said nothing needs to be defined now; he'd rather have the conversation first and see if there's a genuine fit." },
@@ -1899,8 +1871,8 @@ const PODCASTS = [
     host: "Daniel Faggella · Founder & Head of Research, Emerj",
     niche: "Enterprise AI adoption — non-technical business leaders, VP+ AI executives",
     fields: [
-      { label: "Podcast", text: "<a href=\"https://podcasts.apple.com/us/podcast/the-ai-in-business-podcast/id670771965\" target=\"_blank\">Apple Podcasts</a> · <a href=\"https://open.spotify.com/show/4gD9xiYU9iC24vnjUx1PTg\" target=\"_blank\">Spotify</a>" },
-      { label: "About the host", text: "Daniel Faggella — Founder and Head of Research at Emerj Artificial Intelligence Research. Original host of the AI in Business Podcast (the #1 B2B AI podcast online, 7M+ lifetime downloads), with 1,500+ interviews over 10+ years with AI researchers, executives, and business leaders. <a href=\"https://www.linkedin.com/in/danfaggella/\" target=\"_blank\">LinkedIn</a>" },
+      { label: "Podcast", text: "<a href=\"https://podcasts.apple.com/us/podcast/the-ai-in-business-podcast/id670771965\" target=\"_blank\" rel=\"noopener noreferrer\">Apple Podcasts</a> · <a href=\"https://open.spotify.com/show/4gD9xiYU9iC24vnjUx1PTg\" target=\"_blank\" rel=\"noopener noreferrer\">Spotify</a>" },
+      { label: "About the host", text: "Daniel Faggella — Founder and Head of Research at Emerj Artificial Intelligence Research. Original host of the AI in Business Podcast (the #1 B2B AI podcast online, 7M+ lifetime downloads), with 1,500+ interviews over 10+ years with AI researchers, executives, and business leaders. <a href=\"https://www.linkedin.com/in/danfaggella/\" target=\"_blank\" rel=\"noopener noreferrer\">LinkedIn</a>" },
       { label: "About the show", text: "For non-technical business leaders who need to find AI opportunities, align AI capabilities with strategy, and deliver ROI. Each week Emerj interviews top AI executives from Fortune 500/2000 firms and unicorn startups on trends, use-cases, and practical AI adoption. Top 0.5% globally on Listen Notes." },
       { label: "What we pitched Daniel", text: "\"Wanted to see if you're open to guests on The AI in Business Podcast? There are a number of actionable takeaways your audience would get from my experience scaling two companies to 8-figure exits ($52M+). I've also spent the last few years building Novacast.ai. Think it'd be a fit for your audience? Happy to chat.\"" },
       { label: "What Dan Faggella's team said", text: "Replied via Dan's colleague Daniel Faggella (Emerj), who said inquiries go through their Pitch/Intake Form rather than a direct reply, so the editorial and campaign planning team can weigh it against other prospective themes — they meet as a team on Fridays. He asked for it to be filled out by end of day or the next day." },
@@ -1917,8 +1889,8 @@ const PODCASTS = [
     host: "Christine Campbell Rapin",
     niche: "B2B service owners — messaging, offers, client growth",
     fields: [
-      { label: "Podcast", text: "<a href=\"https://podcasts.apple.com/us/podcast/amplify-your-marketing-message-with-christine-campbell/id1662227504\" target=\"_blank\">Apple Podcasts</a> · <a href=\"https://creators.spotify.com/pod/profile/christine-campbell-rapin/\" target=\"_blank\">Spotify</a>" },
-      { label: "About the host", text: "Christine Campbell Rapin — business mentor, consultant, and owner of CLEAR Acceleration Inc. Over 25 years in marketing, sales, and operations, having worked with 400+ businesses on a combined $1B+ in revenue. <a href=\"https://www.linkedin.com/in/christinecampbell1/\" target=\"_blank\">LinkedIn</a>" },
+      { label: "Podcast", text: "<a href=\"https://podcasts.apple.com/us/podcast/amplify-your-marketing-message-with-christine-campbell/id1662227504\" target=\"_blank\" rel=\"noopener noreferrer\">Apple Podcasts</a> · <a href=\"https://creators.spotify.com/pod/profile/christine-campbell-rapin/\" target=\"_blank\" rel=\"noopener noreferrer\">Spotify</a>" },
+      { label: "About the host", text: "Christine Campbell Rapin — business mentor, consultant, and owner of CLEAR Acceleration Inc. Over 25 years in marketing, sales, and operations, having worked with 400+ businesses on a combined $1B+ in revenue. <a href=\"https://www.linkedin.com/in/christinecampbell1/\" target=\"_blank\" rel=\"noopener noreferrer\">LinkedIn</a>" },
       { label: "About the show", text: "Helps B2B service owners turn bland messaging into magnetic, sales-ready offers — practical frameworks, real case studies, and tactics to attract higher-value clients and scale predictably. Active since Dec 2022, 150–530 listeners/episode, PCI Score 71.91%." },
       { label: "What we pitched Christine", text: "\"Wanted to see if you're open to guests on Amplify Your Marketing Message? There are a number of actionable takeaways your audience would get from my experience scaling two tech companies to 8-figure exits. I've also spent the last few years building Novacast.ai.\"" },
       { label: "What Christine said back", text: "All interested guests must apply through her website rather than reply directly. She specifically flagged that guests need to be genuinely interested in building a personal referral relationship with her as host, and recommended engaging with her on LinkedIn and attending one of her events first to improve the odds of a fit." },
@@ -1934,8 +1906,8 @@ const PODCASTS = [
     host: "Rich Brooks · Founder, flyte new media",
     niche: "Digital marketing — SEO, social media, mobile marketing",
     fields: [
-      { label: "Podcast", text: "<a href=\"https://www.theagentsofchange.com\" target=\"_blank\">theagentsofchange.com</a>" },
-      { label: "About the host", text: "Rich Brooks — Founder & President of flyte new media (digital agency in Portland, Maine, ~25 years in business). Nationally recognized speaker on entrepreneurship, digital marketing, and social media; author of \"The Lead Machine.\" Also the \"tech guru\" on Maine's NBC affiliate evening news. <a href=\"https://www.linkedin.com/in/therichbrooks/\" target=\"_blank\">LinkedIn</a>" },
+      { label: "Podcast", text: "<a href=\"https://www.theagentsofchange.com\" target=\"_blank\" rel=\"noopener noreferrer\">theagentsofchange.com</a>" },
+      { label: "About the host", text: "Rich Brooks — Founder & President of flyte new media (digital agency in Portland, Maine, ~25 years in business). Nationally recognized speaker on entrepreneurship, digital marketing, and social media; author of \"The Lead Machine.\" Also the \"tech guru\" on Maine's NBC affiliate evening news. <a href=\"https://www.linkedin.com/in/therichbrooks/\" target=\"_blank\" rel=\"noopener noreferrer\">LinkedIn</a>" },
       { label: "About the show", text: "Weekly interviews with leading marketers on SEO, social media, and mobile marketing — helping listeners increase visibility, drive qualified traffic, and convert it into leads and business. Active since Jul 2013, 1.7K–3.2K listeners/episode, 4.9★ (142 ratings), PCI Score 89.70% — a strong match." },
       { label: "What we pitched Rich", text: "\"Wanted to see if you're open to guests on The Agents of Change Digital Marketing Podcast? There are a number of actionable takeaways your audience would get from my experience scaling two companies to 8-figure exits. I've also spent the last few years building Novacast.ai.\"" },
       { label: "What Rich said back", text: "Guests must fill out a guest suggestion form to manage volume. He reviews them all and gets back within 1–2 weeks if there's a fit — but flagged they get 50+ inquiries a week for just one weekly spot, so a non-response is possible." },
@@ -1950,15 +1922,15 @@ const PODCASTS = [
     host: "Troy Trewin · Founder",
     niche: "Small business owners — growth stories, failures, exits",
     fields: [
-      { label: "Podcast", text: "<a href=\"https://www.growasmallbusiness.com/podcast\" target=\"_blank\">growasmallbusiness.com/podcast</a>" },
-      { label: "About the host", text: "Troy Trewin — Founder of Grow A Small Business, based in Tasmania, Australia. <a href=\"https://www.linkedin.com/in/troytrewin/\" target=\"_blank\">LinkedIn</a>" },
+      { label: "Podcast", text: "<a href=\"https://www.growasmallbusiness.com/podcast\" target=\"_blank\" rel=\"noopener noreferrer\">growasmallbusiness.com/podcast</a>" },
+      { label: "About the host", text: "Troy Trewin — Founder of Grow A Small Business, based in Tasmania, Australia. <a href=\"https://www.linkedin.com/in/troytrewin/\" target=\"_blank\" rel=\"noopener noreferrer\">LinkedIn</a>" },
       { label: "About the show", text: "Weekly cast in the top 30,000 podcasts globally (top 1% of all shows). Guests are small business owners who grew a business from at least 5 full-time team members to something bigger — real stories about failures, stress points, and growth, not just highlight reels. Recent episode: the owner of Chiro One Wellness Centers, who scaled from 2 clinics/12 staff to 164 offices in 13 states with 1,000+ team members and a $100M+ private equity exit." },
       { label: "What Troy said back", text: "He wants Cahill on the weekly cast. Next step is booking a recording slot directly via Calendly — he'll then send the Zoom link and further recording details." },
       { label: "Guest profile fit", text: "Their stated guest criteria: grown a business from 5+ full-time team members, ideally >10%/year growth, been sole or main owner, comfortable sharing real numbers (sales, team headcount) and talking openly about failures/stress points — not just wins. Cahill fits: 8–10 people across Digital Vision Media Group and Novacast.ai, sole/founding owner, and has real failure-to-rebuild material to draw on." },
-      { label: "Cahill's bio & LinkedIn — for quick reference before the call", text: "<a href=\"https://www.linkedin.com/in/cahillcamden/\" target=\"_blank\">linkedin.com/in/cahillcamden</a> — see also the guest one-sheet (bio, key stats, talking points) we've already built for exactly this kind of prep." },
+      { label: "Cahill's bio & LinkedIn — for quick reference before the call", text: "<a href=\"https://www.linkedin.com/in/cahillcamden/\" target=\"_blank\" rel=\"noopener noreferrer\">linkedin.com/in/cahillcamden</a> — see also the guest one-sheet (bio, key stats, talking points) we've already built for exactly this kind of prep." },
       { label: "Recording logistics", text: "1-hour Zoom recording, with a 5–10 min chat beforehand to break the ice. They're fine with swearing on air, and edit out excessive \"umms.\" They'll send draft audio + show notes before it goes live for feedback." },
       { label: "What they'll need from us", text: "A headshot image at least 1,400px wide, for the episode thumbnail — email it to Troy ahead of recording." },
-      { label: "Interview prep doc", text: "Full guest profile notes + the ~23 interview questions Troy will ask (growth numbers, funding, biggest stress point, team-building, mentors, exit details, final five questions) are in this doc: <a href=\"https://docs.google.com/document/d/1d9aHQoBjOHx27vsg9TWaL3oZE6ZpHS46FBNblX1T7jY/edit?folder=1SYdpYZhnlFXVMx8qdh933CsCEBtbiu3X&tab=t.0\" target=\"_blank\">Grow A Small Business — Podcast Questions</a> — worth reading closely before recording; we'll draft answers together closer to the date." }
+      { label: "Interview prep doc", text: "Full guest profile notes + the ~23 interview questions Troy will ask (growth numbers, funding, biggest stress point, team-building, mentors, exit details, final five questions) are in this doc: <a href=\"https://docs.google.com/document/d/1d9aHQoBjOHx27vsg9TWaL3oZE6ZpHS46FBNblX1T7jY/edit?folder=1SYdpYZhnlFXVMx8qdh933CsCEBtbiu3X&tab=t.0\" target=\"_blank\" rel=\"noopener noreferrer\">Grow A Small Business — Podcast Questions</a> — worth reading closely before recording; we'll draft answers together closer to the date." }
     ],
     action: "Book a recording slot via Calendly, then send a 1,400px+ headshot to Troy. Review the prep doc and question list beforehand — answers to be drafted separately before the recording.",
     link: { url: "https://calendly.com/growasmallbusiness/grow-a-small-business-podcast-interview?month=2027-03", label: "Book the recording slot" }
@@ -1969,8 +1941,8 @@ const PODCASTS = [
     host: "Jeff Sesol & Janna Landry",
     niche: "Business/executive leadership coaching — culture, people-growth, leadership stories",
     fields: [
-      { label: "Podcast", text: "<a href=\"https://podcasts.apple.com/us/podcast/pull-the-chute-grow-your-people-grow-your-company-podcast/id1616010994\" target=\"_blank\">Apple Podcasts</a> · <a href=\"https://open.spotify.com/show/3BiDaDU4A81jE0lpli0Yjv\" target=\"_blank\">Spotify</a>" },
-      { label: "About the host", text: "Jeff Sesol — Founder & CEO of Pull the Chute (Gallatin, TN), a business/executive/leadership coaching firm. 30+ years entrepreneurial — built and sold FreeDrive (early web-based storage, 28M+ users) and SonMedia (internet safety for parents), among other ventures. Best-selling author of \"The New Leadership Landscape.\" Co-hosted weekly with Janna Landry, an executive/leadership coach with 25+ years. <a href=\"https://www.linkedin.com/in/jeffsesol/\" target=\"_blank\">LinkedIn</a>" },
+      { label: "Podcast", text: "<a href=\"https://podcasts.apple.com/us/podcast/pull-the-chute-grow-your-people-grow-your-company-podcast/id1616010994\" target=\"_blank\" rel=\"noopener noreferrer\">Apple Podcasts</a> · <a href=\"https://open.spotify.com/show/3BiDaDU4A81jE0lpli0Yjv\" target=\"_blank\" rel=\"noopener noreferrer\">Spotify</a>" },
+      { label: "About the host", text: "Jeff Sesol — Founder & CEO of Pull the Chute (Gallatin, TN), a business/executive/leadership coaching firm. 30+ years entrepreneurial — built and sold FreeDrive (early web-based storage, 28M+ users) and SonMedia (internet safety for parents), among other ventures. Best-selling author of \"The New Leadership Landscape.\" Co-hosted weekly with Janna Landry, an executive/leadership coach with 25+ years. <a href=\"https://www.linkedin.com/in/jeffsesol/\" target=\"_blank\" rel=\"noopener noreferrer\">LinkedIn</a>" },
       { label: "About the show", text: "Weekly interviews with business owners and C-level executives about how they built their culture — what worked, what failed. Active since 2022, 280+ episodes, 5.0★. Their stated mission: help small-to-medium businesses grow by growing their people first." },
       { label: "What Jeff said back", text: "\"Technically, we have stopped taking guests for the remainder of the year. But I like your history.\" He's making an exception — asked us to use the Calendly link in his signature to find a recording date." },
       { label: "Why you're a fit", text: "Jeff's show leans into real, unfiltered leadership and culture-building stories — not just wins. Cahill's build-lose-rebuild arc across two 8-figure exits, plus now building Novacast.ai with a team of 8–10, fits that \"what actually worked\" format well." }
@@ -1997,7 +1969,7 @@ const PODCASTS = [
     host: "David C Barnett",
     niche: "SMB M&A — buying, selling, financing, and exiting small/medium businesses",
     fields: [
-      { label: "Podcast", text: "<a href=\"https://open.spotify.com/show/0IXJd3NPWHwZM1hZuIyBqv\" target=\"_blank\">Spotify</a> · <a href=\"https://podcasts.apple.com/us/podcast/david-c-barnett-small-business-and-deal-making-m-a-smb/id1234025671\" target=\"_blank\">Apple Podcasts</a>" },
+      { label: "Podcast", text: "<a href=\"https://open.spotify.com/show/0IXJd3NPWHwZM1hZuIyBqv\" target=\"_blank\" rel=\"noopener noreferrer\">Spotify</a> · <a href=\"https://podcasts.apple.com/us/podcast/david-c-barnett-small-business-and-deal-making-m-a-smb/id1234025671\" target=\"_blank\" rel=\"noopener noreferrer\">Apple Podcasts</a>" },
       { label: "About the host", text: "David C Barnett — has started, bought, sold, and closed businesses himself. Author of several best-selling business books, including \"Invest Local,\" \"Franchise Warnings,\" and \"How To Sell My Own Business.\" 400+ episodes, mostly short and to the point, on buying/selling/financing/managing SMBs." },
       { label: "Who replied", text: "Erica Parinas, Advantage Liquidity Partners (eparinas@alpatlantic.com) — screening guest submissions on the show's behalf." },
       { label: "What Erica said", text: "Audience is focused on SMB owners buying, selling, and exiting businesses. She explicitly flagged: \"At this time, we are not interested in crypto-related topics.\" She asked for a short explanation of how the guest aligns with their audience and niche as part of the submission." },
@@ -2013,8 +1985,8 @@ const PODCASTS = [
     host: "Alex Bacon · Founder, BrightKeel.AI",
     niche: "AI strategy & automation for founders — turning AI into revenue across sales, marketing, product, ops",
     fields: [
-      { label: "Podcast", text: "<a href=\"https://podcasts.apple.com/gb/podcast/scaling-with-ai/id1823676319\" target=\"_blank\">Apple Podcasts</a> · <a href=\"https://open.spotify.com/show/4lOm06UMkBqespE7quVyiJ\" target=\"_blank\">Spotify</a>" },
-      { label: "About the host", text: "Alex Bacon — Founder of BrightKeel.AI, based in Bath, UK. Also known for The Scale-Up CMO. <a href=\"https://www.linkedin.com/in/alexbacon1/\" target=\"_blank\">LinkedIn</a>" },
+      { label: "Podcast", text: "<a href=\"https://podcasts.apple.com/gb/podcast/scaling-with-ai/id1823676319\" target=\"_blank\" rel=\"noopener noreferrer\">Apple Podcasts</a> · <a href=\"https://open.spotify.com/show/4lOm06UMkBqespE7quVyiJ\" target=\"_blank\" rel=\"noopener noreferrer\">Spotify</a>" },
+      { label: "About the host", text: "Alex Bacon — Founder of BrightKeel.AI, based in Bath, UK. Also known for The Scale-Up CMO. <a href=\"https://www.linkedin.com/in/alexbacon1/\" target=\"_blank\" rel=\"noopener noreferrer\">LinkedIn</a>" },
       { label: "About the show", text: "Bi-weekly podcast — \"the business podcast that turns AI into revenue.\" Alex interviews founders and leaders for real AI use cases across sales, marketing, product, and operations: AI strategy, generative AI, workflow automation, governance and data privacy. \"No hype, just proven tactics.\"" },
       { label: "Who replied", text: "Kiara, Alex's assistant, coordinates guests for the show." },
       { label: "What Kiara said", text: "Alex would be happy to arrange a short 20-minute episode planning call, preferably towards the end of September. After that call, if it's a good fit, they'll follow up to arrange a time for the actual recording. She asked that once booked, we reply with the date, time, and time zone selected so she can cross-check with Alex." },
@@ -2029,8 +2001,8 @@ const PODCASTS = [
     host: "Kyle Lambert · Founder, Left Brain AI & Action Hero Marketing",
     niche: "AI in business — real professionals discussing the intersection of AI and their work",
     fields: [
-      { label: "Podcast", text: "<a href=\"https://podcasts.apple.com/am/podcast/the-brainiac-blueprint/id1837675300\" target=\"_blank\">Apple Podcasts</a> · <a href=\"https://open.spotify.com/show/11f8H2FK3R2EYmpsh2iZ3G\" target=\"_blank\">Spotify</a>" },
-      { label: "About the host", text: "Kyle Lambert — Founder of Left Brain AI and Action Hero Marketing (Philadelphia area). <a href=\"https://www.linkedin.com/in/kyle-f-lambert/\" target=\"_blank\">LinkedIn</a> · Kyle@leftbrainenterprises.biz · 610-246-0397" },
+      { label: "Podcast", text: "<a href=\"https://podcasts.apple.com/am/podcast/the-brainiac-blueprint/id1837675300\" target=\"_blank\" rel=\"noopener noreferrer\">Apple Podcasts</a> · <a href=\"https://open.spotify.com/show/11f8H2FK3R2EYmpsh2iZ3G\" target=\"_blank\" rel=\"noopener noreferrer\">Spotify</a>" },
+      { label: "About the host", text: "Kyle Lambert — Founder of Left Brain AI and Action Hero Marketing (Philadelphia area). <a href=\"https://www.linkedin.com/in/kyle-f-lambert/\" target=\"_blank\" rel=\"noopener noreferrer\">LinkedIn</a> · Kyle@leftbrainenterprises.biz · 610-246-0397" },
       { label: "About the show", text: "Brings real business professionals to the forefront to discuss the intersection of AI and their passions — role, organization, industry, or otherwise. Covers success stories, fails, best practices, and predictions on AI in business." },
       { label: "What Kyle said back", text: "\"Please schedule 20 minutes for us to connect. If we feel it's a good fit, we will schedule time for a recording.\" — so this is a fit-screening call, not the recording itself." },
       { label: "Booked", text: "20-minute call confirmed for Friday, September 25. See the calendar invite for the Zoom link." },
@@ -2042,14 +2014,17 @@ const PODCASTS = [
   {
     id: "go-ai-podcast",
     name: "GO AI Podcast",
-    host: "Jenna Ahern · Guardian Owl Digital",
-    niche: "AI",
+    host: "Jenna Ahern & Connor Rafferty · Guardian Owl Digital",
+    niche: "AI adoption in business — leaders from different industries on how they actually implement AI",
     fields: [
-      { label: "About the show", text: "Active since June 2024. Rated 5.0 (7 reviews) · PCI Score 64%." },
-      { label: "Timeline", text: "✓ Pitched the Guardian Owl Digital team inbox (Sep 21) → ✓ Connor Rafferty replied from his own address with recording slots (Sep 22)" },
+      { label: "Podcast", text: "<a href=\"https://podcasts.apple.com/us/podcast/go-ai-podcast/id1751722259\" target=\"_blank\" rel=\"noopener noreferrer\">Apple Podcasts</a> · <a href=\"https://www.guardianowldigital.com/meet-jenna-ahern/\" target=\"_blank\" rel=\"noopener noreferrer\">Guardian Owl Digital</a>" },
+      { label: "About the show", text: "Technology podcast by Guardian Owl Digital (Louisville, KY): interviews with leaders across industries about real AI implementation — from manufacturing and engineering to marketing and education. Active since June 2024, new episodes roughly twice a month. Rated 5.0 (7 reviews) · PCI Score 64%." },
+      { label: "About the host", text: "Jenna Ahern — Founder & CEO of Guardian Owl Digital, a 7-figure digital marketing agency, and its AI division GO AI; part-time AI lecturer at the University of Louisville College of Business, 2025 Business First Most Admired CEO honoree. Co-hosts with Connor Rafferty (Guardian Owl Digital). <a href=\"https://www.linkedin.com/in/jennaahern/\" target=\"_blank\" rel=\"noopener noreferrer\">Jenna's LinkedIn</a>" },
+      { label: "Why you're a fit", text: "Strong fit. The show is about who is actually implementing AI in business, and Cahill is building an AI-native product (Novacast.ai) after a CMO career — right at the AI-and-marketing crossroads the show is built around. His two 8-figure exits add operator credibility for the business-leader audience." },
+      { label: "Timeline", text: "✓ Pitched the Guardian Owl Digital team inbox (Sep 21) → ✓ Co-host Connor Rafferty replied from his own address with recording slots (Sep 22) → Asked for Tue Oct 6, 9:00 AM ET (Sep 23)" },
       { label: "What we pitched Guardian Owl Digital", text: "\"Wanted to see if you're open to guests on GO AI Podcast? There are a number of actionable takeaways your audience would get from my experience scaling two companies to 8-figure exits. I've also spent the last few years building Novacast.ai. Think it'd be a fit for your audience? Happy to chat.\"" },
       { label: "What Connor said back", text: "\"Do any of these times work for you?\"<br>Mon Oct 5, 12:30–1:30 · Tue Oct 6, before noon · Mon Oct 12, afternoon (nothing after 3 PM) · Tue Oct 13, before noon · Mon Oct 19, afternoon (nothing after 3 PM) · Tue Oct 20, before 11 AM · Thu Oct 22, before noon · Mon Oct 26, afternoon (nothing after 3 PM) · Tue Oct 27, before noon · Thu Oct 29, before 11 AM.<br>\"We are on EST and recordings typically last 30 minutes.\"" },
-      { label: "Who's coordinating on their end", text: "Connor Rafferty (Guardian Owl Digital). He replied from his own address, not team@guardianowldigital.com, so his email is not in the Novacast thread — reply to him directly." }
+      { label: "Who's coordinating on their end", text: "Connor Rafferty — co-host. He replied from his own address, not team@guardianowldigital.com, so his email is not in the Novacast thread — reply to him directly." }
     ],
     action: "Connor offered October recording slots (EST, about 30 minutes). Pick one and reply to Connor directly — his email didn't reach the Novacast thread.",
     link: { action: "reply", label: "Reply to host" },
@@ -2065,14 +2040,16 @@ const PODCASTS = [
   {
     id: "exit-algorithms",
     name: "Exit Algorithms",
-    host: "Pete Vera · BizExitGrow",
-    niche: "Business exits & growth",
+    host: "Pete Vera · BizExitGrow / GreenRock Logistics",
+    niche: "Business growth & exits through technology — AI, automation and data for founders, with a strong 3PL / logistics angle",
     fields: [
-      { label: "Podcast", text: "<a href=\"https://bizexitgrow.com/ExitAlgorithms\" target=\"_blank\">BizExitGrow.com/ExitAlgorithms</a>" },
-      { label: "About the host", text: "Pete Vera — BizExitGrow. Phone: +1-727-758-9553." },
+      { label: "Podcast", text: "<a href=\"https://bizexitgrow.com/ExitAlgorithms\" target=\"_blank\" rel=\"noopener noreferrer\">BizExitGrow.com/ExitAlgorithms</a> · <a href=\"https://podcasts.apple.com/us/podcast/exit-algorithms/id1820424898\" target=\"_blank\" rel=\"noopener noreferrer\">Apple Podcasts</a> · <a href=\"https://open.spotify.com/show/2lTaP8U9DIJhI0VbwHn5t9\" target=\"_blank\" rel=\"noopener noreferrer\">Spotify</a>" },
+      { label: "About the show", text: "Business podcast (launched 2025, new episodes about monthly) where founders, 3PL leaders and execs share how they use AI, automation and data to grow, streamline operations and raise their company's value before an exit. Also on YouTube." },
+      { label: "About the host", text: "Pete Vera — Managing Partner at GreenRock Logistics (buying and building a transportation / 3PL company); the show lives on his BizExitGrow site. Spent 8 years in the U.S. Navy running logistics operations. Phone: +1-727-758-9553. <a href=\"https://www.linkedin.com/in/peter-pete-vera-261873257/\" target=\"_blank\" rel=\"noopener noreferrer\">LinkedIn</a>" },
+      { label: "Why you're a fit", text: "Good fit. The show's core promise — scale smarter, sell stronger — is exactly Cahill's story: two tech companies taken to 8-figure exits ($52M+), now building an AI product. Honest caveat: much of the audience is logistics / 3PL, so the conversation should lean on universal exit and AI-operations lessons rather than industry specifics." },
       { label: "Timeline", text: "✓ Pitched Pete directly (Sep 21, 8:24 PM) → ✓ Pete agreed and sent his booking link (Sep 21, 11:00 PM)" },
       { label: "What we pitched Peter", text: "\"Wanted to see if you're open to guests on Exit Algorithms? There are a number of actionable takeaways your audience would get from my experience scaling two tech companies to 8-figure exits ($52M+). I've also spent the last few years building Novacast.ai. Think it'd be a fit for your audience? Happy to chat.\"" },
-      { label: "What Pete said back", text: "\"I agree, glad you found me! Please find a time that works for you here: <a href=\"https://calendar.app.google/sNRu7Z6EfF9n6Fqb9\" target=\"_blank\">calendar.app.google/sNRu7Z6EfF9n6Fqb9</a>\"" }
+      { label: "What Pete said back", text: "\"I agree, glad you found me! Please find a time that works for you here: <a href=\"https://calendar.app.google/sNRu7Z6EfF9n6Fqb9\" target=\"_blank\" rel=\"noopener noreferrer\">calendar.app.google/sNRu7Z6EfF9n6Fqb9</a>\"" }
     ],
     action: "Pete agreed and shared his podcast booking link. Pick a time on his calendar.",
     link: { url: "https://calendar.app.google/sNRu7Z6EfF9n6Fqb9", label: "Book a time with Pete" },
@@ -2083,6 +2060,7 @@ const PODCASTS = [
 
 // Ordered progression of statuses you can mark on a podcast. `cls` reuses the
 // existing done/action/precall/skip badge colors.
+// ---------- 4. Statuses ----------
 const STATUS_OPTIONS = [
   { value: "replied_to_host", label: "Replied to host", cls: "precall" },
   { value: "waiting_reply", label: "Waiting on reply", cls: "precall" },
@@ -2092,7 +2070,7 @@ const STATUS_OPTIONS = [
   { value: "need_precall", label: "Need to book pre-call", cls: "action" },
   { value: "need_recording", label: "Need to book recording", cls: "action" },
   { value: "precall_booked", label: "Pre-call booked", cls: "prebooked" },
-  { value: "recording_booked", label: "Recording booked", cls: "done" },
+  { value: "recording_booked", label: "Recording booked", cls: "prebooked" }, // blue "Booked" group, same as pre-call
   { value: "episode_recorded", label: "Episode recorded", cls: "done" }
 ];
 
@@ -2132,7 +2110,7 @@ function accordionHTML(podcastId, key, title, innerHTML, openByDefault){
   </details>`;
 }
 
-// ---------- Next step (primary CTA) ----------
+// ---------- 5. Next step (primary CTA) ----------
 // The main action link comes from the conversation (p.link in the prototype). For statuses that
 // need an external action, the user can paste/replace the link — hosts sometimes send it from
 // another address, so it never reaches the thread. Prototype storage: localStorage
@@ -2179,7 +2157,7 @@ function nextStepCtaHTML(ns, extraClass){
     </button>`;
   }
   if (!ns.url) return "";
-  return `<a class="btn primary next-step-cta ${extraClass || ""}" href="${escHTML(ns.url)}" target="_blank" rel="noopener">
+  return `<a class="btn primary next-step-cta ${extraClass || ""}" href="${escHTML(ns.url)}" target="_blank" rel="noopener noreferrer">
     <span>${escHTML(ns.label)}</span>
     <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3.5h6.5V10M12.5 3.5l-9 9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </a>`;
@@ -2294,19 +2272,21 @@ function isoToTimeParts(iso){
 
 let podPanelId = null; // podcast currently shown in the side panel
 const aiSuggestedStatus = new Set(); // podcasts whose current status was suggested by AI, not set by a person
-let activeFilter = "all"; // "all" | "episode_recorded" | "recording_booked" | "waiting" | "action"
+let activeFilter = "all"; // "all" | "episode_recorded" | "booked" | "waiting" | "action"
 
 // Shared classification used by both the status chips and the list filter,
 // so counts and filtering always agree with each other.
 function classifyForChip(p){
   const r = responses[p.id];
   if (r === "episode_recorded") return "episode_recorded";
-  if (r === "recording_booked") return "recording_booked";
+  // "Booked" = any call with a date: pre-call or recording (colour: blue)
+  if (r === "recording_booked" || r === "precall_booked") return "booked";
   const meta = STATUS_OPTIONS.find(o => o.value === r);
-  if (meta && (meta.cls === "precall" || meta.cls === "prebooked")) return "waiting";
+  if (meta && meta.cls === "precall") return "waiting";
   return "action"; // explicit "action" cls, or no status set yet
 }
 
+// ---------- 6. Render ----------
 function render(){
   list.innerHTML = "";
   let panelBodyHTML = "";
@@ -2318,13 +2298,20 @@ function render(){
     return lastChangedTime(b.id) - lastChangedTime(a.id); // freshest first within a tier
   });
 
-  visiblePodcasts.forEach((p, idx) => {
+  // The open panel must render even if its podcast is filtered out of the list
+  // (e.g. status changed while a chip filter is active).
+  const visibleIds = new Set(visiblePodcasts.map(x => x.id));
+  const renderSet = visiblePodcasts.slice();
+  if (podPanelId && !visibleIds.has(podPanelId)){
+    const panelPodcast = PODCASTS.find(x => x.id === podPanelId && !deletedFlags[x.id]);
+    if (panelPodcast) renderSet.push(panelPodcast);
+  }
+  renderSet.forEach((p, idx) => {
     const resp = responses[p.id] || null;
     const statusMeta = STATUS_OPTIONS.find(o => o.value === resp) || null;
     const badgeCls = statusMeta ? statusMeta.cls : "skip";
     const scheduledAt = scheduledDates[p.id] || null;
     const showsSchedule = resp === "recording_booked" || resp === "episode_recorded" || resp === "precall_booked";
-    const showsDetailsCheckbox = resp === "recording_booked" || resp === "precall_booked";
     const showsPrepDoc = resp === "precall_booked" || resp === "recording_booked";
     const prepFile = showsPrepDoc ? readPrepFile(p.id) : null;
     const badgeLabel = statusMeta
@@ -2370,7 +2357,7 @@ function render(){
 
     card.innerHTML = `
       <button type="button" class="card-summary" data-open-podcast="${p.id}" aria-haspopup="dialog">
-        <img class="card-cover" src="${COVER_IMG}" alt="" />
+        <img class="card-cover" src="${COVER_IMG}" alt="" width="40" height="40" decoding="async" />
         <div class="card-content">
           <div class="card-title-block">
             <p class="card-title">${p.name}</p>
@@ -2381,7 +2368,7 @@ function render(){
         <svg class="chev" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     `;
-    list.appendChild(card);
+    if (visibleIds.has(p.id)) list.appendChild(card);
     // Panel content for this podcast (rendered into the side panel, not the list).
     if (podPanelId === p.id) {
       // Split card fields: conversation-related ones go to "Conversation", the rest to "Podcast info".
@@ -2435,7 +2422,12 @@ function render(){
                 <option value="PM" ${tp.ampm === "PM" ? "selected" : ""}>PM</option>
               </select>
             </div>
-          </div>`;
+          </div>
+          ${(resp === "precall_booked" || resp === "recording_booked") ? `
+          <div class="call-cancel-row">
+            <span class="form-hint">Rescheduled? Just change the date — the prep doc will be flagged as outdated.</span>
+            <button type="button" class="prep-link-btn call-cancel-btn" data-cancel-call="${p.id}">Mark as cancelled</button>
+          </div>` : ""}`;
           })() : ""}
           ${clientMessagesHTML(p)}
           ${showsPrepDoc ? `
@@ -2449,7 +2441,7 @@ function render(){
               <span>Create prep doc</span>
             </button>
           </div>
-          ${sentCheckboxHTML(p.id, "Sent call details to client (Slack)", "prep-sent-standalone")}`}` : ""}
+          ${sentCheckboxHTML(p.id, "Call details sent", "prep-sent-standalone")}`}` : ""}
           ${notesHTML}
           ${timelineHTML}
         </div>
@@ -2481,6 +2473,28 @@ function render(){
     });
   });
 
+  // Call cancelled: status goes back to "Need to book …", date and "sent to client" are cleared,
+  // so the calendar and client messages don't show the old booking. Prep doc stays (flagged Outdated).
+  document.querySelectorAll("[data-cancel-call]").forEach(el => {
+    el.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const id = el.dataset.cancelCall;
+      const isPrecall = responses[id] === "precall_booked";
+      const back = isPrecall ? "need_precall" : "need_recording";
+      const ok = window.confirm(`Mark this ${isPrecall ? "pre-call" : "recording"} as cancelled? The status goes back to "${isPrecall ? "Need to book pre-call" : "Need to book recording"}" and the date is cleared.`);
+      if (!ok) return;
+      responses[id] = back;
+      scheduledDates[id] = null;
+      detailsSent[id] = false;
+      aiSuggestedStatus.delete(id);
+      if (!statusHistory[id]) statusHistory[id] = [];
+      statusHistory[id].push({ status: back, changed_at: new Date().toISOString() });
+      render();
+      updateStatusChip();
+      try { await saveResponse(id, back); } catch (err) { console.error("save error", err); }
+    });
+  });
+
   document.querySelectorAll(".schedule-input").forEach(el => {
     el.addEventListener("click", (e) => e.stopPropagation());
     el.addEventListener("change", async (e) => {
@@ -2506,8 +2520,7 @@ function render(){
     });
   });
 
-  // Prep doc: step 1 only renders the entry point. Step 2 wires this to the
-  // create/edit modal (date & time, optional meeting link, notes for the client).
+  // Prep doc: "Create prep doc" opens the modal (date & time, meeting link, notes for the client).
   document.querySelectorAll("[data-prep-doc-id]").forEach(el => {
     el.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -2646,6 +2659,7 @@ function render(){
 // Right-hand "Upcoming" panel: every podcast with a scheduled date/time
 // (pre-call, recording, or the date carried over to episode_recorded),
 // grouped by day and sorted soonest-first — mirrors a calendar sidebar.
+// ---------- 7. Sidebar calendar ----------
 function renderSidebar(){
   const sidebarEl = document.getElementById("sidebarEvents");
   if (!sidebarEl) return;
@@ -2654,7 +2668,8 @@ function renderSidebar(){
   startOfToday.setHours(0, 0, 0, 0);
 
   const events = PODCASTS
-    .filter(p => !deletedFlags[p.id] && scheduledDates[p.id] && new Date(scheduledDates[p.id]) >= startOfToday)
+    .filter(p => !deletedFlags[p.id] && scheduledDates[p.id] && new Date(scheduledDates[p.id]) >= startOfToday
+      && (responses[p.id] === "precall_booked" || responses[p.id] === "recording_booked"))
     .map(p => {
       const resp = responses[p.id];
       const meta = STATUS_OPTIONS.find(o => o.value === resp);
@@ -2686,7 +2701,7 @@ function renderSidebar(){
         <button type="button" class="sidebar-event cls-${ev.cls}" data-jump-id="${ev.id}">
           <div class="sidebar-event-title">${ev.name}</div>
           <div class="sidebar-event-meta">${ev.label} · ${new Date(ev.date).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}</div>
-          ${ev.showsDetails ? `<div class="sidebar-event-details ${ev.detailsSent ? "sent" : "not-sent"}">${ev.detailsSent ? "✓ Details sent to client" : "Details not sent to client"}</div>` : ""}
+          ${ev.showsDetails ? `<div class="sidebar-event-details ${ev.detailsSent ? "sent" : "not-sent"}">${ev.detailsSent ? "✓ Details sent" : "Details not sent yet"}</div>` : ""}
         </button>
       `).join("")}
     </div>
@@ -2709,13 +2724,13 @@ function updateStatusChip(){
     all++;
     const cat = classifyForChip(p);
     if (cat === "episode_recorded") recorded++;
-    else if (cat === "recording_booked") booked++;
+    else if (cat === "booked") booked++;
     else if (cat === "waiting") waiting++;
     else action++;
   });
   document.getElementById("statusChipAll").textContent = `All (${all})`;
   document.getElementById("statusChipRecorded").textContent = `Episode recorded (${recorded})`;
-  document.getElementById("statusChipBooked").textContent = `Recording booked (${booked})`;
+  document.getElementById("statusChipBooked").textContent = `Booked (${booked})`;
   document.getElementById("statusChipPrecall").textContent = `Waiting on reply (${waiting})`;
   document.getElementById("statusChipPending").textContent = `Need action (${action})`;
 
@@ -2732,7 +2747,7 @@ document.querySelectorAll(".status-chip[data-filter]").forEach(chip => {
   });
 });
 
-// ---------- Podcast side panel ----------
+// ---------- 8. Side panel ----------
 // Opening a row shows the podcast in a right-hand panel (same pattern as the Kanban
 // podcast canvas). render() rebuilds the panel content, so every change (status, notes,
 // schedule, prep doc) re-renders list and panel from one source of truth.
@@ -2761,7 +2776,6 @@ function renderPodPanel(bodyHTML){
   const updated = aiSuggestedStatus.has(p.id) ? "Status suggested by AI"
     : (hist.length ? `Updated ${relTime(hist[hist.length - 1].changed_at)}` : "");
   const [hostName, ...hostRest] = (p.host || "").split(" · ");
-  const menuOpen = !document.getElementById("podMenuList")?.hidden && document.getElementById("podMenuList") !== null;
 
   document.getElementById("podPanelCompactTitle").textContent = p.name;
   document.getElementById("podPanelTopbarRight").innerHTML = `
@@ -2786,7 +2800,7 @@ function renderPodPanel(bodyHTML){
   document.getElementById("podPanelBody").innerHTML = `
     <header class="pod-header">
       <div class="pod-header-main">
-        <img class="pod-header-cover" src="${COVER_IMG}" alt="" />
+        <img class="pod-header-cover" src="${COVER_IMG}" alt="" width="100" height="100" decoding="async" />
         <div class="pod-header-text">
           <h2 class="pod-header-title" id="podPanelTitle">${p.name}</h2>
           <dl class="pod-header-rows">
@@ -2918,7 +2932,7 @@ function closePodPanel(){
   });
 })();
 
-// ---------- Prep doc modal (step 2: form only) ----------
+// ---------- 9. Prep doc: modal + form ----------
 // Prototype storage: the form values are kept per podcast in localStorage under
 // "prepdoc:form:<podcast_id>". On the platform this becomes a DB row per podcast.
 const PREP_FORM_KEY = id => `prepdoc:form:${id}`;
@@ -2960,7 +2974,7 @@ function openPrepDocModal(id, trigger, opts = {}){
   const badge = document.getElementById("prepDocCallType");
   const isPrecall = status === "precall_booked";
   badge.textContent = isPrecall ? "Pre-call" : "Recording";
-  badge.className = "call-type-badge " + (isPrecall ? "prebooked" : "done");
+  badge.className = "call-type-badge prebooked"; // both call types share the "Booked" blue
 
   // Date & time: saved form wins, otherwise prefill from the card's scheduled date.
   const iso = scheduledDates[id];
@@ -3036,7 +3050,7 @@ function validatePrepForm(data){
 }
 
 
-// ---------- Step 3: generating state ----------
+// ---------- Prep doc: generating state ----------
 // In the prototype this is a timed simulation. On the platform: POST the form to the
 // backend, which gathers card data, calls the LLM for the AI blocks, and returns the draft.
 const PREP_TITLES = { form: "Create prep doc", loading: "Generating prep doc", preview: "Review prep doc" };
@@ -3081,15 +3095,11 @@ function startPrepDocGeneration(id, form){
   }, PREP_STEPS.length * 1200 + 300));
 }
 
-// ---------- Step 4: draft model, preview & edit ----------
+// ---------- Prep doc: draft model, preview & edit ----------
 // Every block has a source: "system" (card data, read-only), "ai" (LLM draft, editable),
 // "user" (typed in the form, editable). Missing card data is filled with SAMPLE text and
 // flagged, so the developer can see which DB fields are still needed.
 const PREP_DRAFT_KEY = id => `prepdoc:draft:${id}`;
-function readPrepDraft(id){
-  try { const raw = localStorage.getItem(PREP_DRAFT_KEY(id)); return raw ? JSON.parse(raw) : null; }
-  catch (err) { return null; }
-}
 function writePrepDraft(id, draft){
   try { localStorage.setItem(PREP_DRAFT_KEY(id), JSON.stringify(draft)); }
   catch (err) { console.error("Could not save prep doc draft:", err); }
@@ -3216,7 +3226,7 @@ function renderPrepPreview(draft){
     : head(title, "system");
   const factText = f => `<p class="prep-doc-text${f.sample ? " is-sample" : ""}">${escHTML(f.text)}</p>`;
   const linkLine = draft.link
-    ? `Meeting link: <a href="${escHTML(draft.link)}" target="_blank" rel="noopener">${escHTML(draft.link)}</a>`
+    ? `Meeting link: <a href="${escHTML(draft.link)}" target="_blank" rel="noopener noreferrer">${escHTML(draft.link)}</a>`
     : "Meeting link: see the calendar invite for the exact link";
 
   document.getElementById("prepDocPreview").innerHTML = `
@@ -3273,7 +3283,7 @@ function collectPrepDraft(){
 }
 
 
-// ---------- Step 5: saved file, PDF, Outdated ----------
+// ---------- Prep doc: saved file, PDF, Outdated ----------
 // Prototype storage: one localStorage key per podcast, "prepdoc:file:<podcast_id>",
 // holding the final draft + form + snapshot. The PDF is rendered from the saved draft on
 // Download. On the platform: render server-side once on Save and keep the file in storage.
@@ -3322,7 +3332,7 @@ function prepFileHTML(id, file){
       ${outdated ? `
       <div class="prep-file-outdated" role="status">
         <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 3.5l7 12.5H3L10 3.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 8.5v3.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="13.9" r=".9" fill="currentColor"/></svg>
-        <span>${escHTML(outdated)} ${detailsSent[id] ? "The client already has the previous version — regenerate and send the updated doc." : "Regenerate it before sending to the client."}</span>
+        <span>${escHTML(outdated)} ${detailsSent[id] ? "The previous version was already sent — regenerate and send the updated doc." : "Regenerate it before sending."}</span>
       </div>` : ""}
       <div class="prep-file-row">
         <div class="prep-file-icon" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none"><path d="M5 2.75h6.5L15.25 6.5v10.75H5V2.75z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M11.25 2.75V6.75h4" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M7.5 10.5h5M7.5 13.25h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div>
@@ -3340,7 +3350,7 @@ function prepFileHTML(id, file){
         </div>
       </div>
       <p class="prep-file-error" data-prep-error="${id}"></p>
-      ${sentCheckboxHTML(id, "Sent to client (Slack)", "prep-file-sent")}
+      ${sentCheckboxHTML(id, "Prep doc sent", "prep-file-sent")}
     </div>`;
 }
 
@@ -3574,6 +3584,7 @@ document.getElementById("sidebarOverlay").addEventListener("click", (e) => { e.s
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeCalendarDrawer(true); });
 window.matchMedia("(max-width: 980px)").addEventListener("change", (m) => { if (!m.matches) closeCalendarDrawer(); });
 
+// ---------- 10. Boot ----------
 async function loadResponses(){
   try {
     const rows = await fetchAllRows();
