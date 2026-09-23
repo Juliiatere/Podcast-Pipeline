@@ -105,11 +105,29 @@
     padding: 0;
   }
   .shell-search input::placeholder{ color: var(--ink-dim); }
+  .shell-actions{ display: flex; align-items: center; gap: 8px; }
+  .calendar-toggle, .sidebar-close{
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    background: #ffffff;
+    color: var(--heading);
+    cursor: pointer;
+    flex: 0 0 auto;
+  }
+  .calendar-toggle svg, .sidebar-close svg{ width: 18px; height: 18px; }
+  .calendar-toggle:focus-visible, .sidebar-close:focus-visible{ outline: 2px solid var(--amber); outline-offset: 2px; }
+  .sidebar-overlay{ display: none; }
 
   .page-layout{
     display: flex;
     align-items: flex-start;
-    gap: 24px;
+    gap: 12px;
     padding: 16px;
   }
   .wrap{
@@ -131,7 +149,7 @@
     top: 24px;
     margin-top: 0;
     background: #ffffff;
-    border: 1px solid rgba(83,74,183,0.08);
+    border: 1px solid #d3d9f6;
     border-radius: 12px;
     box-shadow: none;
     padding: 12px;
@@ -228,22 +246,87 @@
   .sidebar-event-details.not-sent{ color: var(--status-action-fg); }
 
   @media (max-width: 980px){
-    .page-layout{ flex-direction: column; padding: 0 16px; }
+    body{ padding: 16px; }
+    .page-layout{ flex-direction: column; padding: 16px; }
     .wrap{ max-width: none; width: 100%; }
-    .sidebar{
-      width: 100%;
-      max-width: none;
-      flex: 1 1 auto;
-      position: static;
-      margin-top: 0;
-      max-height: none;
+    /* Row 1: tabs + calendar icon, separator under it. Row 2: search, below the separator. */
+    .shell-topbar{
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-areas: "tabs cal" "search search";
+      column-gap: 8px;
+      row-gap: 0;
+      border-bottom: none;
     }
+    .shell-topbar::after{
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 46px; /* tab row is 47px; the 2px active underline (45-47px) covers this 1px line */
+      height: 1px;
+      background: #d3d9f6;
+      z-index: 0;
+    }
+    .shell-tabs{
+      grid-area: tabs;
+      position: relative;
+      z-index: 1;
+      min-width: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .shell-tabs::-webkit-scrollbar{ display: none; }
+    .shell-tab{ white-space: nowrap; margin-bottom: 0; flex: 0 0 auto; padding: 12px 4px; }
+    .shell-actions{ display: contents; }
+    .calendar-toggle{ display: inline-flex; grid-area: cal; align-self: center; margin-bottom: 1px; }
+    .shell-search{ grid-area: search; width: auto; margin: 16px 4px 0; }
+    .sidebar-header{ display: flex; align-items: center; justify-content: space-between; }
+    .sidebar-close{ display: inline-flex; border: none; }
+    .sidebar{
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1001;
+      width: min(360px, 85vw);
+      min-width: 0;
+      max-width: none;
+      max-height: none;
+      border-radius: 12px 0 0 12px;
+      border-right: none;
+      padding: 16px;
+      transform: translateX(100%);
+      visibility: hidden;
+      transition: transform .25s ease, visibility 0s linear .25s;
+    }
+    .sidebar.is-open{
+      transform: translateX(0);
+      visibility: visible;
+      transition: transform .25s ease;
+    }
+    .sidebar-overlay{
+      display: block;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(11,15,20,0.32);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s ease;
+    }
+    .sidebar-overlay.is-open{ opacity: 1; pointer-events: auto; }
+    body.drawer-open{ overflow: hidden; }
+  }
+  @media (max-width: 980px) and (prefers-reduced-motion: reduce){
+    .sidebar, .sidebar.is-open, .sidebar-overlay{ transition: none; }
   }
 
-  .header{ margin-bottom: 32px; }
+  .header{ margin-bottom: 0; }
   .eyebrow{
     font-family: 'DM Sans', sans-serif;
-    font-weight: 700;
+    font-weight: 500;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     font-size: 13px;
@@ -260,17 +343,27 @@
   }
   .sub{ color: var(--ink-dim); font-size: 15px; line-height: 1.5; max-width: none; font-weight: 400; }
 
-  .status-chip-row{ display:flex; gap:24px; margin-top:20px; flex-wrap:wrap; align-items:center; }
+  .status-chip-row{
+    display:flex;
+    gap:12px;
+    margin-top:0;
+    margin-bottom:12px;
+    padding:12px;
+    background:#f7f7f7;
+    border-radius:12px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
   .status-chip{
     display:inline-flex;
     align-items:center;
     gap:4px;
-    padding:0;
+    padding:4px 8px;
     border-radius:8px;
     font-family: 'DM Sans', sans-serif;
     font-weight:400;
     font-size:14px;
-    border: none;
+    border: 1.5px solid transparent;
     background: transparent;
     cursor: pointer;
     appearance: none;
@@ -279,15 +372,19 @@
   }
   .status-chip.chip-all{
     gap: 8px;
-    border: 1px solid #8e9195;
+    border: 1.5px solid transparent;
     border-radius: 8px;
     background: transparent;
     color: var(--heading);
     font-weight: 400;
     padding: 4px 12px;
   }
-  .status-chip.active.chip-all{ border-color: var(--heading); }
+  .status-chip.active.chip-all{ border-color: #8e9195; color: var(--heading); }
+  .status-chip.active:not(.chip-all){ border-color: currentColor; }
   .status-chip:hover:not(.chip-all){ background: #f7f7f8; }
+  @media (max-width: 980px){
+    .status-chip-row{ column-gap: 8px; row-gap: 4px; }
+  }
   .status-chip.chip-done{ color: #0c8f21; }
   .status-chip.chip-recording-booked{ color: #007aff; }
   .status-chip.chip-action{ color: #9e610c; }
@@ -298,7 +395,8 @@
   }
 
   .list{
-    background: #f7f7f7;
+    background: #fefefe;
+    border: 1px solid #d3d9f6;
     border-radius: 12px;
     padding: 12px 0;
   }
@@ -313,16 +411,22 @@
     transition: background-color .15s ease;
   }
   .card:last-of-type{ border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
-  .card[open]{ background: transparent; border-bottom: none; }
-  .card summary{
-    list-style: none;
-    cursor: pointer;
+  .card-summary{
+    width: 100%;
+    margin: 0;
     padding: 0 12px;
     display: flex;
     align-items: center;
     gap: 16px;
+    border: none;
+    background: transparent;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
   }
-  .card summary::-webkit-details-marker{ display:none; }
+  .card-summary:focus-visible{ outline: 2px solid var(--amber); outline-offset: 4px; border-radius: 8px; }
+  .card-summary:hover .chev, .card.is-active .chev{ color: var(--amber); }
 
   .card-cover{
     width: 40px;
@@ -347,7 +451,7 @@
     color: var(--ink-dim);
     transition: transform .15s ease;
   }
-  .card[open] .chev{ transform: rotate(90deg); color: var(--amber); }
+
 
   .card-title-block{ flex:1; min-width:0; }
   .card-title{
@@ -376,19 +480,20 @@
   .badge.prebooked{ background: var(--status-prebooked-bg); color: var(--status-prebooked-fg); }
   .badge.skip{ background: #f1f1f5; color: #676d77; }
 
-  .card-body{ padding: 0 24px 24px; border-top: 1px solid #d3d9f6; }
+  .card-body{ padding: 0 24px 24px; border-top: none; }
   .card-body-inner{ padding-top: 20px; }
 
   .field{ margin-bottom: 28px; }
   .field:last-of-type{ margin-bottom: 0; }
+  /* Section heading — Figma: Inter Medium 16 / 130% / 0 */
   .field-label{
     font-family: 'Inter', sans-serif;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 16px;
     line-height: 1.3;
     color: var(--heading);
     margin-bottom: 8px;
-    letter-spacing: -0.003em;
+    letter-spacing: 0;
   }
   .field-text{
     font-family: 'DM Sans', sans-serif;
@@ -410,7 +515,7 @@
   .info-box .field-label{
     font-family: 'DM Sans', sans-serif;
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 500;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     line-height: 1.4;
@@ -429,7 +534,7 @@
   .precall-box .field-label{
     font-family: 'DM Sans', sans-serif;
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 500;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     line-height: 1.4;
@@ -448,7 +553,7 @@
   .prebooked-box .field-label{
     font-family: 'DM Sans', sans-serif;
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 500;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     line-height: 1.4;
@@ -467,7 +572,7 @@
   .skip-box .field-label{
     font-family: 'DM Sans', sans-serif;
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 500;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     line-height: 1.4;
@@ -486,7 +591,7 @@
   .action-box .field-label{
     font-family: 'DM Sans', sans-serif;
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 500;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     line-height: 1.4;
@@ -499,23 +604,34 @@
     box-shadow: 0 0 0 3px rgba(184,114,10,0.12);
   }
 
+  /* Button — Figma "button / Size=Small": fixed h32, horizontal padding 12 (11 + 1px border), gap 8, radius 8,
+     DM Sans Regular 14 / 150%, 16px thin-stroke icon. Primary: fill #5068d4, text #fefefe.
+     Secondary: no fill, 1px #5068d4 stroke, text #5068d4. */
   .btn{
     display: inline-flex;
     align-items: center;
     gap: 8px;
     font-family: 'DM Sans', sans-serif;
-    font-weight: 600;
+    font-weight: 400;
     font-size: 14px;
-    padding: 10px 16px;
-    border-radius: 9px;
+    line-height: 21px;
+    letter-spacing: 0;
+    height: 32px;
+    padding: 0 11px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    box-sizing: border-box;
     text-decoration: none;
     margin-top: 10px;
+    cursor: pointer;
   }
-  .btn.primary{ background: var(--amber); color: #ffffff; }
+  .btn svg{ width: 16px; height: 16px; flex: 0 0 auto; }
+  .btn.primary{ background: var(--amber); color: #fefefe; }
   .btn.primary:hover{ background: var(--amber-hover); }
-  .btn.secondary{ background: #ffffff; color: var(--amber); border: 1.5px solid var(--amber); }
+  .btn.secondary{ background: transparent; color: var(--amber); border-color: var(--amber); }
   .btn.secondary:hover{ background: var(--amber-tint); }
-  .btn-small{ padding: 7px 14px; font-size: 12.5px; }
+  .btn:focus-visible{ outline: 2px solid var(--amber); outline-offset: 2px; }
+  .btn-small{ }
   .btn:disabled{ opacity: 0.4; cursor: not-allowed; pointer-events: none; }
 
   .step-list{ display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
@@ -527,7 +643,7 @@
     border: 1.5px solid var(--status-action-fg);
     color: var(--status-action-fg);
     font-family: 'DM Sans', sans-serif;
-    font-weight: 700;
+    font-weight: 500;
     font-size: 12px;
     display: flex; align-items: center; justify-content: center;
   }
@@ -543,14 +659,15 @@
   }
   .response-header .response-title{
     font-family: 'Inter', sans-serif;
-    font-weight: 700;
-    font-size: 15px;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.3;
     color: var(--amber);
-    letter-spacing: -0.005em;
+    letter-spacing: 0;
   }
   .clear-response{
     font-family: 'DM Sans', sans-serif;
-    font-weight: 600;
+    font-weight: 400;
     font-size: 12.5px;
     color: var(--ink-dim);
     cursor: pointer;
@@ -640,7 +757,7 @@
     display: block;
     font-family: 'DM Sans', sans-serif;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--ink-dim);
     margin-bottom: 5px;
   }
@@ -679,12 +796,25 @@
   }
   .schedule-fields .schedule-input{ width: auto; }
   .schedule-date{ flex: 1 1 auto; min-width: 0; }
-  .schedule-hour{ width: 66px; flex: 0 0 auto; padding-right: 20px; }
-  .schedule-minute{ width: 70px; flex: 0 0 auto; padding-right: 20px; }
-  .schedule-ampm{ width: 76px; flex: 0 0 auto; padding-right: 20px; }
+  .schedule-hour{ width: 72px; flex: 0 0 auto; }
+  .schedule-minute{ width: 76px; flex: 0 0 auto; }
+  .schedule-ampm{ width: 84px; flex: 0 0 auto; }
+
+  /* Custom chevron for all card dropdowns: native arrows sit flush to the edge
+     and differ per browser. 14px from the right edge, text never runs under it. */
+  .status-select, select.schedule-input{
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 4.5l3 3 3-3' stroke='%23424239' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 38px;
+    cursor: pointer;
+  }
+  select.schedule-input{ background-position: right 12px center; padding-right: 32px; }
   .schedule-colon{
     font-family: 'DM Sans', sans-serif;
-    font-weight: 600;
+    font-weight: 400;
     color: var(--ink-dim);
     flex: 0 0 auto;
   }
@@ -694,26 +824,633 @@
     .schedule-date{ flex-basis: 100%; }
   }
 
+  /* Prep document (client-facing call brief). Shown for Pre-call booked / Recording booked. */
+  .prep-doc-empty{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px;
+    border: 1px dashed #d3d9f6;
+    border-radius: 12px;
+    background: var(--amber-tint);
+  }
+  .prep-doc-empty-text{
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--body);
+    margin: 0;
+    max-width: 52ch;
+  }
+  .prep-doc-empty .btn{ margin-top: 0; flex: 0 0 auto; }
+  .prep-doc-empty .btn:focus-visible{ outline: 2px solid var(--amber); outline-offset: 2px; }
+  @media (max-width: 640px){
+    .prep-doc-empty{ flex-direction: column; align-items: stretch; }
+    .prep-doc-empty .btn{ justify-content: center; }
+  }
+
+
+
+  /* ---------- Podcast side panel — Figma "Cahill experiment / Updated" ----------
+     Panel 1182 of 1440 (82%), fill #fefefe, border #e0e2e7. Top bar 64h, fill #fefefe 60% +
+     8px background blur, 0.5px bottom border, sticky. Content: 40px side padding, starts 32px
+     below the top bar, 24px between blocks. */
+  .pod-panel-overlay{
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    background: rgba(11,15,20,0.32);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s ease;
+  }
+  .pod-panel-overlay.is-open{ opacity: 1; pointer-events: auto; }
+  .pod-panel{
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1051;
+    width: min(1182px, 82vw);
+    background: #fefefe;
+    border-left: 1px solid #e0e2e7;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    transform: translateX(100%);
+    transition: transform .28s ease;
+  }
+  .pod-panel[hidden]{ display: block; visibility: hidden; }
+  .pod-panel.is-open{ transform: translateX(0); }
+  body.panel-open{ overflow: hidden; }
+
+  .pod-panel-topbar{
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    height: 64px;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: rgba(254,254,254,0.6);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border-bottom: 0.5px solid #e0e2e7;
+  }
+  .pod-panel-topbar-left{ display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .pod-panel-topbar-right{ display: flex; align-items: center; gap: 12px; flex: 0 0 auto; }
+  .pod-icon-btn{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #42423d;
+    cursor: pointer;
+    flex: 0 0 auto;
+  }
+  .pod-icon-btn svg{ width: 20px; height: 20px; }
+  .pod-icon-btn:hover{ background: #f2f3f5; }
+  .pod-icon-btn:focus-visible{ outline: 2px solid var(--amber); outline-offset: 2px; }
+  #podPanelBack{ margin-left: -6px; }
+
+  /* Podcast name appears in the sticky bar once the header has scrolled away */
+  .pod-panel-compact-title{
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.3;
+    color: var(--heading);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  .pod-panel-topbar.is-condensed .pod-panel-compact-title{ opacity: 1; transform: none; }
+
+  .pod-panel-meta{
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 21px;
+    color: #7d7d74;
+    white-space: nowrap;
+  }
+  /* Status dropdown — styled like the Kanban "Close as" control */
+  /* Status dropdown in the top bar — same look as the form dropdowns:
+     grey border, dark text, dark chevron */
+  select.pod-status{
+    width: auto;
+    height: 32px;
+    margin: 0;
+    padding: 0 38px 0 12px;
+    border: 1.5px solid var(--panel-border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 21px;
+    color: var(--heading);
+    background-color: #ffffff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M13 6l-5 5-5-5' stroke='%230b0f14' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-position: right 12px center;
+  }
+  select.pod-status:hover{ border-color: #c9ccd3; }
+  select.pod-status:focus{ outline: none; border-color: var(--amber); }
+  select.pod-status:focus-visible{ outline: 2px solid var(--amber); outline-offset: 2px; }
+
+  .pod-menu{ position: relative; }
+  .pod-menu-list{
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    min-width: 180px;
+    padding: 4px;
+    background: #ffffff;
+    border: 1px solid #e0e2e7;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(11,15,20,0.10);
+    z-index: 10;
+  }
+  .pod-menu-list[hidden]{ display: none; }
+  .pod-menu-item{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 21px;
+    color: var(--danger);
+    text-align: left;
+    cursor: pointer;
+  }
+  .pod-menu-item svg{ width: 16px; height: 16px; flex: 0 0 auto; }
+  .pod-menu-item:hover, .pod-menu-item:focus-visible{ background: #fdecec; outline: none; }
+
+  .pod-panel-body{
+    padding: 32px 40px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .pod-panel-body .card-body-inner{ padding-top: 0; }
+  .pod-panel:focus{ outline: none; }
+
+  /* Next step block — first thing in the panel, colored by status */
+  .pod-actions .next-step{ margin: 0; padding: 16px; border-radius: 12px; }
+  .pod-actions .next-step .field-label{
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: 0;
+    text-transform: none;
+    margin-bottom: 8px;
+  }
+  .next-step-link{ display: flex; flex-direction: column; gap: 6px; margin-top: 16px; max-width: 560px; }
+  .next-step .next-step-cta{ margin-top: 16px; }
+  .next-step-cta-top{ margin-top: 0; white-space: nowrap; }
+  .next-step-cta-inline{ display: none; }
+  @media (max-width: 1100px){ .pod-panel-meta{ display: none; } }
+  @media (max-width: 760px){
+    .next-step-cta-top{ display: none; }
+    .next-step-cta-inline{ display: inline-flex; }
+  }
+  /* Actions come first; the first block never gets a divider above it */
+  .pod-actions > .divider:first-child{ display: none; }
+  .pod-actions > [class$="-box"]{ margin-bottom: 0; }
+
+  /* Accordions — Figma: border 1 #e0e2e7, r12, padding 16, gap 24; head Inter Medium 16 + 24px caret;
+     separators between fields #f2f3f5 */
+  .pod-accordions{ display: flex; flex-direction: column; gap: 16px; }
+  .pod-acc{ border: 1px solid #e0e2e7; border-radius: 12px; background: #fefefe; }
+  .pod-acc-head{
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 16px;
+    cursor: pointer;
+    border-radius: 12px;
+  }
+  .pod-acc-head::-webkit-details-marker{ display: none; }
+  .pod-acc-head:focus-visible{ outline: 2px solid var(--amber); outline-offset: 2px; }
+  .pod-acc-title{ font-family: 'Inter', sans-serif; font-weight: 500; font-size: 16px; line-height: 1.3; color: var(--heading); }
+  .pod-acc-caret{ width: 24px; height: 24px; color: #42423d; flex: 0 0 auto; transform: rotate(180deg); transition: transform .15s ease; }
+  .pod-acc[open] .pod-acc-caret{ transform: none; }
+  .pod-acc-body{ padding: 8px 16px 16px; display: flex; flex-direction: column; }
+  .pod-acc-body .field{ margin: 0; padding: 16px 0; }
+  .pod-acc-body .field:first-child{ padding-top: 0; }
+  .pod-acc-body .field:last-child{ padding-bottom: 0; }
+  .pod-acc-body .field + .field{ border-top: 1px solid #f2f3f5; }
+
+  /* Header: cover 100 r12, gap 24; title Inter Medium 24/130%; meta rows gap 8 */
+  .pod-header{ display: flex; align-items: flex-start; justify-content: space-between; gap: 30px; }
+  .pod-header-main{ display: flex; align-items: center; gap: 24px; min-width: 0; }
+  .pod-header-cover{ width: 100px; height: 100px; border-radius: 12px; object-fit: cover; flex: 0 0 auto; display: block; }
+  .pod-header-text{ display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  .pod-header-title{
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 1.3;
+    color: var(--heading);
+  }
+  .pod-header-rows{ display: flex; flex-direction: column; gap: 8px; }
+  .pod-header-row{ margin: 0; display: flex; gap: 16px; font-family: 'DM Sans', sans-serif; font-size: 14px; line-height: 21px; color: #42423d; }
+  .pod-header-row dt{ color: #7d7d74; flex: 0 0 auto; }
+  .pod-header-row dd{ margin: 0; min-width: 0; }
+  .pod-header-side{ display: flex; flex-direction: column; align-items: flex-end; gap: 16px; flex: 0 0 auto; }
+
+  @media (max-width: 640px){
+    .pod-panel{ width: 100%; border-left: none; }
+    .pod-panel-topbar{ padding: 0 16px; padding-top: env(safe-area-inset-top, 0px); height: calc(56px + env(safe-area-inset-top, 0px)); }
+    .pod-panel-meta{ display: none; }
+    .pod-panel-body{ padding: 24px 16px calc(40px + env(safe-area-inset-bottom, 0px)); }
+    .pod-header{ flex-direction: column; gap: 12px; }
+    .pod-header-main{ align-items: flex-start; gap: 16px; }
+    .pod-header-cover{ width: 64px; height: 64px; }
+    .pod-header-title{ font-size: 20px; }
+    .pod-header-text{ gap: 8px; }
+    .pod-header-row{ flex-direction: column; gap: 0; }
+    .pod-header-side{ align-items: flex-start; }
+    select.pod-status{ max-width: 60vw; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .pod-panel, .pod-panel-overlay, .pod-panel-compact-title{ transition: none; }
+  }
+
+  /* ---------- Prep doc modal ---------- */
+  .modal-overlay{
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(11,15,20,0.32);
+  }
+  .modal-overlay[hidden]{ display: none; }
+  .modal{
+    width: 100%;
+    max-width: 560px;
+    max-height: calc(100vh - 48px);
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border: 1px solid #d3d9f6;
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(11,15,20,0.12);
+  }
+  .modal-header{
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid #d3d9f6;
+  }
+  .modal-title{
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 28px;
+    color: var(--heading);
+    margin: 0;
+  }
+  .modal-subtitle{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 4px 0 0;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--body);
+  }
+  .modal-close{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 auto;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--heading);
+    cursor: pointer;
+  }
+  .modal-close:hover{ background: #f7f7f8; }
+  .modal-close svg{ width: 18px; height: 18px; }
+  .modal-body{
+    padding: 20px 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .modal-footer{
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 16px 24px;
+    border-top: 1px solid #d3d9f6;
+  }
+  .modal-footer .btn{ margin-top: 0; }
+  .modal-close:focus-visible, .modal .btn:focus-visible{ outline: 2px solid var(--amber); outline-offset: 2px; }
+
+  .form-field{ display: flex; flex-direction: column; gap: 6px; }
+  .form-label{
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    color: var(--heading);
+  }
+  .form-label .optional{ font-weight: 400; color: var(--ink-dim); }
+  .form-hint{
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--ink-dim);
+    margin: 0;
+  }
+  .form-error{
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--danger);
+    margin: 0;
+  }
+  .form-error:empty{ display: none; }
+  .form-row{ display: flex; gap: 8px; flex-wrap: wrap; }
+  .form-row > *{ flex: 1 1 140px; min-width: 0; }
+  .prep-input{
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    border: 1.5px solid var(--panel-border);
+    border-radius: 9px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--body);
+    background: #ffffff;
+  }
+  select.prep-input{
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 32px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 4.5l3 3 3-3' stroke='%23676d77' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    cursor: pointer;
+  }
+  textarea.prep-input{ height: auto; min-height: 104px; padding: 10px 12px; line-height: 1.5; resize: vertical; }
+  .prep-input:focus{ outline: none; border-color: var(--amber); }
+  .prep-input.is-invalid{ border-color: var(--danger); }
+  .time-fields{ display: flex; align-items: center; gap: 4px; }
+  .time-fields .prep-input{ flex: 0 0 auto; padding: 0 28px 0 12px; background-position: right 8px center; }
+  #prepHour{ width: 60px; }
+  #prepMinute{ width: 64px; }
+  #prepAmPm{ width: 68px; }
+  .form-row > .form-field-time{ flex: 0 0 auto; }
+  .time-fields .time-colon{ color: var(--ink-dim); }
+
+  .call-type-badge{
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+  }
+  .call-type-badge.prebooked{ background: var(--status-prebooked-bg); color: var(--status-prebooked-fg); }
+  .call-type-badge.done{ background: #eafaf1; color: #1b8a5a; }
+
+  /* Modal views: form -> loading -> preview */
+  .modal [data-view]{ display: none; }
+  .modal[data-mode="form"] [data-view="form"],
+  .modal[data-mode="loading"] [data-view="loading"],
+  .modal[data-mode="preview"] [data-view="preview"]{ display: flex; }
+  .modal[data-mode="preview"]{ max-width: 760px; }
+  .modal-footer-split{ justify-content: space-between; }
+
+  /* Step 3: generating state (matches the outreach loading pattern) */
+  .prep-loading{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+    padding: 40px 24px;
+    background: #fafafd;
+    border-radius: 12px;
+    width: 100%;
+  }
+  .prep-loading-icon{ position: relative; width: 48px; height: 48px; }
+  .prep-loading-ring{ position: absolute; inset: 0; width: 48px; height: 48px; animation: prep-spin 1.1s linear infinite; }
+  .prep-loading-spark{ position: absolute; left: 14px; top: 14px; width: 20px; height: 20px; }
+  @keyframes prep-spin{ to{ transform: rotate(360deg); } }
+  .prep-loading-step{
+    margin: 0;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--amber);
+  }
+  .prep-progress{ width: 100%; max-width: 420px; height: 4px; border-radius: 4px; background: #d3d9f6; overflow: hidden; }
+  .prep-progress-fill{ height: 100%; width: 0; background: var(--amber); border-radius: 4px; transition: width .6s ease; }
+  .prep-loading-sub{ margin: 0; font-family: 'DM Sans', sans-serif; font-size: 13px; line-height: 18px; color: var(--body); }
+  @media (prefers-reduced-motion: reduce){
+    .prep-loading-ring{ animation: none; }
+    .prep-progress-fill{ transition: none; }
+  }
+
+  /* Step 4: preview & edit */
+  .modal-body[data-view="preview"]{ background: #f7f7f8; }
+  .prep-preview-hint{ margin: 0; font-family: 'DM Sans', sans-serif; font-size: 13px; line-height: 20px; color: var(--body); }
+  .src-tag{
+    display: inline-flex;
+    align-items: center;
+    padding: 0 6px;
+    border-radius: 4px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    line-height: 18px;
+    font-weight: 500;
+    white-space: nowrap;
+    vertical-align: 1px;
+  }
+  .src-ai{ background: var(--amber-tint); color: var(--amber); }
+  .src-system{ background: #eef0f3; color: var(--ink-dim); }
+  .src-user{ background: #fdf3e4; color: #9e610c; }
+  .src-missing{ background: #fdecec; color: #b42318; }
+  .src-conversation{ background: #e8f1fe; color: #1f6fd6; }
+
+  .prep-doc{
+    background: #ffffff;
+    border: 1px solid #d3d9f6;
+    border-radius: 8px;
+    padding: 32px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--body);
+  }
+  .prep-doc-eyebrow{ margin: 0 0 8px; font-size: 12px; line-height: 16px; font-weight: 500; color: var(--amber); }
+  .prep-doc-title{ margin: 0; font-family: 'Inter', sans-serif; font-weight: 500; font-size: 24px; line-height: 1.3; color: var(--heading); }
+  .prep-doc-subtitle{ margin: 4px 0 0; font-size: 15px; line-height: 22px; color: var(--body); }
+  .prep-doc-when{
+    margin: 20px 0 0;
+    padding: 12px 16px;
+    border-radius: 8px;
+    background: var(--amber-tint);
+    font-size: 14px;
+    line-height: 22px;
+  }
+  .prep-doc-when strong{ display: block; font-family: 'Inter', sans-serif; font-weight: 500; font-size: 16px; line-height: 1.3; color: var(--heading); margin-bottom: 2px; }
+  .prep-doc-when a{ color: var(--amber); word-break: break-all; }
+  .prep-doc-section{ margin-top: 24px; }
+  .prep-doc-section-head{ display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+  .prep-doc-h{ margin: 0; font-family: 'Inter', sans-serif; font-weight: 500; font-size: 16px; line-height: 1.3; color: var(--heading); }
+  .prep-doc-text{ margin: 0; font-size: 14px; line-height: 22px; white-space: pre-line; }
+  .prep-doc-text.is-sample, .prep-doc-quote.is-sample{ color: var(--ink-dim); font-style: italic; }
+  .prep-doc-quote{ margin: 0; padding-left: 12px; border-left: 2px solid #d3d9f6; font-size: 14px; line-height: 22px; font-style: italic; }
+  .prep-doc-edit{
+    width: 100%;
+    display: block;
+    margin: 0;
+    padding: 8px 10px;
+    border: 1.5px dashed #d3d9f6;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 22px;
+    color: var(--body);
+    background: #ffffff;
+    resize: none;
+    overflow: hidden;
+  }
+  .prep-doc-edit:hover{ border-color: #b7c0ee; }
+  .prep-doc-edit:focus{ outline: none; border-style: solid; border-color: var(--amber); }
+  .prep-doc-edit-hint{ margin: 4px 0 0; font-size: 12px; line-height: 16px; color: var(--ink-dim); }
+  .prep-doc-footer{ margin: 32px 0 0; padding-top: 12px; border-top: 1px solid #d3d9f6; font-size: 12px; line-height: 16px; color: var(--ink-dim); }
+  @media (max-width: 640px){
+    .prep-doc{ padding: 20px 16px; }
+    .modal-footer-split .btn{ flex: 1 1 0; }
+  }
+
+  body.modal-open{ overflow: hidden; }
+
+  @media (max-width: 640px){
+    .modal-overlay{ padding: 0; align-items: stretch; }
+    .modal{ max-width: none; max-height: none; height: 100%; border: none; border-radius: 0; box-shadow: none; }
+    .modal-header, .modal-body, .modal-footer{ padding-left: 16px; padding-right: 16px; }
+    .modal-footer .btn{ flex: 1 1 0; justify-content: center; }
+  }
+
+  /* Step 5: saved prep doc in the card */
+  .prep-file{
+    border: 1px solid #d3d9f6;
+    border-radius: 12px;
+    background: #ffffff;
+    overflow: hidden;
+  }
+  .prep-file-row{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+  }
+  .prep-file-icon{
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--amber-tint);
+    color: var(--amber);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .prep-file-icon svg{ width: 20px; height: 20px; }
+  .prep-file-info{ flex: 1 1 auto; min-width: 0; }
+  .prep-file-name{
+    margin: 0;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--heading);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .prep-file-meta{ margin: 0; font-family: 'DM Sans', sans-serif; font-size: 12px; line-height: 16px; color: var(--ink-dim); }
+  .prep-file-actions{ display: flex; align-items: center; gap: 4px; flex: 0 0 auto; }
+  .prep-file-actions .btn{ margin-top: 0; }
+  .prep-link-btn{
+    padding: 6px 8px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 21px;
+    color: var(--amber);
+    cursor: pointer;
+  }
+  .prep-link-btn:hover{ background: var(--amber-tint); }
+  .prep-file-actions .btn:focus-visible, .prep-link-btn:focus-visible{ outline: 2px solid var(--amber); outline-offset: 2px; }
+  .prep-file-error{ margin: 0; padding: 0 16px 12px; font-family: 'DM Sans', sans-serif; font-size: 12px; line-height: 16px; color: var(--danger); }
+  .prep-file-error:empty{ display: none; }
+  .prep-file-outdated{
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 16px;
+    background: #fdf3e4;
+    border-bottom: 1px solid #f3dfbf;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    line-height: 20px;
+    color: #7a4b09;
+  }
+  .prep-file-outdated svg{ flex: 0 0 auto; width: 16px; height: 16px; margin-top: 2px; color: #9e610c; }
+  .prep-file.is-outdated{ border-color: #f3dfbf; }
+  .prep-file-sent{ margin: 0; padding: 10px 16px; border-top: 1px solid #eef0f6; font-size: 14px; }
+  .prep-sent-standalone{ margin-top: 12px; font-size: 14px; }
+  @media (max-width: 640px){
+    .prep-file-row{ flex-wrap: wrap; align-items: flex-start; }
+    .prep-file-info{ flex: 1 1 0; }
+    .prep-file-actions{ width: 100%; flex-wrap: wrap; gap: 4px 8px; }
+    .prep-file-actions .btn{ order: -1; flex: 1 1 100%; justify-content: center; }
+  }
+
   .delete-row{
     display: flex;
     justify-content: flex-end;
     margin-top: 24px;
   }
-  .delete-btn{
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 8px 14px;
-    border-radius: 8px;
-    border: 1.5px solid var(--panel-border);
-    background: #ffffff;
-    color: var(--ink-dim);
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 600;
-    font-size: 13px;
-  }
-  .delete-btn:hover{ border-color: var(--danger); color: var(--danger); background: #fff5f5; }
+  .delete-btn{ margin-top: 0; }
 
   .timeline{ margin-top: 4px; }
   .timeline-item{
@@ -744,7 +1481,7 @@
   .timeline-item.cls-skip::before{ background: #8a8d9c; }
   .timeline-label{
     font-family: 'DM Sans', sans-serif;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 13.5px;
     color: var(--body);
   }
@@ -760,10 +1497,6 @@
     .badge{ align-self: flex-start; }
   }
 
-  @media (max-width: 480px){
-    .wrap{ margin: 16px 0 0; padding: 24px 20px 24px; border-radius: 12px; }
-    .page-layout{ padding: 0 8px; }
-  }
 </style>
 </head>
 <body>
@@ -773,11 +1506,16 @@
     <div class="shell-tabs">
       <a class="shell-tab" href="#">AI Pitches</a>
       <a class="shell-tab" href="#">Manual Pitches</a>
-      <a class="shell-tab active" href="#">Shortlist</a>
+      <a class="shell-tab active" href="#">Pipeline</a>
     </div>
+    <div class="shell-actions">
     <div class="shell-search">
       <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.4"/><path d="M17.5 17.5l-3.6-3.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
       <input type="text" placeholder="Search by name..." />
+    </div>
+    <button type="button" class="calendar-toggle" id="calendarToggle" aria-label="Open upcoming calendar" aria-controls="sidebar" aria-expanded="false">
+      <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="3" y="4.5" width="14" height="12.5" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M3 8.5h14M7 2.75v3.5M13 2.75v3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </button>
     </div>
   </div>
 
@@ -799,8 +1537,9 @@
   <footer>Maintained by Novacast · Last updated August 28, 2026</footer>
 </div>
 
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-header">Upcoming</div>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<aside class="sidebar" id="sidebar" aria-label="Upcoming">
+  <div class="sidebar-header">Upcoming<button type="button" class="sidebar-close" id="sidebarClose" aria-label="Close calendar"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button></div>
   <div class="sidebar-today-date" id="sidebarTodayDate"></div>
   <div class="sidebar-events" id="sidebarEvents"></div>
 </aside>
@@ -808,6 +1547,118 @@
 </div>
 
 
+
+<!-- Prep doc modal (step 2: form). Steps 3-5 add loading, preview/edit, and saved PDF. -->
+
+<!-- Podcast side panel (same pattern as the Kanban podcast canvas) -->
+<div class="pod-panel-overlay" id="podPanelOverlay"></div>
+<section class="pod-panel" id="podPanel" role="dialog" aria-modal="true" aria-labelledby="podPanelTitle" tabindex="-1" hidden>
+  <div class="pod-panel-topbar" id="podPanelTopbar">
+    <div class="pod-panel-topbar-left">
+      <button type="button" class="pod-icon-btn" id="podPanelBack" aria-label="Close panel">
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M16.875 10H3.125M8.75 4.375L3.125 10l5.625 5.625" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <span class="pod-panel-compact-title" id="podPanelCompactTitle" aria-hidden="true"></span>
+    </div>
+    <div class="pod-panel-topbar-right" id="podPanelTopbarRight"></div>
+  </div>
+  <div class="pod-panel-body" id="podPanelBody"></div>
+</section>
+<div class="modal-overlay" id="prepDocOverlay" hidden>
+  <div class="modal" id="prepDocModal" role="dialog" aria-modal="true" aria-labelledby="prepDocTitle">
+    <div class="modal-header">
+      <div>
+        <h2 class="modal-title" id="prepDocTitle">Create prep doc</h2>
+        <p class="modal-subtitle"><span id="prepDocPodcastName"></span><span class="call-type-badge" id="prepDocCallType"></span></p>
+      </div>
+      <button type="button" class="modal-close" data-prep-close aria-label="Close"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body" data-view="form">
+      <div class="form-field">
+        <label class="form-label" for="prepDate">Date</label>
+        <input type="date" class="prep-input" id="prepDate" />
+        <p class="form-error" id="prepDateError"></p>
+      </div>
+      <div class="form-row">
+        <div class="form-field form-field-time">
+          <span class="form-label" id="prepTimeLabel">Start time</span>
+          <div class="time-fields" role="group" aria-labelledby="prepTimeLabel">
+            <select class="prep-input" id="prepHour" aria-label="Hour"></select>
+            <span class="time-colon">:</span>
+            <select class="prep-input" id="prepMinute" aria-label="Minute">
+              <option value="00">00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option>
+            </select>
+            <select class="prep-input" id="prepAmPm" aria-label="AM or PM">
+              <option value="AM">AM</option><option value="PM">PM</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="prepDuration">Duration</label>
+          <select class="prep-input" id="prepDuration">
+            <option value="15">15 min</option><option value="20">20 min</option><option value="30">30 min</option>
+            <option value="45">45 min</option><option value="60">60 min</option><option value="90">90 min</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="prepTimezone">Client time zone</label>
+        <select class="prep-input" id="prepTimezone">
+          <option value="America/Toronto">Eastern Time (Toronto, New York)</option>
+          <option value="America/Chicago">Central Time (Chicago)</option>
+          <option value="America/Denver">Mountain Time (Denver)</option>
+          <option value="America/Los_Angeles">Pacific Time (Los Angeles)</option>
+          <option value="Europe/London">UK (London)</option>
+          <option value="Europe/Berlin">Central Europe (Berlin, Warsaw)</option>
+          <option value="Europe/Kyiv">Eastern Europe (Kyiv)</option>
+        </select>
+        <p class="form-hint">The time in the document is shown in this time zone.</p>
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="prepLink">Meeting link <span class="optional">(optional)</span></label>
+        <input type="url" class="prep-input" id="prepLink" placeholder="https://zoom.us/j/..." inputmode="url" />
+        <p class="form-hint">If empty, the doc says to use the link from the calendar invite.</p>
+        <p class="form-error" id="prepLinkError"></p>
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="prepClientNotes">Notes for the client <span class="optional">(optional)</span></label>
+        <textarea class="prep-input" id="prepClientNotes" placeholder="Questions or recommendations from the host, things to prepare..."></textarea>
+        <p class="form-hint">Goes into the PDF as is. Internal team notes are not included.</p>
+      </div>
+    </div>
+    <!-- Step 3: generating -->
+    <div class="modal-body" data-view="loading">
+      <div class="prep-loading" role="status" aria-live="polite">
+        <div class="prep-loading-icon" aria-hidden="true">
+          <svg class="prep-loading-ring" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="22" stroke="#d3d9f6" stroke-width="2"/><path d="M24 2a22 22 0 0 1 22 22" stroke="#5068d4" stroke-width="2.5" stroke-linecap="round"/></svg>
+          <svg class="prep-loading-spark" viewBox="0 0 20 20" fill="none"><path d="M9 4l1.4 3.8L14 9.2l-3.6 1.4L9 14.4l-1.4-3.8L4 9.2l3.6-1.4L9 4z" fill="#5068d4"/><path d="M15 2.5l.5 1.3 1.3.5-1.3.5-.5 1.3-.5-1.3-1.3-.5 1.3-.5.5-1.3z" fill="#5068d4"/></svg>
+        </div>
+        <p class="prep-loading-step" id="prepLoadingStep">Collecting podcast and host info...</p>
+        <div class="prep-progress" aria-hidden="true"><div class="prep-progress-fill" id="prepProgressFill"></div></div>
+        <p class="prep-loading-sub">Preparing your prep doc. This won't take long.</p>
+      </div>
+    </div>
+    <!-- Step 4: preview & edit -->
+    <div class="modal-body" data-view="preview">
+      <p class="prep-preview-hint">Check the draft before saving. Blocks marked <span class="src-tag src-ai">AI draft</span> and your notes can be edited. Details <span class="src-tag src-system">From pipeline</span> come from the podcast card, <span class="src-tag src-conversation">From conversation</span> from the outreach thread.</p>
+      <article class="prep-doc" id="prepDocPreview"></article>
+    </div>
+    <div class="modal-footer" data-view="form">
+      <button type="button" class="btn secondary" data-prep-close>Cancel</button>
+      <button type="button" class="btn primary" id="prepGenerate">
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2.5l1.2 3.3 3.3 1.2-3.3 1.2L8 11.5 6.8 8.2 3.5 7l3.3-1.2L8 2.5z" stroke="currentColor" stroke-linejoin="round"/><path d="M12.5 10.5v3M11 12h3" stroke="currentColor" stroke-linecap="round"/></svg>
+        <span>Generate</span>
+      </button>
+    </div>
+    <div class="modal-footer" data-view="loading">
+      <button type="button" class="btn secondary" data-prep-close>Cancel</button>
+    </div>
+    <div class="modal-footer modal-footer-split" data-view="preview">
+      <button type="button" class="btn secondary" id="prepBack">Back to details</button>
+      <button type="button" class="btn primary" id="prepSave">Save PDF</button>
+    </div>
+  </div>
+</div>
 <script>
 const SUPABASE_URL = "https://huogkifyzaybppnhzayc.supabase.co";
 const SUPABASE_KEY = "sb_publishable_IR37FVvE-vcguWs9RgATuw_WkvpUSu3";
@@ -1153,6 +2004,37 @@ const PODCASTS = [
       { label: "Why you're a fit", text: "Kyle's format is about real professionals and AI intersecting with their work — Cahill's build/exit/rebuild story plus now building an AI-native product (Novacast.ai) fits that lens well." }
     ],
     action: "Fit-screening call booked for Sep 25 — if it goes well, Kyle will follow up to schedule the actual recording."
+  },
+  // Added manually Sep 23, 2026. On the platform these come from the outreach thread + AI.
+  {
+    id: "go-ai-podcast",
+    name: "GO AI Podcast",
+    host: "Jenna Ahern · Guardian Owl Digital",
+    niche: "AI",
+    fields: [
+      { label: "About the show", text: "Active since June 2024. Rated 5.0 (7 reviews) · PCI Score 64%." },
+      { label: "Timeline", text: "✓ Pitched the Guardian Owl Digital team inbox (Sep 21) → ✓ Connor Rafferty replied from his own address with recording slots (Sep 22)" },
+      { label: "What we pitched Guardian Owl Digital", text: "\"Wanted to see if you're open to guests on GO AI Podcast? There are a number of actionable takeaways your audience would get from my experience scaling two companies to 8-figure exits. I've also spent the last few years building Novacast.ai. Think it'd be a fit for your audience? Happy to chat.\"" },
+      { label: "What Connor said back", text: "\"Do any of these times work for you?\"<br>Mon Oct 5, 12:30–1:30 · Tue Oct 6, before noon · Mon Oct 12, afternoon (nothing after 3 PM) · Tue Oct 13, before noon · Mon Oct 19, afternoon (nothing after 3 PM) · Tue Oct 20, before 11 AM · Thu Oct 22, before noon · Mon Oct 26, afternoon (nothing after 3 PM) · Tue Oct 27, before noon · Thu Oct 29, before 11 AM.<br>\"We are on EST and recordings typically last 30 minutes.\"" },
+      { label: "Who's coordinating on their end", text: "Connor Rafferty (Guardian Owl Digital). He replied from his own address, not team@guardianowldigital.com, so his email is not in the Novacast thread — reply to him directly." }
+    ],
+    action: "Connor offered October recording slots (EST, about 30 minutes). Pick one and reply to Connor directly — his email didn't reach the Novacast thread.",
+    link: { action: "reply", label: "Reply to host" }
+  },
+  {
+    id: "exit-algorithms",
+    name: "Exit Algorithms",
+    host: "Pete Vera · BizExitGrow",
+    niche: "Business exits & growth",
+    fields: [
+      { label: "Podcast", text: "<a href=\"https://bizexitgrow.com/ExitAlgorithms\" target=\"_blank\">BizExitGrow.com/ExitAlgorithms</a>" },
+      { label: "About the host", text: "Pete Vera — BizExitGrow. Phone: +1-727-758-9553." },
+      { label: "Timeline", text: "✓ Pitched Pete directly (Sep 21, 8:24 PM) → ✓ Pete agreed and sent his booking link (Sep 21, 11:00 PM)" },
+      { label: "What we pitched Peter", text: "\"Wanted to see if you're open to guests on Exit Algorithms? There are a number of actionable takeaways your audience would get from my experience scaling two tech companies to 8-figure exits ($52M+). I've also spent the last few years building Novacast.ai. Think it'd be a fit for your audience? Happy to chat.\"" },
+      { label: "What Pete said back", text: "\"I agree, glad you found me! Please find a time that works for you here: <a href=\"https://calendar.app.google/sNRu7Z6EfF9n6Fqb9\" target=\"_blank\">calendar.app.google/sNRu7Z6EfF9n6Fqb9</a>\"" }
+    ],
+    action: "Pete agreed and shared his podcast booking link. Pick a time on his calendar.",
+    link: { url: "https://calendar.app.google/sNRu7Z6EfF9n6Fqb9", label: "Book a time with Pete" }
   }
 ];
 
@@ -1190,6 +2072,67 @@ function lastChangedTime(id){
 }
 
 const list = document.getElementById("list");
+
+// Accordion (Figma "Podcast Info" block): open state is remembered per podcast + section
+// so re-renders (status change, notes) don't collapse what the user opened.
+const accordionState = new Map();
+function accordionHTML(podcastId, key, title, innerHTML, openByDefault){
+  const stateKey = `${podcastId}:${key}`;
+  const open = accordionState.has(stateKey) ? accordionState.get(stateKey) : openByDefault;
+  return `<details class="pod-acc" data-acc-key="${stateKey}" ${open ? "open" : ""}>
+    <summary class="pod-acc-head">
+      <span class="pod-acc-title">${title}</span>
+      <svg class="pod-acc-caret" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4.5 15l7.5-7.5 7.5 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </summary>
+    <div class="pod-acc-body">${innerHTML}</div>
+  </details>`;
+}
+
+// ---------- Next step (primary CTA) ----------
+// The main action link comes from the conversation (p.link in the prototype). For statuses that
+// need an external action, the user can paste/replace the link — hosts sometimes send it from
+// another address, so it never reaches the thread. Prototype storage: localStorage
+// "nextstep:link:<podcast_id>". Platform: a next_step_url column on the pipeline item.
+const NEXT_STEP_EDITABLE = {
+  need_precall: { field: "Booking link", fallbackLabel: "Book pre-call", placeholder: "https://calendly.com/..." },
+  need_form:    { field: "Form link",    fallbackLabel: "Fill out form", placeholder: "https://docs.google.com/forms/..." },
+};
+function readNextStepLink(id){
+  try { const raw = localStorage.getItem(`nextstep:link:${id}`); return raw ? JSON.parse(raw).url || "" : ""; }
+  catch (err) { return ""; }
+}
+function writeNextStepLink(id, url){
+  try {
+    if (url) localStorage.setItem(`nextstep:link:${id}`, JSON.stringify({ url, savedAt: new Date().toISOString() }));
+    else localStorage.removeItem(`nextstep:link:${id}`);
+  } catch (err) { console.error("Could not save next step link:", err); }
+}
+function nextStepFor(p){
+  const status = responses[p.id] || null;
+  // "Reply to host": internal action, not an external link. Used when the card says so, or by default
+  // when the host replied and there is no external link. Platform: open the thread's reply composer.
+  if ((p.link && p.link.action === "reply") || (status === "host_replied_need_response" && !p.link)){
+    return { reply: true, label: (p.link && p.link.label) || "Reply to host", url: "", editable: null, custom: false };
+  }
+  const editable = NEXT_STEP_EDITABLE[status] || null;
+  const custom = editable ? readNextStepLink(p.id) : "";
+  const url = custom || (p.link ? p.link.url : "");
+  const label = (p.link && p.link.label) || (editable ? editable.fallbackLabel : "Open link");
+  return { url, label, editable, custom: !!custom };
+}
+function nextStepCtaHTML(ns, extraClass){
+  if (ns.reply){
+    return `<button type="button" class="btn primary next-step-cta ${extraClass || ""}" data-reply-host="${escHTML(podPanelId || "")}">
+      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5.5 9.5L2 6l3.5-3.5M2 6h8a4 4 0 0 1 4 4v2.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>${escHTML(ns.label)}</span>
+    </button>`;
+  }
+  if (!ns.url) return "";
+  return `<a class="btn primary next-step-cta ${extraClass || ""}" href="${escHTML(ns.url)}" target="_blank" rel="noopener">
+    <span>${escHTML(ns.label)}</span>
+    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3.5h6.5V10M12.5 3.5l-9 9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>`;
+}
 
 function fieldHTML(f){
   return `<div class="field">
@@ -1232,7 +2175,7 @@ function isoToTimeParts(iso){
   return { hour: h, minute, ampm };
 }
 
-const openCards = new Set();
+let podPanelId = null; // podcast currently shown in the side panel
 let activeFilter = "all"; // "all" | "episode_recorded" | "recording_booked" | "waiting" | "action"
 
 // Shared classification used by both the status chips and the list filter,
@@ -1248,6 +2191,7 @@ function classifyForChip(p){
 
 function render(){
   list.innerHTML = "";
+  let panelBodyHTML = "";
   const visiblePodcasts = PODCASTS.filter(p => !deletedFlags[p.id] && (activeFilter === "all" || classifyForChip(p) === activeFilter));
   visiblePodcasts.sort((a, b) => {
     const pa = STATUS_PRIORITY[responses[a.id]] ?? 0;
@@ -1263,26 +2207,24 @@ function render(){
     const scheduledAt = scheduledDates[p.id] || null;
     const showsSchedule = resp === "recording_booked" || resp === "episode_recorded" || resp === "precall_booked";
     const showsDetailsCheckbox = resp === "recording_booked" || resp === "precall_booked";
+    const showsPrepDoc = resp === "precall_booked" || resp === "recording_booked";
+    const prepFile = showsPrepDoc ? readPrepFile(p.id) : null;
     const badgeLabel = statusMeta
       ? (showsSchedule && scheduledAt ? `${statusMeta.label} · ${fmtDateTime(scheduledAt)}` : statusMeta.label)
       : "Not set";
 
-    const card = document.createElement("details");
-    card.className = "card";
+    const card = document.createElement("div");
+    card.className = "card" + (podPanelId === p.id ? " is-active" : "");
     card.dataset.id = p.id;
-    if (openCards.has(p.id)) card.open = true;
-    card.addEventListener("toggle", () => {
-      if (card.open) openCards.add(p.id); else openCards.delete(p.id);
-    });
 
     const boxClass = BOX_CLASS_BY_CLS[badgeCls] || "action-box";
 
-    const linkHTML = p.link ? `<a class="btn primary" href="${p.link.url}" target="_blank">${p.link.label} →</a>` : "";
+    const ns = nextStepFor(p);
 
     const history = (statusHistory[p.id] || []).slice().reverse();
     const timelineHTML = history.length ? `
       <div class="divider"></div>
-      <div class="response-header"><span class="response-title">Timeline</span></div>
+      <div class="response-header"><span class="response-title">Status history</span></div>
       <div class="timeline">
         ${history.map(h => {
           const meta = STATUS_OPTIONS.find(o => o.value === h.status);
@@ -1309,7 +2251,7 @@ function render(){
       </div>`;
 
     card.innerHTML = `
-      <summary>
+      <button type="button" class="card-summary" data-open-podcast="${p.id}" aria-haspopup="dialog">
         <img class="card-cover" src="${COVER_IMG}" alt="" />
         <div class="card-content">
           <div class="card-title-block">
@@ -1318,23 +2260,34 @@ function render(){
           </div>
           <span class="badge ${badgeCls}">${badgeLabel}</span>
         </div>
-        <svg class="chev" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </summary>
-      <div class="card-body">
-        <div class="card-body-inner">
-          ${fieldHTML({label:"Niche", text:p.niche})}
-          ${p.fields.map(fieldHTML).join("")}
-          <div class="${boxClass}">
-            <div class="field-label">Context</div>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    `;
+    list.appendChild(card);
+    // Panel content for this podcast (rendered into the side panel, not the list).
+    if (podPanelId === p.id) {
+      // Split card fields: conversation-related ones go to "Conversation", the rest to "Podcast info".
+      const isConvField = f => /^(What we pitched|What .+ (said|flagged)|Who replied|Who's coordinating|Timeline$|How this got booked|Replied to host)/.test(f.label);
+      const infoFields = [{ label: "Niche", text: p.niche }, ...p.fields.filter(f => !isConvField(f))];
+      const convFields = p.fields.filter(isConvField);
+      panelBodyHTML = `
+        <div class="card-body-inner pod-actions">
+          <section class="${boxClass} next-step" aria-labelledby="nextStepTitle">
+            <div class="field-label" id="nextStepTitle">Next step</div>
             <div class="field-text">${p.action}</div>
-            ${linkHTML}
-          </div>
-          <div class="divider"></div>
-          <div class="response-header"><span class="response-title">Status</span></div>
-          <select class="status-select" data-status-id="${p.id}">
-            <option value="" ${!resp ? "selected" : ""}>— select a status —</option>
-            ${STATUS_OPTIONS.map(o => `<option value="${o.value}" ${resp===o.value ? "selected" : ""}>${o.label}</option>`).join("")}
-          </select>
+            ${ns.editable ? `
+            <div class="next-step-link">
+              <label class="form-label" for="nextStepLink-${p.id}">${ns.editable.field}</label>
+              <div class="next-step-link-row">
+                <input type="url" class="prep-input" id="nextStepLink-${p.id}" data-next-link-id="${p.id}" value="${escHTML(ns.url)}" placeholder="${ns.editable.placeholder}" inputmode="url" />
+              </div>
+              <p class="form-hint" data-next-link-hint="${p.id}">${ns.custom ? "Added manually." : (ns.url ? "Taken from the conversation. Paste a new one if the host sent it from another address." : "No link in the conversation yet. Paste it here to enable the button.")}</p>
+              <p class="form-error" data-next-link-error="${p.id}"></p>
+            </div>` : ""}
+            ${nextStepCtaHTML(ns, "next-step-cta-inline")}
+          </section>
+          ${showsSchedule ? `<div class="divider"></div>
+          <div class="response-header"><span class="response-title">Call details</span></div>` : ""}
           ${showsSchedule ? (() => {
             const tp = isoToTimeParts(scheduledAt);
             const hourOptions = Array.from({length: 12}, (_, i) => i + 1)
@@ -1358,24 +2311,30 @@ function render(){
             </div>
           </div>`;
           })() : ""}
-          ${showsDetailsCheckbox ? `
-          <label class="details-sent-row">
-            <input type="checkbox" class="details-sent-checkbox" data-details-id="${p.id}" ${detailsSent[p.id] ? "checked" : ""} />
-            <span>Sent call details to client (Slack)</span>
-          </label>` : ""}
-          ${timelineHTML}
-          ${notesHTML}
-          <div class="delete-row">
-            <button type="button" class="delete-btn" data-delete-id="${p.id}" title="Remove from list">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span>Delete podcast</span>
+          ${showsPrepDoc ? `
+          <div class="divider"></div>
+          <div class="response-header"><span class="response-title">Prep document</span></div>
+          ${prepFile ? prepFileHTML(p.id, prepFile) : `
+          <div class="prep-doc-empty">
+            <p class="prep-doc-empty-text">Create a PDF brief for the client with call details, what we pitched, and host and show info.</p>
+            <button type="button" class="btn primary" data-prep-doc-id="${p.id}">
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M12.5 14h-9a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5h6L13 5.5v8a.5.5 0 0 1-.5.5z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.5 2v3.5H13M6 8.5h4M6 10.5h4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Create prep doc</span>
             </button>
           </div>
+          ${sentCheckboxHTML(p.id, "Sent call details to client (Slack)", "prep-sent-standalone")}`}` : ""}
+          ${notesHTML}
+          ${timelineHTML}
         </div>
-      </div>
+        <div class="pod-accordions">
+          ${accordionHTML(p.id, "info", "Podcast info", infoFields.map(fieldHTML).join(""), true)}
+          ${convFields.length ? accordionHTML(p.id, "conversation", "Conversation", convFields.map(fieldHTML).join(""), false) : ""}
+        </div>
     `;
-    list.appendChild(card);
+    }
   });
+
+  renderPodPanel(panelBodyHTML);
 
   document.querySelectorAll(".status-select").forEach(el => {
     el.addEventListener("click", (e) => e.stopPropagation());
@@ -1419,13 +2378,65 @@ function render(){
     });
   });
 
+  // Prep doc: step 1 only renders the entry point. Step 2 wires this to the
+  // create/edit modal (date & time, optional meeting link, notes for the client).
+  document.querySelectorAll("[data-prep-doc-id]").forEach(el => {
+    el.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openPrepDocModal(el.dataset.prepDocId, el);
+    });
+  });
+
+  document.querySelectorAll("[data-prep-action]").forEach(el => {
+    el.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const id = el.dataset.prepId;
+      const action = el.dataset.prepAction;
+      if (action === "download") downloadPrepPdf(id, el);
+      else if (action === "edit") openPrepDocModal(id, el, { mode: "edit" });
+      else if (action === "regenerate") openPrepDocModal(id, el);
+    });
+  });
+
   document.querySelectorAll(".details-sent-checkbox").forEach(el => {
     el.addEventListener("click", (e) => e.stopPropagation());
     el.addEventListener("change", async (e) => {
       e.stopPropagation();
       const id = el.dataset.detailsId;
       detailsSent[id] = el.checked;
+      render(); // refresh calendar "Details not sent" flag and the Outdated message
       try { await saveRow(id); } catch (err) { console.error("save error", err); }
+    });
+  });
+
+  document.querySelectorAll("[data-next-link-id]").forEach(el => {
+    const commit = () => {
+      const id = el.dataset.nextLinkId;
+      const url = el.value.trim();
+      const errEl = document.querySelector(`[data-next-link-error="${id}"]`);
+      if (url && !/^https?:\/\/\S+\.\S+/.test(url)){
+        el.classList.add("is-invalid");
+        if (errEl) errEl.textContent = "Enter a full link starting with https://";
+        return;
+      }
+      el.classList.remove("is-invalid");
+      if (errEl) errEl.textContent = "";
+      const p = PODCASTS.find(x => x.id === id);
+      const fromConversation = p && p.link ? p.link.url : "";
+      const next = url && url !== fromConversation ? url : "";
+      if (next === readNextStepLink(id)) return;
+      writeNextStepLink(id, next);
+      render();
+    };
+    el.addEventListener("click", (e) => e.stopPropagation());
+    el.addEventListener("change", commit);
+    el.addEventListener("keydown", (e) => { if (e.key === "Enter"){ e.preventDefault(); el.blur(); } });
+  });
+
+  document.querySelectorAll("[data-open-podcast]").forEach(el => {
+    el.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openPodPanel(el.dataset.openPodcast, el);
     });
   });
 
@@ -1435,9 +2446,11 @@ function render(){
       e.stopPropagation();
       const id = el.dataset.deleteId;
       const podcast = PODCASTS.find(p => p.id === id);
+      closePodMenu();
       const ok = window.confirm(`Remove "${podcast ? podcast.name : id}" from the list? This can only be undone manually in the database.`);
       if (!ok) return;
       deletedFlags[id] = true;
+      if (podPanelId === id) closePodPanel();
       render();
       updateStatusChip();
       try { await saveRow(id); } catch (err) { console.error("delete error", err); }
@@ -1555,11 +2568,8 @@ function renderSidebar(){
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
       const id = btn.dataset.jumpId;
-      const card = document.querySelector(`.card[data-id="${id}"]`);
-      if (!card) return;
-      card.open = true;
-      openCards.add(id);
-      card.scrollIntoView({ behavior: "smooth", block: "center" });
+      closeCalendarDrawer();
+      openPodPanel(id, btn);
     });
   });
 }
@@ -1594,23 +2604,835 @@ document.querySelectorAll(".status-chip[data-filter]").forEach(chip => {
   });
 });
 
-// Collapse an open card on any click that isn't on its own summary (header) —
-// this covers clicks fully outside the card, AND clicks inside the open card's
-// body away from the header, so people don't have to scroll back up to close it.
-// Clicks on interactive controls (status select, notes, save/clear buttons)
-// already call stopPropagation in their own handlers, so they never reach here.
-// Also skip closing if the click is the tail end of selecting text (e.g. to
-// copy a field), so selecting text inside a card doesn't collapse it.
-document.addEventListener("click", (e) => {
-  const selection = window.getSelection();
-  if (selection && selection.toString().length > 0) return;
-  document.querySelectorAll(".card[open]").forEach(card => {
-    const summary = card.querySelector(":scope > summary");
-    if (summary && summary.contains(e.target)) return; // let native summary toggle handle itself
-    card.open = false;
-    if (card.dataset.id) openCards.delete(card.dataset.id);
+// ---------- Podcast side panel ----------
+// Opening a row shows the podcast in a right-hand panel (same pattern as the Kanban
+// podcast canvas). render() rebuilds the panel content, so every change (status, notes,
+// schedule, prep doc) re-renders list and panel from one source of truth.
+let podPanelTrigger = null;
+let podHeaderObserver = null;
+
+function relTime(iso){
+  const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  if (days <= 0) return "today";
+  if (days === 1) return "yesterday";
+  return `${days} days ago`;
+}
+
+function renderPodPanel(bodyHTML){
+  const panel = document.getElementById("podPanel");
+  if (!podPanelId){ return; }
+  const p = PODCASTS.find(x => x.id === podPanelId);
+  if (!p || deletedFlags[p.id]){ closePodPanel(); return; }
+  const resp = responses[p.id] || null;
+  const statusMeta = STATUS_OPTIONS.find(o => o.value === resp) || null;
+  const badgeCls = statusMeta ? statusMeta.cls : "skip";
+  const scheduledAt = scheduledDates[p.id] || null;
+  const showsSchedule = resp === "recording_booked" || resp === "episode_recorded" || resp === "precall_booked";
+  const badgeLabel = statusMeta ? (showsSchedule && scheduledAt ? `${statusMeta.label} · ${fmtDateTime(scheduledAt)}` : statusMeta.label) : "Not set";
+  const hist = statusHistory[p.id] || [];
+  const updated = hist.length ? `Updated ${relTime(hist[hist.length - 1].changed_at)}` : "";
+  const [hostName, ...hostRest] = (p.host || "").split(" · ");
+  const menuOpen = !document.getElementById("podMenuList")?.hidden && document.getElementById("podMenuList") !== null;
+
+  document.getElementById("podPanelCompactTitle").textContent = p.name;
+  document.getElementById("podPanelTopbarRight").innerHTML = `
+    ${updated ? `<span class="pod-panel-meta">${updated}</span>` : ""}
+    ${nextStepCtaHTML(nextStepFor(p), "next-step-cta-top")}
+    <select class="status-select pod-status" data-status-id="${p.id}" aria-label="Status">
+      <option value="" ${!resp ? "selected" : ""}>Set status</option>
+      ${STATUS_OPTIONS.map(o => `<option value="${o.value}" ${resp === o.value ? "selected" : ""}>${o.label}</option>`).join("")}
+    </select>
+    <div class="pod-menu">
+      <button type="button" class="pod-icon-btn" id="podMenuBtn" aria-label="More actions" aria-haspopup="menu" aria-expanded="false" aria-controls="podMenuList">
+        <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><circle cx="4.5" cy="10" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="15.5" cy="10" r="1.5"/></svg>
+      </button>
+      <div class="pod-menu-list" id="podMenuList" role="menu" hidden>
+        <button type="button" class="pod-menu-item" role="menuitem" data-delete-id="${p.id}">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13.5 3.5h-11M6.5 6.5v4M9.5 6.5v4M12.5 3.5V13a.5.5 0 0 1-.5.5H4a.5.5 0 0 1-.5-.5V3.5M10.5 3.5v-1a1 1 0 0 0-1-1h-3a1 1 0 0 0-1 1v1" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Delete podcast</span>
+        </button>
+      </div>
+    </div>`;
+
+  document.getElementById("podPanelBody").innerHTML = `
+    <header class="pod-header">
+      <div class="pod-header-main">
+        <img class="pod-header-cover" src="${COVER_IMG}" alt="" />
+        <div class="pod-header-text">
+          <h2 class="pod-header-title" id="podPanelTitle">${p.name}</h2>
+          <dl class="pod-header-rows">
+            <div class="pod-header-row"><dt>Hosted by:</dt><dd>${hostName}${hostRest.length ? ` · ${hostRest.join(" · ")}` : ""}</dd></div>
+          </dl>
+        </div>
+      </div>
+      <div class="pod-header-side">
+        <span class="badge ${badgeCls}">${badgeLabel}</span>
+      </div>
+    </header>
+    ${bodyHTML}`;
+
+  document.querySelectorAll("#podPanelBody .pod-acc").forEach(acc => {
+    acc.addEventListener("toggle", () => accordionState.set(acc.dataset.accKey, acc.open));
   });
+
+  // Prototype: "Reply to host" opens the Conversation section. Platform: go to the thread's reply box.
+  document.querySelectorAll("#podPanel [data-reply-host]").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const acc = document.querySelector('#podPanelBody .pod-acc[data-acc-key$=":conversation"]');
+      if (!acc) return;
+      acc.open = true;
+      accordionState.set(acc.dataset.accKey, true);
+      const panelEl = document.getElementById("podPanel");
+      const top = acc.getBoundingClientRect().top - panelEl.getBoundingClientRect().top + panelEl.scrollTop - 80;
+      panelEl.scrollTo({ top, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      acc.querySelector("summary").focus({ preventScroll: true });
+    });
+  });
+
+  const menuBtn = document.getElementById("podMenuBtn");
+  menuBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const listEl = document.getElementById("podMenuList");
+    const open = listEl.hidden;
+    listEl.hidden = !open;
+    menuBtn.setAttribute("aria-expanded", String(open));
+    if (open) listEl.querySelector(".pod-menu-item").focus();
+  });
+
+  // Condensed title in the sticky bar once the big title scrolls out of view
+  if (podHeaderObserver) podHeaderObserver.disconnect();
+  const titleEl = document.getElementById("podPanelTitle");
+  podHeaderObserver = new IntersectionObserver(([entry]) => {
+    document.getElementById("podPanelTopbar").classList.toggle("is-condensed", !entry.isIntersecting);
+  }, { root: panel, rootMargin: "-64px 0px 0px 0px", threshold: 0 });
+  podHeaderObserver.observe(titleEl);
+}
+
+function closePodMenu(){
+  const listEl = document.getElementById("podMenuList");
+  if (listEl && !listEl.hidden){
+    listEl.hidden = true;
+    document.getElementById("podMenuBtn")?.setAttribute("aria-expanded", "false");
+  }
+}
+
+function openPodPanel(id, trigger){
+  const panel = document.getElementById("podPanel");
+  const switching = podPanelId && podPanelId !== id;
+  podPanelId = id;
+  podPanelTrigger = trigger || null;
+  render();
+  if (switching) panel.scrollTop = 0;
+  panel.hidden = false;
+  requestAnimationFrame(() => {
+    panel.classList.add("is-open");
+    document.getElementById("podPanelOverlay").classList.add("is-open");
+  });
+  document.body.classList.add("panel-open");
+  panel.focus({ preventScroll: true });
+}
+
+function closePodPanel(){
+  const panel = document.getElementById("podPanel");
+  if (!podPanelId) return;
+  const lastId = podPanelId;
+  podPanelId = null;
+  closePodMenu();
+  panel.classList.remove("is-open");
+  document.getElementById("podPanelOverlay").classList.remove("is-open");
+  document.body.classList.remove("panel-open");
+  if (podHeaderObserver){ podHeaderObserver.disconnect(); podHeaderObserver = null; }
+  document.getElementById("podPanelTopbar").classList.remove("is-condensed");
+  setTimeout(() => { if (!podPanelId){ panel.hidden = true; panel.scrollTop = 0; } }, 300);
+  document.querySelectorAll(".card.is-active").forEach(c => c.classList.remove("is-active"));
+  // Return focus to the row that opened the panel (it may have been re-rendered)
+  const row = document.querySelector(`[data-open-podcast="${lastId}"]`);
+  if (row) row.focus({ preventScroll: true });
+  podPanelTrigger = null;
+}
+
+(function initPodPanel(){
+  const panel = document.getElementById("podPanel");
+  document.getElementById("podPanelBack").addEventListener("click", (e) => { e.stopPropagation(); closePodPanel(); });
+  document.getElementById("podPanelOverlay").addEventListener("click", (e) => { e.stopPropagation(); closePodPanel(); });
+  panel.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (!e.target.closest(".pod-menu")) closePodMenu();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (!podPanelId) return;
+    if (!document.getElementById("prepDocOverlay").hidden) return; // the prep doc modal handles its own keys
+    if (e.key === "Escape"){
+      const listEl = document.getElementById("podMenuList");
+      if (listEl && !listEl.hidden){ closePodMenu(); document.getElementById("podMenuBtn").focus(); return; }
+      closePodPanel();
+      return;
+    }
+    if (e.key !== "Tab") return;
+    const focusables = [...panel.querySelectorAll("button, input, select, textarea, a[href]")].filter(el => !el.disabled && el.offsetParent !== null);
+    if (!focusables.length) return;
+    const first = focusables[0], last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  });
+})();
+
+// ---------- Prep doc modal (step 2: form only) ----------
+// Prototype storage: the form values are kept per podcast in localStorage under
+// "prepdoc:form:<podcast_id>". On the platform this becomes a DB row per podcast.
+const PREP_FORM_KEY = id => `prepdoc:form:${id}`;
+const PREP_DEFAULT_DURATION = { precall_booked: "20", recording_booked: "45" };
+let prepDocState = { id: null, trigger: null };
+
+function readPrepForm(id){
+  try {
+    const raw = localStorage.getItem(PREP_FORM_KEY(id));
+    return raw ? JSON.parse(raw) : null;
+  } catch (err) { return null; }
+}
+function writePrepForm(id, data){
+  try { localStorage.setItem(PREP_FORM_KEY(id), JSON.stringify(data)); }
+  catch (err) { console.error("Could not save prep doc form:", err); }
+}
+
+function prepTimeParts(iso){
+  if (!iso) return { hour: 9, minute: "00", ampm: "AM" };
+  const d = new Date(iso);
+  let h = d.getHours();
+  const ampm = h >= 12 ? "PM" : "AM";
+  h = h % 12 || 12;
+  const m = d.getMinutes();
+  const minute = m < 8 ? "00" : m < 23 ? "15" : m < 38 ? "30" : m < 53 ? "45" : "00";
+  return { hour: h, minute, ampm };
+}
+
+function openPrepDocModal(id, trigger, opts = {}){
+  const podcast = PODCASTS.find(p => String(p.id) === String(id));
+  if (!podcast) return;
+  prepDocState = { id, trigger, generated: false };
+  const status = responses[id];
+  const file = readPrepFile(id);
+  // Edit / Regenerate start from the saved file's form values; a first run from the last form draft.
+  const saved = (file && file.form) || readPrepForm(id);
+
+  document.getElementById("prepDocPodcastName").textContent = podcast.name;
+  const badge = document.getElementById("prepDocCallType");
+  const isPrecall = status === "precall_booked";
+  badge.textContent = isPrecall ? "Pre-call" : "Recording";
+  badge.className = "call-type-badge " + (isPrecall ? "prebooked" : "done");
+
+  // Date & time: saved form wins, otherwise prefill from the card's scheduled date.
+  const iso = scheduledDates[id];
+  const tp = prepTimeParts(iso);
+  const hourSel = document.getElementById("prepHour");
+  hourSel.innerHTML = Array.from({ length: 12 }, (_, i) => i + 1).map(h => `<option value="${h}">${h}</option>`).join("");
+  document.getElementById("prepDate").value = saved?.date ?? isoToDateInputValue(iso);
+  hourSel.value = String(saved?.hour ?? tp.hour);
+  document.getElementById("prepMinute").value = saved?.minute ?? tp.minute;
+  document.getElementById("prepAmPm").value = saved?.ampm ?? tp.ampm;
+  document.getElementById("prepDuration").value = saved?.duration ?? (PREP_DEFAULT_DURATION[status] || "30");
+  document.getElementById("prepTimezone").value = saved?.timezone ?? "America/Toronto";
+  document.getElementById("prepLink").value = saved?.link ?? "";
+  document.getElementById("prepClientNotes").value = saved?.clientNotes ?? "";
+  clearPrepErrors();
+
+  document.getElementById("prepDocOverlay").hidden = false;
+  document.body.classList.add("modal-open");
+  if (opts.mode === "edit" && file){
+    // Edit the saved text without regenerating. Call details stay as saved.
+    setPrepMode("preview");
+    renderPrepPreview(JSON.parse(JSON.stringify(file.draft)));
+    const firstEdit = document.querySelector("#prepDocPreview .prep-doc-edit");
+    if (firstEdit) firstEdit.focus({ preventScroll: true });
+  } else {
+    setPrepMode("form");
+    document.getElementById("prepDate").focus();
+  }
+}
+
+function closePrepDocModal(){
+  const overlay = document.getElementById("prepDocOverlay");
+  if (overlay.hidden) return;
+  cancelPrepGeneration();
+  overlay.hidden = true;
+  document.body.classList.remove("modal-open");
+  if (prepDocState.trigger) prepDocState.trigger.focus({ preventScroll: true });
+  prepDocState = { id: null, trigger: null };
+}
+
+function clearPrepErrors(){
+  ["prepDate", "prepLink"].forEach(f => {
+    document.getElementById(f).classList.remove("is-invalid");
+    document.getElementById(f + "Error").textContent = "";
+  });
+}
+
+function collectPrepForm(){
+  return {
+    date: document.getElementById("prepDate").value,
+    hour: document.getElementById("prepHour").value,
+    minute: document.getElementById("prepMinute").value,
+    ampm: document.getElementById("prepAmPm").value,
+    duration: document.getElementById("prepDuration").value,
+    timezone: document.getElementById("prepTimezone").value,
+    link: document.getElementById("prepLink").value.trim(),
+    clientNotes: document.getElementById("prepClientNotes").value.trim(),
+  };
+}
+
+function validatePrepForm(data){
+  clearPrepErrors();
+  let firstInvalid = null;
+  const fail = (field, msg) => {
+    document.getElementById(field).classList.add("is-invalid");
+    document.getElementById(field + "Error").textContent = msg;
+    firstInvalid = firstInvalid || field;
+  };
+  if (!data.date) fail("prepDate", "Add the call date.");
+  if (data.link && !/^https?:\/\/\S+\.\S+/.test(data.link)) fail("prepLink", "Enter a full link starting with https://");
+  if (firstInvalid) document.getElementById(firstInvalid).focus();
+  return !firstInvalid;
+}
+
+
+// ---------- Step 3: generating state ----------
+// In the prototype this is a timed simulation. On the platform: POST the form to the
+// backend, which gathers card data, calls the LLM for the AI blocks, and returns the draft.
+const PREP_TITLES = { form: "Create prep doc", loading: "Generating prep doc", preview: "Review prep doc" };
+const PREP_STEPS = [
+  { text: "Collecting podcast and host info...", progress: 30 },
+  { text: "Writing talking points...",           progress: 70 },
+  { text: "Building your prep doc...",           progress: 100 },
+];
+let prepTimers = [];
+
+function setPrepMode(mode){
+  const modal = document.getElementById("prepDocModal");
+  modal.dataset.mode = mode;
+  document.getElementById("prepDocTitle").textContent = PREP_TITLES[mode];
+  modal.querySelectorAll('.modal-body[data-view]').forEach(el => { el.scrollTop = 0; });
+}
+function cancelPrepGeneration(){
+  prepTimers.forEach(clearTimeout);
+  prepTimers = [];
+}
+function startPrepDocGeneration(id, form){
+  cancelPrepGeneration();
+  setPrepMode("loading");
+  const stepEl = document.getElementById("prepLoadingStep");
+  const fill = document.getElementById("prepProgressFill");
+  fill.style.width = "0%";
+  PREP_STEPS.forEach((step, i) => {
+    prepTimers.push(setTimeout(() => {
+      stepEl.textContent = step.text;
+      fill.style.width = step.progress + "%";
+    }, i * 1200 + 50));
+  });
+  prepTimers.push(setTimeout(() => {
+    prepTimers = [];
+    const draft = buildPrepDraft(id, form);
+    writePrepDraft(id, draft);
+    prepDocState.generated = true;
+    setPrepMode("preview"); // must be visible before render so textareas can auto-size
+    renderPrepPreview(draft);
+    const firstEdit = document.querySelector("#prepDocPreview .prep-doc-edit");
+    if (firstEdit) firstEdit.focus({ preventScroll: true });
+  }, PREP_STEPS.length * 1200 + 300));
+}
+
+// ---------- Step 4: draft model, preview & edit ----------
+// Every block has a source: "system" (card data, read-only), "ai" (LLM draft, editable),
+// "user" (typed in the form, editable). Missing card data is filled with SAMPLE text and
+// flagged, so the developer can see which DB fields are still needed.
+const PREP_DRAFT_KEY = id => `prepdoc:draft:${id}`;
+function readPrepDraft(id){
+  try { const raw = localStorage.getItem(PREP_DRAFT_KEY(id)); return raw ? JSON.parse(raw) : null; }
+  catch (err) { return null; }
+}
+function writePrepDraft(id, draft){
+  try { localStorage.setItem(PREP_DRAFT_KEY(id), JSON.stringify(draft)); }
+  catch (err) { console.error("Could not save prep doc draft:", err); }
+}
+
+// Client profile: single source of truth for the client's facts. SAMPLE values for the prototype.
+const CLIENT_PROFILE = {
+  name: "Cahill Camden",
+  headline: "two 8-figure exits ($52M+ combined) as CMO and Operations Advisor",
+  product: "Novacast.ai",
+};
+
+const TZ_LABELS = {
+  "America/Toronto": "ET (Toronto time)",
+  "America/Chicago": "CT (Chicago time)",
+  "America/Denver": "MT (Denver time)",
+  "America/Los_Angeles": "PT (Los Angeles time)",
+  "Europe/London": "UK time",
+  "Europe/Berlin": "CET (Berlin time)",
+  "Europe/Kyiv": "Kyiv time",
+};
+
+function escHTML(str){
+  return String(str ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+function htmlToText(html){
+  const d = document.createElement("div");
+  d.innerHTML = html || "";
+  // Keep link targets readable in the PDF: "LinkedIn" -> "LinkedIn (linkedin.com/in/...)"
+  d.querySelectorAll("a[href]").forEach(a => {
+    const url = a.getAttribute("href").replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
+    if (!a.textContent.includes(url)) a.textContent = `${a.textContent} (${url})`;
+  });
+  return d.textContent.replace(/\s+/g, " ").trim();
+}
+function findField(podcast, test){
+  const f = (podcast.fields || []).find(f => test(f.label));
+  return f ? htmlToText(f.text) : "";
+}
+
+function formatPrepWhen(form){
+  if (!form.date) return "";
+  const [y, m, d] = form.date.split("-").map(Number);
+  const dateObj = new Date(y, m - 1, d);
+  const dayStr = dateObj.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+  let h24 = (Number(form.hour) % 12) + (form.ampm === "PM" ? 12 : 0);
+  const startMin = h24 * 60 + Number(form.minute);
+  const endMin = startMin + Number(form.duration);
+  const fmt = (mins, withAmPm) => {
+    const hh = Math.floor((mins % 1440) / 60), mm = mins % 60;
+    const ap = hh >= 12 ? "PM" : "AM";
+    const h12 = hh % 12 || 12;
+    return `${h12}:${String(mm).padStart(2, "0")}${withAmPm ? " " + ap : ""}`;
+  };
+  const sameHalf = (Math.floor((startMin % 1440) / 720)) === (Math.floor((endMin % 1440) / 720));
+  const range = sameHalf ? `${fmt(startMin, false)}–${fmt(endMin, true)}` : `${fmt(startMin, true)}–${fmt(endMin, true)}`;
+  return `${dayStr} · ${range} ${TZ_LABELS[form.timezone] || ""}`.trim();
+}
+
+function buildPrepDraft(id, form){
+  const podcast = PODCASTS.find(p => String(p.id) === String(id));
+  const isPrecall = responses[id] === "precall_booked";
+  const hostName = (podcast.host || "").split(" · ")[0] || "the host";
+  const sample = txt => ({ text: txt, sample: true });
+  const real = txt => ({ text: txt, sample: false });
+  const orSample = (txt, fallback) => txt ? real(txt) : sample(fallback);
+
+  const aboutHost = findField(podcast, l => l.startsWith("About the host"));
+  const aboutShow = findField(podcast, l => l.startsWith("About the show"));
+  // On the platform these two ALWAYS come from the outreach thread the podcast was added from
+  // (pipeline item -> thread_id): pitch = our outbound pitch message, reply = the host's reply
+  // that led to adding it. The card fields below are only the prototype's stand-in for that thread.
+  const pitched  = findField(podcast, l => l.startsWith("What we pitched"));
+  const replied  = findField(podcast, l => /^What .+ (said|flagged)/.test(l));
+  const fit      = findField(podcast, l => l.startsWith("Why you're a fit"));
+
+  return {
+    version: 1,
+    createdAt: new Date().toISOString(),
+    callType: isPrecall ? "precall" : "recording",
+    // system (read-only)
+    eyebrow: isPrecall ? "Podcast · Pre-call prep" : "Podcast · Recording prep",
+    title: podcast.name,
+    subtitle: isPrecall ? `Fit-screening call with host ${hostName}` : `Episode recording with host ${hostName}`,
+    when: formatPrepWhen(form),
+    durationLine: `${form.duration}-minute ${isPrecall ? "fit-screening call" : "recording"} with ${hostName}`,
+    link: form.link,
+    host: orSample(aboutHost || podcast.host, "Host bio is missing in the podcast card."),
+    show: orSample(aboutShow || podcast.niche, "Show description is missing in the podcast card."),
+    howBooked: orSample(replied, `SAMPLE: ${hostName} replied to the pitch and agreed to a call.`),
+    pitched: orSample(pitched, `SAMPLE: "Wanted to see if you're open to guests on ${podcast.name}? Your listeners would get actionable takeaways from my experience scaling two tech companies to 8-figure exits. I've also spent the last few years building ${CLIENT_PROFILE.product}."`),
+    // ai (editable) — generated by the LLM on the platform
+    whyFit: fit
+      ? fit
+      : `${podcast.name} focuses on ${podcast.niche || "business leaders"}. ${CLIENT_PROFILE.name}'s story (${CLIENT_PROFILE.headline}, now building ${CLIENT_PROFILE.product}) fits that lens well.`,
+    toCover: (isPrecall ? [
+      `This is a fit-screening call, not the recording. Keep it conversational so ${hostName} can gauge the match.`,
+      `How AI has intersected with your own work: building ${CLIENT_PROFILE.product}.`,
+      `Your background: ${CLIENT_PROFILE.headline}, and the lessons from scaling, exiting and rebuilding.`,
+      `Ask what ${podcast.name} typically covers and find where your story fits best.`,
+    ] : [
+      `Join 10 minutes early to check audio, camera and lighting.`,
+      `Have 2–3 concrete stories ready from ${CLIENT_PROFILE.headline}.`,
+      `One practical takeaway the ${podcast.name} audience can use right away.`,
+      `Mention ${CLIENT_PROFILE.product} naturally when it fits the conversation, not as a pitch.`,
+    ]).join("\n"),
+    // user (editable)
+    clientNotes: form.clientNotes,
+    footer: `Prepared by Novacast · Podcast Pipeline (${CLIENT_PROFILE.name.split(" ")[0]}) · ${new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}`,
+  };
+}
+
+function renderPrepPreview(draft){
+  const tag = src => ({
+    ai: '<span class="src-tag src-ai">AI draft</span>',
+    system: '<span class="src-tag src-system">From pipeline</span>',
+    user: '<span class="src-tag src-user">Your notes</span>',
+    conversation: '<span class="src-tag src-conversation">From conversation</span>',
+  }[src]);
+  const head = (title, src) => `<div class="prep-doc-section-head"><h3 class="prep-doc-h">${title}</h3>${tag(src)}</div>`;
+  // Facts missing in the card are shown as SAMPLE text with a "Missing data" tag instead of "From pipeline".
+  const factHead = (title, f) => f.sample
+    ? `<div class="prep-doc-section-head"><h3 class="prep-doc-h">${title}</h3><span class="src-tag src-missing">Missing data</span></div>`
+    : head(title, "system");
+  const factText = f => `<p class="prep-doc-text${f.sample ? " is-sample" : ""}">${escHTML(f.text)}</p>`;
+  const linkLine = draft.link
+    ? `Meeting link: <a href="${escHTML(draft.link)}" target="_blank" rel="noopener">${escHTML(draft.link)}</a>`
+    : "Meeting link: see the calendar invite for the exact link";
+
+  document.getElementById("prepDocPreview").innerHTML = `
+    <p class="prep-doc-eyebrow">${escHTML(draft.eyebrow)}</p>
+    <h2 class="prep-doc-title">${escHTML(draft.title)}</h2>
+    <p class="prep-doc-subtitle">${escHTML(draft.subtitle)}</p>
+    <div class="prep-doc-when">
+      <strong>${escHTML(draft.when)}</strong>
+      ${escHTML(draft.durationLine)}<br>${linkLine}
+    </div>
+    <section class="prep-doc-section">${factHead("Host", draft.host)}${factText(draft.host)}</section>
+    <section class="prep-doc-section">${factHead("About the show", draft.show)}${factText(draft.show)}</section>
+    <section class="prep-doc-section">${head("How this got booked", "conversation")}<p class="prep-doc-quote${draft.howBooked.sample ? " is-sample" : ""}">${escHTML(draft.howBooked.text)}</p></section>
+    <section class="prep-doc-section">${head("What we pitched", "conversation")}<p class="prep-doc-quote${draft.pitched.sample ? " is-sample" : ""}">${escHTML(draft.pitched.text)}</p></section>
+    <section class="prep-doc-section">
+      ${head('<label for="prepEditWhyFit">Why you\'re a fit</label>', "ai")}
+      <textarea class="prep-doc-edit" id="prepEditWhyFit" data-draft-field="whyFit" rows="3">${escHTML(draft.whyFit)}</textarea>
+    </section>
+    <section class="prep-doc-section">
+      ${head('<label for="prepEditToCover">Things to be ready to cover</label>', "ai")}
+      <textarea class="prep-doc-edit" id="prepEditToCover" data-draft-field="toCover" rows="4">${escHTML(draft.toCover)}</textarea>
+      <p class="prep-doc-edit-hint">One point per line. Each line becomes a bullet in the PDF.</p>
+    </section>
+    <section class="prep-doc-section">
+      ${head('<label for="prepEditNotes">Notes from the host</label>', "user")}
+      <textarea class="prep-doc-edit" id="prepEditNotes" data-draft-field="clientNotes" rows="2" placeholder="Optional. Leave empty to hide this section in the PDF.">${escHTML(draft.clientNotes)}</textarea>
+    </section>
+    <p class="prep-doc-footer">${escHTML(draft.footer)}</p>
+  `;
+  prepDocState.draft = draft;
+  document.querySelectorAll("#prepDocPreview .prep-doc-edit").forEach(ta => {
+    const fit = () => { ta.style.height = "auto"; ta.style.height = ta.scrollHeight + 3 + "px"; };
+    ta.addEventListener("input", fit);
+    fit();
+  });
+}
+function refitPrepTextareas(){
+  document.querySelectorAll("#prepDocPreview .prep-doc-edit").forEach(ta => {
+    ta.style.height = "auto"; ta.style.height = ta.scrollHeight + 3 + "px";
+  });
+}
+
+function collectPrepDraft(){
+  const draft = prepDocState.draft;
+  if (!draft) return null;
+  document.querySelectorAll("#prepDocPreview [data-draft-field]").forEach(ta => {
+    draft[ta.dataset.draftField] = ta.value.trim();
+  });
+  // Notes typed in the preview flow back into the form, so "Back" and "Generate" stay in sync.
+  const saved = readPrepForm(prepDocState.id);
+  if (saved){ saved.clientNotes = draft.clientNotes; writePrepForm(prepDocState.id, saved); }
+  document.getElementById("prepClientNotes").value = draft.clientNotes;
+  return draft;
+}
+
+
+// ---------- Step 5: saved file, PDF, Outdated ----------
+// Prototype storage: one localStorage key per podcast, "prepdoc:file:<podcast_id>",
+// holding the final draft + form + snapshot. The PDF is rendered from the saved draft on
+// Download. On the platform: render server-side once on Save and keep the file in storage.
+const PREP_FILE_KEY = id => `prepdoc:file:${id}`;
+function readPrepFile(id){
+  try { const raw = localStorage.getItem(PREP_FILE_KEY(id)); return raw ? JSON.parse(raw) : null; }
+  catch (err) { return null; }
+}
+function writePrepFile(id, file){
+  try { localStorage.setItem(PREP_FILE_KEY(id), JSON.stringify(file)); }
+  catch (err) { console.error("Could not save prep doc:", err); }
+}
+function prepFileName(id, draft){
+  const slug = (draft.title || String(id)).normalize("NFKD").replace(/[^\w\s-]/g, "").trim().replace(/\s+/g, "-");
+  return `${slug}-${draft.callType === "precall" ? "Precall" : "Recording"}-Prep.pdf`;
+}
+
+// Outdated when the card's call date or status changed after the doc was generated.
+// Platform: also flag it when a new message arrives in the outreach thread.
+function prepOutdatedReason(id, file){
+  const snap = file.snapshot || {};
+  if ((snap.status || null) !== (responses[id] || null)){
+    const meta = STATUS_OPTIONS.find(o => o.value === responses[id]);
+    return `Status changed to ${meta ? meta.label : "a new status"} after this doc was created.`;
+  }
+  if ((snap.scheduledAt || null) !== (scheduledDates[id] || null)){
+    return "The call date in the card changed after this doc was created.";
+  }
+  return "";
+}
+
+// "Sent to client" lives with the prep doc: the PDF is what gets sent. Same details_sent field.
+function sentCheckboxHTML(id, label, extraClass){
+  return `<label class="details-sent-row ${extraClass}">
+    <input type="checkbox" class="details-sent-checkbox" data-details-id="${id}" ${detailsSent[id] ? "checked" : ""} />
+    <span>${label}</span>
+  </label>`;
+}
+
+function prepFileHTML(id, file){
+  const outdated = prepOutdatedReason(id, file);
+  const created = new Date(file.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  const edited = file.savedAt !== file.createdAt ? ` · edited ${new Date(file.savedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}` : "";
+  return `
+    <div class="prep-file${outdated ? " is-outdated" : ""}">
+      ${outdated ? `
+      <div class="prep-file-outdated" role="status">
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 3.5l7 12.5H3L10 3.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 8.5v3.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="13.9" r=".9" fill="currentColor"/></svg>
+        <span>${escHTML(outdated)} ${detailsSent[id] ? "The client already has the previous version — regenerate and send the updated doc." : "Regenerate it before sending to the client."}</span>
+      </div>` : ""}
+      <div class="prep-file-row">
+        <div class="prep-file-icon" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none"><path d="M5 2.75h6.5L15.25 6.5v10.75H5V2.75z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M11.25 2.75V6.75h4" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M7.5 10.5h5M7.5 13.25h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+        <div class="prep-file-info">
+          <p class="prep-file-name" title="${escHTML(file.fileName)}">${escHTML(file.fileName)}</p>
+          <p class="prep-file-meta">Created ${created}${edited} · ${escHTML(file.draft.when)}</p>
+        </div>
+        <div class="prep-file-actions">
+          <button type="button" class="prep-link-btn" data-prep-action="edit" data-prep-id="${id}">Edit</button>
+          <button type="button" class="prep-link-btn" data-prep-action="regenerate" data-prep-id="${id}">Regenerate</button>
+          <button type="button" class="btn ${outdated ? "secondary" : "primary"} btn-small" data-prep-action="download" data-prep-id="${id}">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2.5v7M5 6.5l3 3 3-3M2.5 12.5h11" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Download</span>
+          </button>
+        </div>
+      </div>
+      <p class="prep-file-error" data-prep-error="${id}"></p>
+      ${sentCheckboxHTML(id, "Sent to client (Slack)", "prep-file-sent")}
+    </div>`;
+}
+
+// jsPDF is loaded on first download only (vector text, selectable, ~350 KB).
+const JSPDF_URL = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+let jsPdfPromise = null;
+function loadJsPdf(){
+  if (window.jspdf) return Promise.resolve(window.jspdf);
+  if (!jsPdfPromise){
+    jsPdfPromise = new Promise((resolve, reject) => {
+      const tag = document.createElement("script");
+      tag.src = JSPDF_URL;
+      tag.onload = () => window.jspdf ? resolve(window.jspdf) : reject(new Error("jsPDF missing"));
+      tag.onerror = () => { jsPdfPromise = null; reject(new Error("Could not load jsPDF")); };
+      document.head.appendChild(tag);
+    });
+  }
+  return jsPdfPromise;
+}
+
+// Built-in PDF fonts only cover Latin-1 + a few typographic marks; swap anything else.
+function pdfSafe(str){
+  return String(str ?? "")
+    .replace(/[\u2192\u2794\u27A1]/g, "->")
+    .replace(/[\u2713\u2714\u2705]/g, "")
+    .replace(/\u00A0/g, " ")
+    .replace(/[^\x00-\xFF\u2013\u2014\u2018\u2019\u201C\u201D\u2022\u2026\u20AC]/g, "")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
+}
+
+function buildPrepPdf(jspdf, draft){
+  const doc = new jspdf.jsPDF({ unit: "pt", format: "letter" });
+  const W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight();
+  const M = 56, CW = W - M * 2, BOTTOM = H - 56;
+  const C = { heading: [11, 15, 20], body: [66, 66, 57], dim: [103, 109, 119], accent: [80, 104, 212], tint: [242, 243, 252], line: [211, 217, 246] };
+  let y = M;
+  const ensure = h => { if (y + h > BOTTOM){ doc.addPage(); y = M; } };
+  const write = (text, { size = 10.5, style = "normal", color = C.body, gap = 4, indent = 0, lh = 1.45 } = {}) => {
+    doc.setFont("helvetica", style); doc.setFontSize(size); doc.setTextColor(...color);
+    const lines = doc.splitTextToSize(pdfSafe(text), CW - indent);
+    const lineH = size * lh;
+    lines.forEach(line => { ensure(lineH); doc.text(line, M + indent, y + size); y += lineH; });
+    y += gap;
+  };
+  const heading = t => { ensure(40); y += 14; write(t, { size: 11.5, style: "bold", color: C.heading, gap: 2 }); };
+  const quote = t => {
+    doc.setFont("helvetica", "italic"); doc.setFontSize(10.5);
+    const lines = doc.splitTextToSize(pdfSafe(t), CW - 14);
+    const lineH = 10.5 * 1.45;
+    lines.forEach(line => {
+      ensure(lineH);
+      doc.setDrawColor(...C.line); doc.setLineWidth(1.5); doc.line(M + 1, y, M + 1, y + lineH);
+      doc.setTextColor(...C.body); doc.text(line, M + 14, y + 10.5); y += lineH;
+    });
+    y += 4;
+  };
+
+  write(draft.eyebrow, { size: 9, style: "bold", color: C.accent, gap: 6 });
+  write(draft.title, { size: 22, style: "bold", color: C.heading, gap: 2, lh: 1.2 });
+  write(draft.subtitle, { size: 12, color: C.body, gap: 14 });
+
+  // Call details box
+  const linkText = draft.link ? `Meeting link: ${draft.link}` : "Meeting link: see the calendar invite for the exact link";
+  doc.setFont("helvetica", "bold"); doc.setFontSize(12);
+  const whenLines = doc.splitTextToSize(pdfSafe(draft.when), CW - 28);
+  doc.setFont("helvetica", "normal"); doc.setFontSize(10.5);
+  const detailLines = doc.splitTextToSize(pdfSafe(draft.durationLine), CW - 28).concat(doc.splitTextToSize(pdfSafe(linkText), CW - 28));
+  const boxH = 14 + whenLines.length * 16 + detailLines.length * 15 + 12;
+  ensure(boxH);
+  doc.setFillColor(...C.tint); doc.roundedRect(M, y, CW, boxH, 6, 6, "F");
+  let by = y + 14;
+  doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(...C.heading);
+  whenLines.forEach(l => { doc.text(l, M + 14, by + 11); by += 16; });
+  doc.setFont("helvetica", "normal"); doc.setFontSize(10.5); doc.setTextColor(...C.body);
+  detailLines.forEach(l => {
+    const isLink = draft.link && l.includes(pdfSafe(draft.link).slice(0, 12));
+    if (isLink) doc.setTextColor(...C.accent);
+    doc.text(l, M + 14, by + 10.5); by += 15;
+    doc.setTextColor(...C.body);
+  });
+  if (draft.link) doc.link(M, y, CW, boxH, { url: draft.link });
+  y += boxH + 6;
+
+  heading("Host"); write(draft.host.text);
+  heading("About the show"); write(draft.show.text);
+  heading("How this got booked"); quote(draft.howBooked.text);
+  heading("What we pitched"); quote(draft.pitched.text);
+  heading("Why you're a fit"); write(draft.whyFit);
+  const points = (draft.toCover || "").split("\n").map(t => t.trim()).filter(Boolean);
+  if (points.length){
+    heading("Things to be ready to cover");
+    points.forEach(pt => {
+      doc.setFont("helvetica", "normal"); doc.setFontSize(10.5);
+      // keep a bullet and its wrapped lines on the same page
+      ensure(doc.splitTextToSize(pdfSafe(pt), CW - 14).length * 10.5 * 1.45);
+      doc.setTextColor(...C.accent); doc.text("\u2022", M + 2, y + 10.5);
+      write(pt, { indent: 14, gap: 3 });
+    });
+  }
+  if ((draft.clientNotes || "").trim()){
+    heading("Notes from the host");
+    write(draft.clientNotes);
+  }
+
+  // Footer on every page
+  const pages = doc.getNumberOfPages();
+  for (let i = 1; i <= pages; i++){
+    doc.setPage(i);
+    doc.setDrawColor(...C.line); doc.setLineWidth(0.75); doc.line(M, H - 40, W - M, H - 40);
+    doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(...C.dim);
+    doc.text(pdfSafe(draft.footer), M, H - 26);
+    if (pages > 1) doc.text(`${i} / ${pages}`, W - M, H - 26, { align: "right" });
+  }
+  return doc;
+}
+
+async function downloadPrepPdf(id, btn){
+  const file = readPrepFile(id);
+  if (!file) return;
+  const errEl = document.querySelector(`[data-prep-error="${id}"]`);
+  const label = btn.querySelector("span");
+  if (errEl) errEl.textContent = "";
+  btn.disabled = true;
+  if (label) label.textContent = "Preparing...";
+  try {
+    const jspdf = await loadJsPdf();
+    const doc = buildPrepPdf(jspdf, file.draft);
+    doc.save(file.fileName);
+  } catch (err) {
+    console.error("PDF error:", err);
+    if (errEl) errEl.textContent = "Couldn't create the PDF. Check your internet connection and try again.";
+  } finally {
+    btn.disabled = false;
+    if (label) label.textContent = "Download";
+  }
+}
+
+window.addEventListener("resize", () => {
+  if (document.getElementById("prepDocModal").dataset.mode === "preview") refitPrepTextareas();
 });
+
+(function initPrepDocModal(){
+  const overlay = document.getElementById("prepDocOverlay");
+  const modal = document.getElementById("prepDocModal");
+  // Keep clicks inside the modal from reaching the global "collapse open cards" handler.
+  overlay.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (e.target === overlay) closePrepDocModal();
+  });
+  overlay.querySelectorAll("[data-prep-close]").forEach(btn => btn.addEventListener("click", closePrepDocModal));
+  document.getElementById("prepGenerate").addEventListener("click", () => {
+    const data = collectPrepForm();
+    if (!validatePrepForm(data)) return;
+    writePrepForm(prepDocState.id, data);
+    startPrepDocGeneration(prepDocState.id, data);
+  });
+  document.getElementById("prepBack").addEventListener("click", () => {
+    const draft = collectPrepDraft();
+    if (draft) writePrepDraft(prepDocState.id, draft);
+    setPrepMode("form");
+    document.getElementById("prepDate").focus();
+  });
+  document.getElementById("prepSave").addEventListener("click", () => {
+    const id = prepDocState.id;
+    const draft = collectPrepDraft();
+    const prev = readPrepFile(id);
+    const fresh = prepDocState.generated || !prev;
+    writePrepFile(id, {
+      draft,
+      form: fresh ? readPrepForm(id) : prev.form,
+      fileName: prepFileName(id, draft),
+      savedAt: new Date().toISOString(),
+      createdAt: fresh ? new Date().toISOString() : prev.createdAt,
+      // Snapshot used by the Outdated check. A text-only edit keeps the old snapshot,
+      // because it doesn't change the call details in the document.
+      snapshot: fresh ? { scheduledAt: scheduledDates[id] || null, status: responses[id] || null } : prev.snapshot,
+    });
+    prepDocState.trigger = null;
+    closePrepDocModal();
+    render();
+    const dl = document.querySelector(`[data-prep-action="download"][data-prep-id="${id}"]`);
+    if (dl) dl.focus({ preventScroll: true });
+  });
+  document.addEventListener("keydown", (e) => {
+    if (overlay.hidden) return;
+    if (e.key === "Escape") { e.preventDefault(); closePrepDocModal(); return; }
+    if (e.key !== "Tab") return;
+    // Simple focus trap
+    const focusables = [...modal.querySelectorAll("button, input, select, textarea, a[href]")].filter(el => !el.disabled && el.offsetParent !== null);
+    const first = focusables[0], last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  });
+})();
+
+// Mobile-only (<=980px): the "Upcoming" sidebar becomes an off-canvas drawer
+// opened from the calendar icon in the top bar. On desktop these controls are hidden.
+function openCalendarDrawer(){
+  document.getElementById("sidebar").classList.add("is-open");
+  document.getElementById("sidebarOverlay").classList.add("is-open");
+  document.body.classList.add("drawer-open");
+  document.getElementById("calendarToggle").setAttribute("aria-expanded", "true");
+  document.getElementById("sidebarClose").focus();
+}
+function closeCalendarDrawer(returnFocus){
+  const sidebar = document.getElementById("sidebar");
+  if (!sidebar.classList.contains("is-open")) return;
+  sidebar.classList.remove("is-open");
+  document.getElementById("sidebarOverlay").classList.remove("is-open");
+  document.body.classList.remove("drawer-open");
+  const toggle = document.getElementById("calendarToggle");
+  toggle.setAttribute("aria-expanded", "false");
+  if (returnFocus) toggle.focus({ preventScroll: true });
+}
+// On narrow screens the tab row scrolls horizontally; keep the active tab fully in view.
+(function keepActiveTabVisible(){
+  const tabs = document.querySelector(".shell-tabs");
+  const active = tabs && tabs.querySelector(".shell-tab.active");
+  if (!active) return;
+  const fit = () => {
+    const overflowRight = active.offsetLeft + active.offsetWidth - (tabs.scrollLeft + tabs.clientWidth);
+    if (overflowRight > 0) tabs.scrollLeft += overflowRight;
+  };
+  fit();
+  window.addEventListener("resize", fit);
+})();
+document.getElementById("calendarToggle").addEventListener("click", (e) => { e.stopPropagation(); openCalendarDrawer(); });
+document.getElementById("sidebarClose").addEventListener("click", (e) => { e.stopPropagation(); closeCalendarDrawer(); });
+document.getElementById("sidebarOverlay").addEventListener("click", (e) => { e.stopPropagation(); closeCalendarDrawer(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeCalendarDrawer(true); });
+window.matchMedia("(max-width: 980px)").addEventListener("change", (m) => { if (!m.matches) closeCalendarDrawer(); });
 
 async function loadResponses(){
   try {
