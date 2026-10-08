@@ -2076,6 +2076,30 @@ const PODCASTS = [
     action: "Brooke's auto-reply asks guests to apply through her Google Form. Fill it out for Cahill — they review applications on an ongoing basis and only reach out if it's a fit.",
     link: { url: "https://forms.gle/CHBWUfWR6pcRcoyZ9", label: "Fill out guest application" },
     suggestedStatus: "need_form"
+  },
+  // Added Oct 8, 2026 — host team replied with a 3-step guest intake.
+  {
+    id: "tech-cant-save-us",
+    name: "Tech Can't Save Us",
+    host: "Paul David · Literal Humans",
+    niche: "Mission-driven tech — founders using technology to tackle real problems without losing sight of the people it affects",
+    fields: [
+      { label: "Podcast", text: "<a href=\"https://literalhumans.com/podcast-topic/tech-cant-save-us/\" target=\"_blank\" rel=\"noopener noreferrer\">Literal Humans — Tech Can't Save Us</a>" },
+      { label: "About the show", text: "Weekly interview podcast produced by Literal Humans. Guests are founders, CEOs and innovators at mission-driven tech companies; recent episodes cover logistics, space, mental health, AI and financial services — including an episode on humanizing AI with the co-founders of Proofed." },
+      { label: "About the host", text: "Paul David — host of Tech Can't Save Us (Literal Humans). Guest intake is handled by Enrico D'Andrea, Founder's Associate." },
+      { label: "Why you're a fit", text: "Strong fit. The show is about using technology for real problems while keeping people in view — Cahill can speak to the human side of AI in outreach: using AI to find genuine fit between hosts and guests instead of sending generic mass pitches, and where human judgment still has to make the call." },
+      { label: "Timeline", text: "✓ Pitched podcast@literalhumans.com → ✓ Enrico D'Andrea replied with the guest intake steps (Oct 8)" },
+      { label: "What Enrico said back", text: "\"Thanks for reaching out. We would be interested in having you as a guest on Tech Can't Save Us. To move forward: 1) send us a brief summary about who you are and what you want to talk about, 2) complete our podcast form, 3) give us your availability for recordings (Monday–Wednesday 2–5pm BST).\" The form link isn't in the visible email — check for a hyperlink in Gmail or ask Enrico for it." },
+      { label: "Who's coordinating on their end", text: "Enrico D'Andrea, Founder's Associate — enrico@literalhumans.com (podcast@literalhumans.com in CC)." }
+    ],
+    action: "They're interested. Reply to Enrico with a short summary + the one-sheet, availability (Mon–Wed 2–5pm UK), and ask for the podcast form link if it isn't in his email.",
+    link: { action: "reply", label: "Reply to host" },
+    suggestedStatus: "host_replied_need_response",
+    hostOptions: {
+      title: "Recording windows they offered (UK time)",
+      items: ["Monday 2–5 PM", "Tuesday 2–5 PM", "Wednesday 2–5 PM"],
+      note: "For Cahill in Vancouver: 2–5 PM UK = 6–9 AM PT until Oct 25; Oct 26–31 = 7–10 AM PT (UK changes clocks first); from Nov 1 = 6–9 AM PT again."
+    }
   }
 ];
 
