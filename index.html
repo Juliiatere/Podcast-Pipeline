@@ -1345,6 +1345,27 @@
   .prep-doc-when a{ color: var(--amber); word-break: break-all; }
   .prep-doc-section{ margin-top: 24px; }
   .prep-doc-section-head{ display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+  .prep-doc-section-meta{ display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  .prep-section-toggle{
+    padding: 2px 6px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--amber);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .prep-section-toggle:hover{ background: var(--amber-tint); }
+  .prep-section-toggle:focus-visible{ outline: 2px solid var(--amber); outline-offset: 2px; }
+  .prep-hidden-label{ display: none; font-family: 'DM Sans', sans-serif; font-size: 12px; line-height: 18px; color: var(--ink-dim); }
+  /* Hidden section: heading stays (so it can be shown again), body collapses, everything dims */
+  .prep-doc-section.is-hidden .prep-doc-section-body{ display: none; }
+  .prep-doc-section.is-hidden .prep-doc-h{ color: var(--ink-dim); text-decoration: line-through; }
+  .prep-doc-section.is-hidden .src-tag{ display: none; }
+  .prep-doc-section.is-hidden .prep-hidden-label{ display: inline; }
   .prep-doc-h{ margin: 0; font-family: 'Inter', sans-serif; font-weight: 500; font-size: 16px; line-height: 1.3; color: var(--heading); }
   .prep-doc-text{ margin: 0; font-size: 14px; line-height: 22px; white-space: pre-line; }
   .prep-doc-text.is-sample, .prep-doc-quote.is-sample{ color: var(--ink-dim); font-style: italic; }
@@ -3187,6 +3208,9 @@ function startPrepDocGeneration(id, form){
   prepTimers.push(setTimeout(() => {
     prepTimers = [];
     const draft = buildPrepDraft(id, form);
+    // Keep the user's "hide from PDF" choices across Regenerate
+    const prevFile = readPrepFile(id);
+    if (prevFile && prevFile.draft && prevFile.draft.hidden) draft.hidden = { ...prevFile.draft.hidden };
     writePrepDraft(id, draft);
     prepDocState.generated = true;
     setPrepMode("preview"); // must be visible before render so textareas can auto-size
@@ -3323,11 +3347,17 @@ function renderPrepPreview(draft){
     user: '<span class="src-tag src-user">Your notes</span>',
     conversation: '<span class="src-tag src-conversation">From conversation</span>',
   }[src]);
-  const head = (title, src) => `<div class="prep-doc-section-head"><h3 class="prep-doc-h">${title}</h3>${tag(src)}</div>`;
+  // Every section can be hidden from the PDF (e.g. "Why you're a fit" is no longer relevant once
+  // the recording is booked). Hidden sections stay in the draft, so they can be shown again.
+  const hidden = draft.hidden || (draft.hidden = {});
+  const toggle = key => `<button type="button" class="prep-section-toggle" data-toggle-section="${key}" aria-pressed="${hidden[key] ? "true" : "false"}">${hidden[key] ? "Show in PDF" : "Hide from PDF"}</button>`;
+  const headWith = (title, tagHTML, key) => `<div class="prep-doc-section-head"><h3 class="prep-doc-h">${title}</h3><div class="prep-doc-section-meta"><span class="prep-hidden-label">Hidden from PDF</span>${tagHTML}${toggle(key)}</div></div>`;
+  const head = (title, src, key) => headWith(title, tag(src), key);
   // Facts missing in the card are shown as SAMPLE text with a "Missing data" tag instead of "From pipeline".
-  const factHead = (title, f) => f.sample
-    ? `<div class="prep-doc-section-head"><h3 class="prep-doc-h">${title}</h3><span class="src-tag src-missing">Missing data</span></div>`
-    : head(title, "system");
+  const factHead = (title, f, key) => f.sample
+    ? headWith(title, '<span class="src-tag src-missing">Missing data</span>', key)
+    : head(title, "system", key);
+  const sec = key => `class="prep-doc-section${hidden[key] ? " is-hidden" : ""}" data-section="${key}"`;
   const factText = f => `<p class="prep-doc-text${f.sample ? " is-sample" : ""}">${escHTML(f.text)}</p>`;
   const linkLine = draft.link
     ? `Meeting link: <a href="${escHTML(draft.link)}" target="_blank" rel="noopener noreferrer">${escHTML(draft.link)}</a>`
@@ -3341,26 +3371,38 @@ function renderPrepPreview(draft){
       <strong>${escHTML(draft.when)}</strong>
       ${escHTML(draft.durationLine)}<br>${linkLine}
     </div>
-    <section class="prep-doc-section">${factHead("Host", draft.host)}${factText(draft.host)}</section>
-    <section class="prep-doc-section">${factHead("About the show", draft.show)}${factText(draft.show)}</section>
-    <section class="prep-doc-section">${head("How this got booked", "conversation")}<p class="prep-doc-quote${draft.howBooked.sample ? " is-sample" : ""}">${escHTML(draft.howBooked.text)}</p></section>
-    <section class="prep-doc-section">${head("What we pitched", "conversation")}<p class="prep-doc-quote${draft.pitched.sample ? " is-sample" : ""}">${escHTML(draft.pitched.text)}</p></section>
-    <section class="prep-doc-section">
-      ${head('<label for="prepEditWhyFit">Why you\'re a fit</label>', "ai")}
-      <textarea class="prep-doc-edit" id="prepEditWhyFit" data-draft-field="whyFit" rows="3">${escHTML(draft.whyFit)}</textarea>
+    <section ${sec("host")}>${factHead("Host", draft.host, "host")}<div class="prep-doc-section-body">${factText(draft.host)}</div></section>
+    <section ${sec("show")}>${factHead("About the show", draft.show, "show")}<div class="prep-doc-section-body">${factText(draft.show)}</div></section>
+    <section ${sec("howBooked")}>${head("How this got booked", "conversation", "howBooked")}<div class="prep-doc-section-body"><p class="prep-doc-quote${draft.howBooked.sample ? " is-sample" : ""}">${escHTML(draft.howBooked.text)}</p></div></section>
+    <section ${sec("pitched")}>${head("What we pitched", "conversation", "pitched")}<div class="prep-doc-section-body"><p class="prep-doc-quote${draft.pitched.sample ? " is-sample" : ""}">${escHTML(draft.pitched.text)}</p></div></section>
+    <section ${sec("whyFit")}>
+      ${head('<label for="prepEditWhyFit">Why you\'re a fit</label>', "ai", "whyFit")}<div class="prep-doc-section-body">
+      <textarea class="prep-doc-edit" id="prepEditWhyFit" data-draft-field="whyFit" rows="3">${escHTML(draft.whyFit)}</textarea></div>
     </section>
-    <section class="prep-doc-section">
-      ${head('<label for="prepEditToCover">Things to be ready to cover</label>', "ai")}
+    <section ${sec("toCover")}>
+      ${head('<label for="prepEditToCover">Things to be ready to cover</label>', "ai", "toCover")}<div class="prep-doc-section-body">
       <textarea class="prep-doc-edit" id="prepEditToCover" data-draft-field="toCover" rows="4">${escHTML(draft.toCover)}</textarea>
-      <p class="prep-doc-edit-hint">One point per line. Each line becomes a bullet in the PDF.</p>
+      <p class="prep-doc-edit-hint">One point per line. Each line becomes a bullet in the PDF.</p></div>
     </section>
-    <section class="prep-doc-section">
-      ${head('<label for="prepEditNotes">Notes from the host</label>', "user")}
-      <textarea class="prep-doc-edit" id="prepEditNotes" data-draft-field="clientNotes" rows="2" placeholder="Optional. Leave empty to hide this section in the PDF.">${escHTML(draft.clientNotes)}</textarea>
+    <section ${sec("clientNotes")}>
+      ${head('<label for="prepEditNotes">Notes from the host</label>', "user", "clientNotes")}<div class="prep-doc-section-body">
+      <textarea class="prep-doc-edit" id="prepEditNotes" data-draft-field="clientNotes" rows="2" placeholder="Optional. Leave empty to hide this section in the PDF.">${escHTML(draft.clientNotes)}</textarea></div>
     </section>
     <p class="prep-doc-footer">${escHTML(draft.footer)}</p>
   `;
   prepDocState.draft = draft;
+  document.querySelectorAll("#prepDocPreview [data-toggle-section]").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const key = btn.dataset.toggleSection;
+      const isHidden = !draft.hidden[key];
+      draft.hidden[key] = isHidden;
+      btn.closest(".prep-doc-section").classList.toggle("is-hidden", isHidden);
+      btn.textContent = isHidden ? "Show in PDF" : "Hide from PDF";
+      btn.setAttribute("aria-pressed", String(isHidden));
+      if (!isHidden) refitPrepTextareas();
+    });
+  });
   document.querySelectorAll("#prepDocPreview .prep-doc-edit").forEach(ta => {
     const fit = () => { ta.style.height = "auto"; ta.style.height = ta.scrollHeight + 3 + "px"; };
     ta.addEventListener("input", fit);
@@ -3539,13 +3581,14 @@ function buildPrepPdf(jspdf, draft){
   if (draft.link) doc.link(M, y, CW, boxH, { url: draft.link });
   y += boxH + 6;
 
-  heading("Host"); write(draft.host.text);
-  heading("About the show"); write(draft.show.text);
-  heading("How this got booked"); quote(draft.howBooked.text);
-  heading("What we pitched"); quote(draft.pitched.text);
-  heading("Why you're a fit"); write(draft.whyFit);
+  const hid = draft.hidden || {};
+  if (!hid.host){ heading("Host"); write(draft.host.text); }
+  if (!hid.show){ heading("About the show"); write(draft.show.text); }
+  if (!hid.howBooked){ heading("How this got booked"); quote(draft.howBooked.text); }
+  if (!hid.pitched){ heading("What we pitched"); quote(draft.pitched.text); }
+  if (!hid.whyFit && (draft.whyFit || "").trim()){ heading("Why you're a fit"); write(draft.whyFit); }
   const points = (draft.toCover || "").split("\n").map(t => t.trim()).filter(Boolean);
-  if (points.length){
+  if (points.length && !hid.toCover){
     heading("Things to be ready to cover");
     points.forEach(pt => {
       doc.setFont("helvetica", "normal"); doc.setFontSize(10.5);
@@ -3555,7 +3598,7 @@ function buildPrepPdf(jspdf, draft){
       write(pt, { indent: 14, gap: 3 });
     });
   }
-  if ((draft.clientNotes || "").trim()){
+  if ((draft.clientNotes || "").trim() && !hid.clientNotes){
     heading("Notes from the host");
     write(draft.clientNotes);
   }
