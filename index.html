@@ -1566,6 +1566,156 @@
     .badge{ align-self: flex-start; }
   }
 
+  /* ---------- 11. Client report builder ----------
+     Full-screen editor opened from "Create report". Left: settings. Right: live A4 preview
+     (794x1123 px pages, same layout as the Figma "Monthly Performance Report"). */
+  .header{ display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .header .btn{ margin-top: 0; }
+  .rb-open-btn{ flex: 0 0 auto; margin-bottom: 12px; } /* aligns with the chip row (it has margin-bottom 12px) */
+
+  .rb{ position: fixed; inset: 0; z-index: 400; background: #f7f7f8; display: flex; flex-direction: column; }
+  .rb[hidden]{ display: none; }
+  body.rb-open{ overflow: hidden; }
+  .rb-top{ height: 64px; flex: 0 0 auto; display: flex; align-items: center; gap: 16px; padding: 0 24px;
+    background: rgba(255,255,255,.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-bottom: 1px solid var(--panel-border); }
+  .rb-back{ display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 8px; margin-left: -8px; border: 0; border-radius: 8px;
+    background: transparent; font: 400 14px/21px 'DM Sans', sans-serif; color: var(--body); cursor: pointer; }
+  .rb-back:hover{ background: var(--amber-tint); }
+  .rb-back svg{ width: 16px; height: 16px; }
+  .rb-title{ margin: 0; font: 500 16px/130% 'Inter', sans-serif; color: var(--heading); }
+  .rb-saved{ font: 400 12px/18px 'DM Sans', sans-serif; color: var(--ink-dim); }
+  .rb-top-actions{ margin-left: auto; display: flex; gap: 8px; }
+  .rb-top-actions .btn{ margin-top: 0; }
+
+  .rb-body{ flex: 1 1 auto; min-height: 0; display: flex; }
+  .rb-panel{ width: 380px; flex: 0 0 auto; overflow-y: auto; background: #fff; border-right: 1px solid var(--panel-border); padding: 8px 24px 40px; }
+  .rb-preview{ flex: 1 1 auto; min-width: 0; overflow: auto; padding: 32px 24px 64px; }
+  .rb-pages{ display: flex; flex-direction: column; align-items: center; gap: 24px; }
+  .rb-frame{ position: relative; flex: 0 0 auto; box-shadow: 0 1px 2px rgba(11,15,20,.06), 0 8px 24px rgba(11,15,20,.08); }
+  .rb-frame > .rp-page{ position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+  .rb-tabs{ display: none; }
+
+  /* Settings panel */
+  .rb-sec{ padding: 20px 0; border-bottom: 1px solid var(--panel-border); }
+  .rb-sec:last-child{ border-bottom: 0; }
+  .rb-sec-title{ margin: 0 0 12px; font: 500 16px/130% 'Inter', sans-serif; color: var(--heading); display: flex; align-items: center; gap: 8px; }
+  .rb-field{ display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+  .rb-field:last-child{ margin-bottom: 0; }
+  .rb-label{ font: 500 12px/18px 'DM Sans', sans-serif; color: var(--ink-dim); }
+  .rb-input, .rb-select, .rb-textarea{ width: 100%; font: 400 14px/21px 'DM Sans', sans-serif; color: var(--body); background: #fff;
+    border: 1px solid var(--panel-border); border-radius: 8px; padding: 5px 10px; min-height: 32px; }
+  .rb-textarea{ resize: vertical; min-height: 96px; }
+  .rb-input:focus, .rb-select:focus, .rb-textarea:focus{ outline: 2px solid var(--amber); outline-offset: -1px; border-color: transparent; }
+  .rb-input[readonly]{ background: #f7f7f8; color: var(--ink-dim); }
+  .rb-row{ display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .rb-hint{ margin: 4px 0 0; font: 400 12px/18px 'DM Sans', sans-serif; color: var(--ink-dim); }
+  .rb-link{ border: 0; background: none; padding: 0; font: 400 12px/18px 'DM Sans', sans-serif; color: var(--amber); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+  .rb-ai{ display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 10px; background: var(--amber-tint); color: var(--amber);
+    font: 500 11px/20px 'DM Sans', sans-serif; }
+  .rb-check{ display: flex; align-items: center; gap: 8px; min-height: 32px; font: 400 14px/21px 'DM Sans', sans-serif; color: var(--body); cursor: pointer; }
+  .rb-check input{ width: 16px; height: 16px; margin: 0; accent-color: var(--amber); flex: 0 0 auto; }
+  .rb-check .rb-count{ margin-left: auto; color: var(--ink-dim); font-size: 12px; }
+  .rb-dot{ width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+
+  .rb-group{ margin-top: 12px; }
+  .rb-group-title{ margin: 0 0 4px; font: 500 12px/18px 'DM Sans', sans-serif; color: var(--ink-dim); display: flex; align-items: center; gap: 6px; }
+  .rb-pod{ display: grid; grid-template-columns: 16px 32px minmax(0,1fr); column-gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid #f0f1f3; }
+  .rb-pod:first-of-type{ border-top: 0; }
+  .rb-pod input[type=checkbox]{ width: 16px; height: 16px; margin: 0; accent-color: var(--amber); }
+  .rb-pod-cover{ width: 32px; height: 32px; border-radius: 6px; object-fit: cover; background: #e8ecfc; }
+  .rb-pod-name{ margin: 0; font: 500 13px/18px 'DM Sans', sans-serif; color: var(--heading); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rb-pod-meta{ margin: 0; font: 400 12px/18px 'DM Sans', sans-serif; color: var(--ink-dim); }
+  .rb-pod-warn{ margin: 2px 0 0; font: 400 12px/18px 'DM Sans', sans-serif; color: var(--status-action-fg); }
+  .rb-pod .rb-select{ grid-column: 3; margin-top: 6px; min-height: 28px; padding: 3px 8px; font-size: 13px; }
+  .rb-pod.is-off .rb-pod-name, .rb-pod.is-off .rb-pod-cover{ opacity: .45; }
+  .rb-others summary{ cursor: pointer; font: 500 12px/18px 'DM Sans', sans-serif; color: var(--ink-dim); padding: 6px 0; }
+
+  .rb-item{ border: 1px solid var(--panel-border); border-radius: 8px; padding: 10px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 6px; }
+  .rb-item-head{ display: flex; align-items: center; gap: 8px; }
+  .rb-item-head .rb-input{ flex: 1 1 auto; }
+  .rb-icon-btn{ width: 32px; height: 32px; flex: 0 0 auto; border: 0; border-radius: 8px; background: transparent; color: var(--ink-dim); cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; }
+  .rb-icon-btn:hover{ background: var(--amber-tint); color: var(--amber); }
+  .rb-icon-btn svg{ width: 16px; height: 16px; }
+  .rb-item .rb-textarea{ min-height: 56px; }
+  .rb-auto-item{ background: #f7f7f8; border-style: dashed; }
+  .rb-auto-item p{ margin: 0; font: 400 12px/18px 'DM Sans', sans-serif; color: var(--ink-dim); }
+  .rb-auto-item strong{ font-weight: 500; color: var(--heading); }
+  .rb-file{ font: 400 12px/18px 'DM Sans', sans-serif; }
+
+  /* ---------- Report page (A4 at 96 dpi) ---------- */
+  .rp-page{ width: 794px; height: 1123px; position: relative; overflow: hidden; background: #fefefe; color: #0b0f14;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; line-height: 150%; }
+  .rp-planet{ position: absolute; left: 42px; top: 73px; width: 752px; height: 923px; pointer-events: none; }
+  .rp-head{ position: absolute; top: 0; left: 0; right: 0; height: 40px; background: #435298; display: flex; align-items: center; justify-content: center; }
+  .rp-head svg{ width: 104px; height: 25px; display: block; }
+  .rp-body{ position: absolute; top: 80px; left: 40px; width: 714px; display: flex; flex-direction: column; gap: 40px; }
+  .rp-intro{ display: flex; flex-direction: column; gap: 24px; }
+  .rp-meta{ margin: 0 0 8px; font: 500 12px/150% 'DM Sans', sans-serif; color: #676d77; }
+  .rp-h1{ margin: 0; font: 700 32px/100% 'Inter', sans-serif; text-transform: uppercase; color: #0b0f14; letter-spacing: -0.01em; }
+  .rp-goal{ display: flex; align-items: center; gap: 8px; font: 500 16px/130% 'Inter', sans-serif; }
+  .rp-goal-check{ width: 20px; height: 20px; border-radius: 50%; background: #0c8f21; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; }
+  .rp-goal-check svg{ width: 12px; height: 12px; }
+  .rp-goal-num{ font-weight: 600; color: #0c8f21; text-transform: uppercase; }
+  .rp-goal-text{ text-transform: capitalize; }
+  .rp-sections{ display: flex; flex-direction: column; gap: 16px; }
+  .rp-sec{ display: flex; flex-direction: column; gap: 12px; }
+  .rp-h2{ margin: 0; font: 500 16px/130% 'Inter', sans-serif; text-transform: uppercase; color: #0b0f14; }
+  .rp-card{ background: rgba(255,255,255,.7); border-radius: 12px; padding: 12px 12px 12px 0; }
+  .rp-win{ display: flex; gap: 24px; align-items: center; }
+  .rp-win-img{ width: 175px; height: 92px; border-radius: 8px; object-fit: cover; flex: 0 0 auto; background: #e8ecfc; }
+  .rp-win-title{ margin: 0 0 4px; font: 500 16px/130% 'Inter', sans-serif; }
+  .rp-win-title a{ color: #5068d4; text-decoration: underline; text-underline-offset: 2px; }
+  .rp-win-text{ margin: 0; font-size: 14px; line-height: 150%; color: #151c25; }
+  .rp-funnel{ display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 8px; }
+  .rp-kpi{ border-left: 2px solid #5068d4; padding: 0 12px; display: flex; flex-direction: column; gap: 8px; }
+  .rp-kpi-label{ margin: 0; font-size: 14px; line-height: 150%; color: #151c25; }
+  .rp-kpi-value{ margin: 0; font: 500 24px/130% 'Inter', sans-serif; color: #5068d4; }
+  .rp-legend{ display: flex; flex-wrap: wrap; gap: 8px 24px; }
+  .rp-legend span{ display: inline-flex; align-items: center; gap: 4px; font-size: 14px; }
+  .rp-legend i{ width: 12px; height: 12px; border-radius: 50%; border: 1px solid #fff; display: inline-block; }
+  .rp-bar{ display: flex; height: 8px; gap: 2px; }
+  .rp-bar i{ display: block; height: 8px; border-radius: 4px; min-width: 8px; }
+  .rp-caption{ margin: 0; font-size: 12px; line-height: 150%; color: #151c25; }
+  .rp-overview{ border-left: 2px solid #5068d4; padding: 0 12px; margin: 0; font-size: 14px; line-height: 150%; color: #151c25; }
+  .rp-next{ display: flex; flex-direction: column; gap: 12px; }
+  .rp-next-item{ border-left: 2px solid #5068d4; padding: 0 12px; }
+  .rp-next-title{ margin: 0; font-size: 14px; line-height: 150%; color: #0b0f14; }
+  .rp-next-text{ margin: 0; font-size: 12px; line-height: 150%; color: #676d77; }
+  .rp-foot{ position: absolute; left: 40px; right: 41px; top: 1074px; border-top: 1px solid #e0e2e7; padding-top: 4px; display: flex; justify-content: space-between;
+    font-size: 14px; line-height: 150%; color: #aeb2b7; }
+  .rp-empty{ margin: 0; font-size: 14px; color: #676d77; }
+  .rp-overflow{ position: absolute; left: 40px; right: 40px; bottom: 56px; padding: 6px 10px; border-radius: 8px; background: #fff6e8; color: #b8720a;
+    font: 500 12px/18px 'DM Sans', sans-serif; }
+
+  @media (max-width: 900px){
+    .rb-top{ padding: 0 16px; gap: 8px; }
+    .rb-saved{ display: none; }
+    .rb-top-actions .btn span{ display: none; }
+    .rb-tabs{ display: flex; gap: 4px; padding: 8px 16px; background: #fff; border-bottom: 1px solid var(--panel-border); }
+    .rb-tabs button{ flex: 1 1 0; height: 32px; border: 1px solid var(--panel-border); border-radius: 8px; background: #fff;
+      font: 400 14px/21px 'DM Sans', sans-serif; color: var(--body); cursor: pointer; }
+    .rb-tabs button[aria-selected="true"]{ border-color: var(--amber); color: var(--amber); background: var(--amber-tint); }
+    .rb-body{ flex-direction: column; }
+    .rb-panel{ width: 100%; border-right: 0; padding: 0 16px 32px; }
+    .rb-preview{ padding: 16px 16px 48px; }
+    .rb[data-view="settings"] .rb-preview{ display: none; }
+    .rb[data-view="preview"] .rb-panel{ display: none; }
+  }
+
+  @media print{
+    @page{ size: 794px 1123px; margin: 0; }
+    body.rb-open > *:not(#reportBuilder){ display: none !important; }
+    body.rb-open{ background: #fff; margin: 0 !important; padding: 0 !important; }
+    #reportBuilder{ position: static; display: block; background: #fff; }
+    #reportBuilder .rb-top, #reportBuilder .rb-tabs, #reportBuilder .rb-panel, #reportBuilder .rp-overflow{ display: none !important; }
+    #reportBuilder .rb-body, #reportBuilder .rb-preview{ display: block !important; padding: 0; overflow: visible; }
+    #reportBuilder .rb-pages{ display: block; }
+    #reportBuilder .rb-frame{ width: 794px !important; height: 1123px !important; box-shadow: none; break-after: page; page-break-after: always; }
+    #reportBuilder .rb-frame > .rp-page{ transform: none !important; }
+    .rp-page{ -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
 </style>
 </head>
 <body>
@@ -1595,11 +1745,15 @@
   <div class="header">
     <div class="status-chip-row">
       <button type="button" class="status-chip chip-all active" data-filter="all"><span id="statusChipAll"></span></button>
-      <button type="button" class="status-chip chip-done" data-filter="episode_recorded"><span class="dot"></span><span id="statusChipRecorded"></span></button>
+      <button type="button" class="status-chip chip-done" data-filter="done"><span class="dot"></span><span id="statusChipRecorded"></span></button>
       <button type="button" class="status-chip chip-booked" data-filter="booked"><span class="dot"></span><span id="statusChipBooked"></span></button>
       <button type="button" class="status-chip chip-precall" data-filter="waiting"><span class="dot"></span><span id="statusChipPrecall"></span></button>
       <button type="button" class="status-chip chip-action" data-filter="action"><span class="dot"></span><span id="statusChipPending"></span></button>
     </div>
+    <button type="button" class="btn secondary rb-open-btn" id="openReportBuilder">
+      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 2.5h5.5L12.5 5.5v8H4v-11z" stroke="currentColor" stroke-linejoin="round"/><path d="M6 8.5h4.5M6 11h3" stroke="currentColor" stroke-linecap="round"/></svg>
+      <span>Create report</span>
+    </button>
   </div>
 
   <div class="list" id="list"></div>
@@ -1731,6 +1885,38 @@
     </div>
   </div>
 </div>
+<!-- 11. Client report builder (opened from "Create report"; markup filled by renderReportBuilder) -->
+<div class="rb" id="reportBuilder" hidden role="dialog" aria-modal="true" aria-labelledby="rbTitle" data-view="settings">
+  <div class="rb-top">
+    <button type="button" class="rb-back" id="rbClose">
+      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 12.5L5.5 8 10 3.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Pipeline</span>
+    </button>
+    <h2 class="rb-title" id="rbTitle">Client report</h2>
+    <span class="rb-saved" id="rbSaved" aria-live="polite"></span>
+    <div class="rb-top-actions">
+      <button type="button" class="btn secondary" id="rbReset" aria-label="Reset report settings">
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8a5.5 5.5 0 1 0 1.6-3.9M2.5 2.5v2.5H5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Reset</span>
+      </button>
+      <button type="button" class="btn primary" id="rbPdf" aria-label="Download PDF">
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2.5v8M4.5 7L8 10.5 11.5 7M3 13.5h10" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Download PDF</span>
+      </button>
+    </div>
+  </div>
+  <div class="rb-tabs" role="tablist" aria-label="Report view">
+    <button type="button" role="tab" data-rb-view="settings" aria-selected="true">Settings</button>
+    <button type="button" role="tab" data-rb-view="preview" aria-selected="false">Preview</button>
+  </div>
+  <div class="rb-body">
+    <aside class="rb-panel" id="rbPanel" aria-label="Report settings"></aside>
+    <div class="rb-preview" id="rbPreview">
+      <div class="rb-pages" id="rbPages"></div>
+    </div>
+  </div>
+</div>
+
 <script>
 /* =====================================================================
    Podcast Pipeline — prototype (behaviour + UI reference, not production code)
@@ -1747,6 +1933,7 @@
    8. Side panel ................ open/close, header, menu, accordions
    9. Prep doc .................. modal, generating, preview, saved file, PDF
    10. Mobile & boot ............ drawer, tabs, loadResponses()
+   11. Client report builder ..... "Create report": settings + live A4 preview (page 1), PDF via print
 
    Search for "Platform:" for places that need a real backend,
    and "Prototype storage:" for localStorage stand-ins.
@@ -2200,13 +2387,14 @@ const STATUS_OPTIONS = [
   { value: "precall_missed", label: "Pre-call didn't happen", cls: "action" }, // no-show / dropped: reschedule
   { value: "recording_booked", label: "Recording booked", cls: "prebooked" }, // blue "Booked" group, same as pre-call
   { value: "recording_missed", label: "Recording didn't happen", cls: "action" },
-  { value: "episode_recorded", label: "Episode recorded", cls: "done" }
+  { value: "episode_recorded", label: "Episode recorded", cls: "done" },
+  { value: "episode_published", label: "Episode published", cls: "done" } // final step; the client report counts it as "Published"
 ];
 
 // Statuses that carry a call date (Call details block + calendar). Booked = upcoming;
 // done/missed/recorded keep the date so the call stays in the calendar history.
 const BOOKED_STATUSES = new Set(["precall_booked", "recording_booked"]);
-const DATED_STATUSES = new Set(["precall_booked", "precall_done", "precall_missed", "recording_booked", "recording_missed", "episode_recorded"]);
+const DATED_STATUSES = new Set(["precall_booked", "precall_done", "precall_missed", "recording_booked", "recording_missed", "episode_recorded", "episode_published"]);
 const PRECALL_STATUSES = new Set(["precall_booked", "precall_done", "precall_missed"]);
 // Outcome buttons shown once a booked call's time has passed.
 const CALL_OUTCOMES = {
@@ -2224,7 +2412,8 @@ const STATUS_PRIORITY = {
   waiting_reply: 1, replied_to_host: 1, host_replied_need_response: 1, form_filled: 1, precall_done: 1,
   precall_booked: 2,
   recording_booked: 3,
-  episode_recorded: 4
+  episode_recorded: 4,
+  episode_published: 5
 };
 
 function lastChangedTime(id){
@@ -2262,10 +2451,11 @@ const NEXT_STEP_EDITABLE = {
   precall_done:     { field: "Booking link", fallbackLabel: "Book recording",       placeholder: "https://calendly.com/..." },
   precall_missed:   { field: "Booking link", fallbackLabel: "Reschedule pre-call",  placeholder: "https://calendly.com/..." },
   recording_missed: { field: "Booking link", fallbackLabel: "Reschedule recording", placeholder: "https://calendly.com/..." },
-  // Episode recorded: a place to keep the published episode link. Never falls back to the
+  // Episode published: a place to keep the episode link. Never falls back to the
   // conversation link (that would be the booking/recording room, not the episode).
-  episode_recorded: { field: "Episode link", fallbackLabel: "Open episode", placeholder: "https://open.spotify.com/episode/...", ownLinkOnly: true,
-                      emptyHint: "Save the episode link here once it's published." },
+  // Episode recorded has no link field: its next step is "Mark as published" (see nextStepFor).
+  episode_published: { field: "Episode link", fallbackLabel: "Open episode", placeholder: "https://open.spotify.com/episode/...", ownLinkOnly: true,
+                       emptyHint: "Paste the episode link to share it with the client and use it in the report." },
 };
 function readNextStepLink(id){
   try { const raw = localStorage.getItem(`nextstep:link:${id}`); return raw ? JSON.parse(raw).url || "" : ""; }
@@ -2284,6 +2474,10 @@ function nextStepFor(p){
   if ((p.link && p.link.action === "reply") || (status === "host_replied_need_response" && !p.link)){
     return { reply: true, label: (p.link && p.link.label) || "Reply to host", url: "", editable: null, custom: false };
   }
+  // Episode recorded: the next step is internal — mark it as published once the host releases it.
+  if (status === "episode_recorded"){
+    return { markPublished: true, label: "Mark as published", url: "", editable: null, custom: false };
+  }
   const editable = NEXT_STEP_EDITABLE[status] || null;
   const custom = editable ? readNextStepLink(p.id) : "";
   const convUrl = (editable && editable.ownLinkOnly) ? "" : (p.link && p.link.url ? p.link.url : "");
@@ -2293,6 +2487,12 @@ function nextStepFor(p){
   return { url, label, editable, custom: !!custom };
 }
 function nextStepCtaHTML(ns, extraClass){
+  if (ns.markPublished){
+    return `<button type="button" class="btn primary next-step-cta ${extraClass || ""}" data-mark-published="${escHTML(podPanelId || "")}">
+      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>${escHTML(ns.label)}</span>
+    </button>`;
+  }
   if (ns.reply){
     return `<button type="button" class="btn primary next-step-cta ${extraClass || ""}" data-reply-host="${escHTML(podPanelId || "")}">
       <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5.5 9.5L2 6l3.5-3.5M2 6h8a4 4 0 0 1 4 4v2.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -2462,13 +2662,14 @@ function isoToTimeParts(iso, tz){
 
 let podPanelId = null; // podcast currently shown in the side panel
 const aiSuggestedStatus = new Set(); // podcasts whose current status was suggested by AI, not set by a person
-let activeFilter = "all"; // "all" | "episode_recorded" | "booked" | "waiting" | "action"
+let activeFilter = "all"; // "all" | "done" | "booked" | "waiting" | "action"
 
 // Shared classification used by both the status chips and the list filter,
 // so counts and filtering always agree with each other.
 function classifyForChip(p){
   const r = responses[p.id];
-  if (r === "episode_recorded") return "episode_recorded";
+  // "Done" = episode recorded or published (colour: green)
+  if (r === "episode_recorded" || r === "episode_published") return "done";
   // "Booked" = any call with a date: pre-call or recording (colour: blue)
   if (r === "recording_booked" || r === "precall_booked") return "booked";
   const meta = STATUS_OPTIONS.find(o => o.value === r);
@@ -3012,13 +3213,13 @@ function updateStatusChip(){
     if (deletedFlags[p.id]) return;
     all++;
     const cat = classifyForChip(p);
-    if (cat === "episode_recorded") recorded++;
+    if (cat === "done") recorded++;
     else if (cat === "booked") booked++;
     else if (cat === "waiting") waiting++;
     else action++;
   });
   document.getElementById("statusChipAll").textContent = `All (${all})`;
-  document.getElementById("statusChipRecorded").textContent = `Episode recorded (${recorded})`;
+  document.getElementById("statusChipRecorded").textContent = `Done (${recorded})`;
   document.getElementById("statusChipBooked").textContent = `Booked (${booked})`;
   document.getElementById("statusChipPrecall").textContent = `Waiting on reply (${waiting})`;
   document.getElementById("statusChipPending").textContent = `Need action (${action})`;
@@ -3115,6 +3316,22 @@ function renderPodPanel(bodyHTML){
       const label = btn.querySelector("span");
       label.textContent = ok ? "Copied" : "Copy failed";
       setTimeout(() => { label.textContent = "Copy"; }, 1500);
+    });
+  });
+
+  // "Mark as published": episode_recorded -> episode_published. The episode link field appears next.
+  document.querySelectorAll("#podPanel [data-mark-published]").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.markPublished;
+      if (!id || responses[id] !== "episode_recorded") return;
+      responses[id] = "episode_published";
+      aiSuggestedStatus.delete(id);
+      if (!statusHistory[id]) statusHistory[id] = [];
+      statusHistory[id].push({ status: "episode_published", changed_at: new Date().toISOString() });
+      render();
+      updateStatusChip();
+      try { await saveResponse(id, "episode_published"); } catch (err) { console.error("save error", err); }
     });
   });
 
@@ -3902,6 +4119,598 @@ document.getElementById("sidebarClose").addEventListener("click", (e) => { e.sto
 document.getElementById("sidebarOverlay").addEventListener("click", (e) => { e.stopPropagation(); closeCalendarDrawer(); });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeCalendarDrawer(true); });
 window.matchMedia("(max-width: 980px)").addEventListener("change", (m) => { if (!m.matches) closeCalendarDrawer(); });
+
+
+// ---------- 11. Client report builder ----------
+// "Create report" opens a full-screen editor: settings on the left, live A4 preview on the right.
+// Data comes from the same in-memory state as the pipeline (responses, statusHistory, scheduledDates).
+// Report settings (period, funnel numbers, exclusions, texts) are a per-client draft.
+//   Prototype storage: localStorage "report:draft:v1".
+//   Platform: a `reports` table (client_id, period_start, period_end, config JSON, generated_at) so a
+//   sent report is a frozen snapshot and does not change when the pipeline changes later.
+// Page 1 only in this skeleton. Page 2 (client & targeting + podcast pipeline grid) comes next.
+
+const REPORT_LOGO_SVG = "<svg width=\"104\" height=\"25\" viewBox=\"0 0 104 25\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"Novacast\"><path d=\"M4.89258 3.19336C5.31609 3.19341 5.70564 3.33541 6.01953 3.57227C6.43403 3.59202 6.84512 3.7489 7.17871 4.04688L16.3799 12.2646C16.4876 12.3569 16.6112 12.4563 16.6748 12.4756C16.7849 12.5089 16.9035 12.4966 17.0049 12.4424C17.1064 12.3881 17.1825 12.2957 17.2158 12.1855C17.2241 12.158 17.2291 12.1118 17.2324 12.0576V9.28418C17.2324 9.27956 17.2336 9.27502 17.2354 9.27051C17.253 9.05247 17.4158 8.87328 17.6367 8.84863C18.1526 8.79138 19.1567 8.70801 20.6162 8.70801C22.0752 8.70801 23.0787 8.79138 23.5947 8.84863C23.8207 8.87371 23.9858 9.06043 23.9971 9.28516C23.9979 9.28821 24 9.29084 24 9.29395V20.6572C23.9999 21.6927 23.1605 22.5273 22.125 22.5273H19.1074C18.6829 22.5273 18.2928 22.3854 17.9785 22.1484C17.5419 22.1429 17.1051 21.9876 16.7539 21.6738L9.71191 15.3838L7.60156 13.499L7.59961 13.4971C7.50599 13.4208 7.40059 13.3397 7.34668 13.3174C7.24044 13.2734 7.12088 13.2734 7.01465 13.3174C6.90832 13.3615 6.82332 13.4464 6.7793 13.5527C6.77422 13.565 6.77098 13.5814 6.76758 13.6006V20.6523C6.76758 21.6878 5.92802 22.5272 4.89258 22.5273H1.875C0.839467 22.5273 0 21.6879 0 20.6523V5.06836C0 4.03283 0.839466 3.19336 1.875 3.19336H4.89258ZM6.76758 12.7539C6.76857 12.7541 6.76951 12.7546 6.77051 12.7549L6.76758 12.7529V12.7539ZM20.6162 6.80469C22.0753 6.80469 23.0787 6.88903 23.5947 6.94629C23.8287 6.97225 23.9998 7.1709 24 7.40625C24 7.70027 23.7388 7.92903 23.4463 7.90039C22.8773 7.84417 21.8946 7.77149 20.6162 7.77148C19.3377 7.77148 18.3551 7.84416 17.7861 7.90039C17.4935 7.92916 17.2324 7.70034 17.2324 7.40625C17.2326 7.17101 17.4029 6.9724 17.6367 6.94629C18.1526 6.88903 19.1567 6.80469 20.6162 6.80469ZM20.6162 4.90234C22.0752 4.90235 23.0787 4.98571 23.5947 5.04297C23.8288 5.06895 24 5.26841 24 5.50391C23.9999 5.79783 23.7388 6.02665 23.4463 5.99805C22.8773 5.94182 21.8946 5.86914 20.6162 5.86914C19.3377 5.86914 18.3551 5.94182 17.7861 5.99805C17.4936 6.02678 17.2325 5.7979 17.2324 5.50391C17.2324 5.2685 17.4028 5.06907 17.6367 5.04297C18.1526 4.98571 19.1567 4.90234 20.6162 4.90234ZM20.6162 3C22.0752 3 23.0787 3.08337 23.5947 3.14062C23.8288 3.1666 24 3.36609 24 3.60156C24 3.89557 23.7388 4.12433 23.4463 4.0957C22.8773 4.03948 21.8946 3.9668 20.6162 3.9668C19.3377 3.9668 18.3551 4.03948 17.7861 4.0957C17.4935 4.12446 17.2324 3.89564 17.2324 3.60156C17.2325 3.36618 17.4028 3.16671 17.6367 3.14062C18.1526 3.08337 19.1567 3 20.6162 3Z\" fill=\"#FEFEFE\"/><path d=\"M45.9648 8C46.6165 8 47.2089 8.10082 47.7412 8.30273C48.2733 8.50458 48.7273 8.80286 49.1035 9.19727C49.489 9.59191 49.7834 10.088 49.9854 10.6846C50.1964 11.2718 50.3017 11.951 50.3018 12.7217C50.3018 13.5201 50.191 14.2179 49.9707 14.8145C49.7596 15.4017 49.457 15.8925 49.0625 16.2871C48.677 16.6818 48.2134 16.9807 47.6719 17.1826C47.1306 17.3752 46.5342 17.4716 45.8828 17.4717C45.2221 17.4717 44.625 17.3708 44.0928 17.1689C43.5605 16.967 43.1013 16.6681 42.7158 16.2734C42.3397 15.8788 42.0505 15.3925 41.8486 14.8145C41.6468 14.2272 41.5459 13.5481 41.5459 12.7773C41.5459 11.6944 41.7341 10.8039 42.1104 10.1064C42.4958 9.39984 43.0235 8.87219 43.6934 8.52344C44.3633 8.17471 45.1206 8.00002 45.9648 8ZM73.5029 8C74.2004 8 74.7929 8.08734 75.2793 8.26172C75.7655 8.43609 76.1556 8.67925 76.4492 8.99121C76.7521 9.31242 76.9727 9.68879 77.1104 10.1201C77.248 10.5514 77.3209 11.0152 77.3301 11.5107H75.4121C75.3357 11.178 75.3338 11.1753 75.2236 10.8633C75.1135 10.5513 74.9253 10.2901 74.6592 10.0791C74.4022 9.87719 74.0349 9.77637 73.5576 9.77637C73.1264 9.77644 72.7318 9.87726 72.374 10.0791C72.0162 10.2902 71.6989 10.6056 71.4971 11.0459C71.3011 11.4735 71.1974 12.0346 71.1914 12.7217C71.1948 13.4215 71.2985 13.9915 71.4971 14.4248C71.699 14.8653 72.0161 15.1815 72.374 15.3926C72.7319 15.5944 73.1264 15.6953 73.5576 15.6953C74.0349 15.6953 74.4022 15.5945 74.6592 15.3926C74.9252 15.1816 75.1135 14.9203 75.2236 14.6084C75.3338 14.2964 75.3347 14.2936 75.4111 13.9609H77.3301C77.3209 14.4565 77.247 14.9202 77.1094 15.3516C76.9717 15.7828 76.752 16.1593 76.4492 16.4805C76.1555 16.7925 75.7647 17.0356 75.2783 17.21C74.792 17.3842 74.2002 17.4717 73.5029 17.4717C73.4703 17.4717 73.4376 17.4701 73.4053 17.4697C73.3874 17.4699 73.3695 17.4717 73.3516 17.4717C72.9071 17.4717 72.4901 17.4217 72.0996 17.3262C71.9186 17.286 71.7434 17.2396 71.5752 17.1826C71.0062 16.9899 70.52 16.6954 70.1162 16.3008C69.7217 15.9062 69.4181 15.4244 69.207 14.8555C69.0052 14.2774 68.9043 13.6028 68.9043 12.832C68.9043 12.7832 68.9054 12.7347 68.9062 12.6865C68.9062 12.6709 68.9053 12.6553 68.9053 12.6396C68.9053 11.8687 69.0061 11.1934 69.208 10.6152C69.4191 10.0464 69.7217 9.56446 70.1162 9.16992C70.5199 8.77539 71.0064 8.48179 71.5752 8.28906C71.7367 8.23437 71.9048 8.18859 72.0781 8.14941C72.4746 8.05046 72.8991 8 73.3516 8C73.3705 8 73.3894 8.00081 73.4082 8.00098C73.4396 8.0006 73.4712 8 73.5029 8ZM91.6201 8C92.4184 8 93.0975 8.11443 93.6572 8.34375C94.2171 8.57319 94.6493 8.89462 94.9521 9.30762C95.2549 9.71137 95.4197 10.1842 95.4473 10.7256L93.4648 11.29C93.4648 11.024 93.4189 10.7898 93.3271 10.5879C93.2446 10.3862 93.1255 10.2212 92.9697 10.0928C92.8137 9.95511 92.6201 9.85428 92.3906 9.79004C92.1613 9.71669 91.9 9.6797 91.6064 9.67969C91.2578 9.67969 90.9597 9.72117 90.7119 9.80371C90.4734 9.88629 90.2941 9.99618 90.1748 10.1338C90.0555 10.2622 89.9961 10.4136 89.9961 10.5879C89.9961 10.808 90.0872 10.9919 90.2705 11.1387C90.4632 11.2763 90.7208 11.3961 91.042 11.4971C91.3724 11.5888 91.7353 11.6807 92.1299 11.7725C92.5243 11.855 92.9325 11.9605 93.3545 12.0889C93.7767 12.2082 94.1719 12.3684 94.5391 12.5703C94.9061 12.7722 95.1997 13.0478 95.4199 13.3965C95.6493 13.736 95.7636 14.1674 95.7637 14.6904C95.7637 15.2503 95.6124 15.7419 95.3096 16.1641C95.0159 16.5768 94.5708 16.8976 93.9746 17.127C93.3781 17.3564 92.6389 17.4717 91.7578 17.4717C91.1706 17.4717 90.6383 17.4167 90.1611 17.3066C89.6839 17.1965 89.2706 17.0308 88.9219 16.8105C88.5731 16.5811 88.2976 16.2921 88.0957 15.9434C87.8938 15.5946 87.775 15.1903 87.7383 14.7314L89.6787 14.085C89.7063 14.4704 89.817 14.7919 90.0098 15.0488C90.2025 15.3056 90.4592 15.4985 90.7803 15.627C91.1107 15.7463 91.478 15.8057 91.8818 15.8057C92.2672 15.8057 92.5888 15.7597 92.8457 15.668C93.1117 15.567 93.3091 15.4427 93.4375 15.2959C93.575 15.14 93.6435 14.975 93.6436 14.8008C93.6436 14.5989 93.5562 14.4332 93.3818 14.3047C93.2075 14.1672 92.9686 14.0526 92.666 13.9609C92.3632 13.86 92.0101 13.7636 91.6064 13.6719C91.1476 13.5617 90.6974 13.442 90.2568 13.3135C89.8165 13.185 89.4174 13.0202 89.0596 12.8184C88.7016 12.6073 88.4171 12.3408 88.2061 12.0195C88.0043 11.6893 87.9034 11.2766 87.9033 10.7812C87.9033 10.2214 88.0456 9.73429 88.3301 9.32129C88.6146 8.90844 89.0325 8.58778 89.583 8.3584C90.1337 8.11982 90.8125 8 91.6201 8ZM37.7734 14.291H37.9385L37.8008 8.19238H39.9619V17.2783H37.3604L33.1885 10.8359H33.0371L33.1611 17.2783H31V8.19238H33.877L37.7734 14.291ZM55.1777 15.4199H55.3701L57.3662 8.19238H59.7617L56.8018 17.2783H53.7188L50.7588 8.19238H53.1816L55.1777 15.4199ZM68.4434 17.2783H66.0205L65.5156 15.5713H61.9541L61.4492 17.2783H59.0264L62.1104 8.19238H65.3594L68.4434 17.2783ZM87.1709 17.2783H84.748L84.2432 15.5713H80.6826L80.1777 17.2783H77.7539L80.8379 8.19238H84.0869L87.1709 17.2783ZM104 10.0371H101.329V17.2783H99.0986V10.0371H96.4561V8.19238H104V10.0371ZM45.8965 9.81738C45.4561 9.81738 45.0796 9.93183 44.7676 10.1611C44.4648 10.3814 44.2306 10.7119 44.0654 11.1523C43.9003 11.5836 43.8174 12.116 43.8174 12.749C43.8174 13.2261 43.8634 13.6531 43.9551 14.0293C44.056 14.3964 44.1938 14.7088 44.3682 14.9658C44.5425 15.2136 44.7631 15.4063 45.0293 15.5439C45.3045 15.6723 45.6117 15.7373 45.9512 15.7373C46.4009 15.7373 46.7772 15.6265 47.0801 15.4062C47.3921 15.1768 47.6262 14.8509 47.7822 14.4287C47.9474 13.9974 48.0303 13.4742 48.0303 12.8594C48.0303 12.208 47.9473 11.6576 47.7822 11.208C47.617 10.7491 47.374 10.4042 47.0527 10.1748C46.7408 9.93627 46.3552 9.81744 45.8965 9.81738ZM62.3945 14.085H65.0752L63.8447 9.92773H63.625L62.3945 14.085ZM81.1221 14.085H83.8027L82.5723 9.92773H82.3525L81.1221 14.085Z\" fill=\"#FEFEFE\"/></svg>";
+
+// Report categories. Each podcast is placed by its status AS OF THE PERIOD END (from the status log),
+// not its current status, so an old report stays correct. Anything else is "not in report" by default.
+const REPORT_CATEGORIES = [
+  { key: "published",  label: "Published",        color: "#0c8f21", statuses: ["episode_published"] },
+  { key: "recorded",   label: "Recorded",         color: "#4cc38a", statuses: ["episode_recorded"] },
+  { key: "booked",     label: "Recording booked", color: "#007aff", statuses: ["recording_booked"] },
+  { key: "inprogress", label: "In progress",      color: "#94a4e9", statuses: ["precall_booked", "precall_done"] },
+];
+const REPORT_CAT_BY_STATUS = {};
+REPORT_CATEGORIES.forEach(c => c.statuses.forEach(s => { REPORT_CAT_BY_STATUS[s] = c.key; }));
+const REPORT_CAT = Object.fromEntries(REPORT_CATEGORIES.map(c => [c.key, c]));
+
+// Cover art. Platform: comes from the podcast record. Prototype: Apple Podcasts artwork URLs.
+const REPORT_COVERS = {
+  "marketing-in-progress": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts221/v4/f2/1e/a7/f21ea75c-a2a1-beb8-de7e-764edb31c79b/mza_17907989648187346523.jpg/400x400bb.jpg",
+  "brainiac-blueprint": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts221/v4/ef/10/c7/ef10c79d-8eb3-0f94-a287-22c8193331dd/mza_9359307641644990812.jpg/400x400bf-60.jpg",
+  "ai-edge-podcast": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/fd/f7/ac/fdf7ac8c-4610-e256-2bcf-c271a04086b6/mza_662009966540216265.png/400x400bf-60.jpg",
+  "scaling-with-ai": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/60/e4/1e/60e41e84-de79-d221-96c7-ea48aa0a17a7/mza_394367034658488832.jpg/400x400bf-60.jpg",
+  "exit-algorithms": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts221/v4/e9/9f/b6/e99fb66b-ebdb-53b2-abb1-fc3f2c236d20/mza_8823081391611594103.jpg/400x400bb.jpg",
+  "tech-cant-save-us": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/9c/8a/9a/9c8a9ae5-b274-af90-81b8-cabb5fdb8c57/mza_7079428336009483380.jpg/400x400bb.jpg",
+  "pull-the-chute-podcast": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/cd/37/7e/cd377ea0-4774-622d-0289-1adff4602840/mza_5021150450910131771.jpg/400x400bf-60.jpg",
+  "founders-voyage": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts115/v4/7b/fb/f0/7bfbf0cb-a6b1-eeea-dded-2f851cf70c4d/mza_14962822545929850192.png/400x400bb.jpg",
+  "grow-a-small-business-podcast": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts115/v4/a3/cd/9c/a3cd9c0f-628b-c950-75cd-306abdd378db/mza_12306658192918940223.jpg/400x400bb.jpg",
+  "marketer-of-the-day": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts125/v4/04/b5/0f/04b50f58-5d55-b0b6-f265-5d3cf4f0a972/mza_202644931362525462.jpg/400x400bb.jpg",
+};
+// Short show name for running text: drops "(Formerly ...)", " — subtitle" and a trailing " with First Last".
+function rbShortName(p){ return p.name.split(" (")[0].split(" — ")[0].replace(/ with [A-Z][a-z]+ [A-Z][a-z]+$/, ""); }
+function reportCover(id){ return REPORT_COVERS[id] || COVER_IMG; }
+
+// Prototype seed for Cahill: the values from the Sep 1 - Oct 15 report made by hand.
+// Platform: pitches/responses come from outreach data; texts are AI drafts.
+const REPORT_SEED = {
+  v: 1,
+  preset: "custom",
+  start: "2026-09-01",
+  end: "2026-10-15",
+  title: "",                       // empty = auto from period length
+  clientName: CLIENT_PROFILE.name,
+  clientEmail: "cahill@novacastpr.com",
+  pitches: 224,
+  responses: 35,
+  touchpoints: "",                 // empty = auto (about 1.4 touchpoints per pitch, rounded down to 50)
+  cats: { published: true, recorded: true, booked: true, inprogress: true },
+  excluded: { "ai-for-sales-podcast": true },
+  override: {                      // podcast_id -> category key; fixes stale pipeline statuses for this report only
+    "marketing-in-progress": "published",
+    "brainiac-blueprint": "recorded",
+    "ai-edge-podcast": "recorded",
+  },
+  blocks: { win: true, funnel: true, opps: true, overview: true, next: true },
+  winId: "marketing-in-progress",
+  winLink: "https://open.spotify.com/show/3nGz1edwVDc4h4a4631hiw",
+  winText: "Cahill's conversation with host Gayle Kalvert (Creo Collective) went live on Sep 29. The Creo team sent a ready-made reel, cover art and LinkedIn copy for promotion, and Gayle said she hopes to collaborate again.",
+  winImage: "",                    // data URL of an uploaded image; empty = podcast cover
+  overview: "",                    // empty = auto draft
+  nextAuto: true,                  // "calls in the next 30 days" item, built from the call dates
+  nextItems: [
+    { title: "Convert warm leads", text: "GO AI Podcast — confirming a new slot; Breakthrough SaaS Growth — sending the intro video hosts requested." },
+    { title: "Follow through on applications", text: "Agents of Change, David C Barnett (SMB M&A) and The AI Movement are reviewing Cahill's guest applications." },
+    { title: "Move 6 open conversations to booked", text: "Revenue Science, AI Chicks, Agency Profit, AsembleAI, Founder's Mentality and Making Data Simple." },
+  ],
+};
+const REPORT_STORE_KEY = "report:draft:v1";
+let reportCfg = null;
+let rbSavedTimer = null;
+
+function loadReportCfg(){
+  try {
+    const raw = localStorage.getItem(REPORT_STORE_KEY);
+    if (raw){ const cfg = JSON.parse(raw); if (cfg && cfg.v === REPORT_SEED.v) return Object.assign(structuredClone(REPORT_SEED), cfg); }
+  } catch (err) { /* storage blocked: fall back to the seed */ }
+  return structuredClone(REPORT_SEED);
+}
+function saveReportCfg(){
+  try { localStorage.setItem(REPORT_STORE_KEY, JSON.stringify(reportCfg)); } catch (err) { /* ignore */ }
+  const el = document.getElementById("rbSaved");
+  if (!el) return;
+  el.textContent = "Draft saved";
+  clearTimeout(rbSavedTimer);
+  rbSavedTimer = setTimeout(() => { el.textContent = ""; }, 1500);
+}
+
+// ---- Period helpers ----
+function rbDate(ymd){ const [y, m, d] = ymd.split("-").map(Number); return new Date(y, m - 1, d); }
+function rbYmd(d){ return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; }
+function rbEndOfDay(ymd){ const d = rbDate(ymd); d.setHours(23, 59, 59, 999); return d; }
+function rbFmt(ymd, opts){ return rbDate(ymd).toLocaleDateString("en-US", opts); }
+function rbPeriodDays(){ return Math.round((rbDate(reportCfg.end) - rbDate(reportCfg.start)) / 86400000) + 1; }
+function rbApplyPreset(preset){
+  const today = new Date();
+  if (preset === "last30"){ const s = new Date(today); s.setDate(s.getDate() - 29); reportCfg.start = rbYmd(s); reportCfg.end = rbYmd(today); }
+  if (preset === "thisMonth"){ reportCfg.start = rbYmd(new Date(today.getFullYear(), today.getMonth(), 1)); reportCfg.end = rbYmd(today); }
+  if (preset === "lastMonth"){
+    reportCfg.start = rbYmd(new Date(today.getFullYear(), today.getMonth() - 1, 1));
+    reportCfg.end = rbYmd(new Date(today.getFullYear(), today.getMonth(), 0));
+  }
+  reportCfg.preset = preset;
+}
+
+// Status as of the period end: last status-log entry on or before that day. Falls back to the current
+// status for podcasts that were never logged (e.g. AI-suggested only).
+function statusAtPeriodEnd(id){
+  const end = rbEndOfDay(reportCfg.end).getTime();
+  const hist = statusHistory[id];
+  if (hist && hist.length){
+    let s = null;
+    hist.forEach(h => { if (new Date(h.changed_at).getTime() <= end) s = h.status; });
+    return s;
+  }
+  return responses[id] || null;
+}
+function statusLabel(v){ const o = STATUS_OPTIONS.find(x => x.value === v); return o ? o.label : "No status"; }
+
+// One row per podcast: auto category, effective category (after override), included or not.
+function reportRows(){
+  return PODCASTS.filter(p => !deletedFlags[p.id]).map(p => {
+    const status = statusAtPeriodEnd(p.id);
+    const autoCat = REPORT_CAT_BY_STATUS[status] || null;
+    const cat = reportCfg.override[p.id] || autoCat;
+    const iso = scheduledDates[p.id];
+    // Booked call whose date is before the period end: the pipeline was probably not updated.
+    const stale = status === "recording_booked" || status === "precall_booked"
+      ? (iso && new Date(iso).getTime() < rbEndOfDay(reportCfg.end).getTime()) : false;
+    const included = !!cat && !!reportCfg.cats[cat] && !reportCfg.excluded[p.id];
+    return { p, status, autoCat, cat, iso, stale, included };
+  });
+}
+
+function rbCounts(rows){
+  const c = { published: 0, recorded: 0, booked: 0, inprogress: 0 };
+  rows.forEach(r => { if (r.included) c[r.cat]++; });
+  return c;
+}
+function rbPlural(n, one, many){ return `${n} ${n === 1 ? one : many}`; }
+
+function rbAutoTitle(){
+  const days = rbPeriodDays();
+  if (days <= 35) return "30 Days of Podcast Outreach";
+  return `${Math.round(days / 7)} Weeks of Podcast Outreach`;
+}
+function rbRate(){ const p = Number(reportCfg.pitches) || 0, r = Number(reportCfg.responses) || 0; return p ? Math.round(r / p * 100) : 0; }
+function rbTouchpoints(){
+  if (reportCfg.touchpoints !== "" && reportCfg.touchpoints != null) return Number(reportCfg.touchpoints);
+  return Math.floor((Number(reportCfg.pitches) || 0) * 1.4 / 50) * 50;
+}
+function rbGoalParts(c){
+  const parts = [];
+  if (reportCfg.cats.published && c.published) parts.push(`${c.published} live`);
+  if (reportCfg.cats.recorded && c.recorded) parts.push(`${c.recorded} recorded`);
+  if (reportCfg.cats.booked && c.booked) parts.push(rbPlural(c.booked, "recording booked", "recordings booked"));
+  if (reportCfg.cats.inprogress && c.inprogress) parts.push(rbPlural(c.inprogress, "pre-call", "pre-calls"));
+  return parts;
+}
+
+// Overview draft. Platform: AI writes this from the period's threads; the user edits it.
+function rbAutoOverview(rows, c){
+  const start = rbFmt(reportCfg.start, { month: "long", day: "numeric" });
+  const end = rbFmt(reportCfg.end, { month: "long", day: "numeric" });
+  const total = c.published + c.recorded + c.booked + c.inprogress;
+  const names = cat => rows.filter(r => r.included && r.cat === cat).map(r => rbShortName(r.p));
+  const bits = [];
+  if (c.published) bits.push(`${rbPlural(c.published, "episode", "episodes")} already live (${names("published").join(", ")})`);
+  if (c.recorded) bits.push(`${rbPlural(c.recorded, "recording", "recordings")} done (${names("recorded").join(", ")})`);
+  if (c.booked){
+    const last = rows.filter(r => r.included && r.cat === "booked" && r.iso).map(r => new Date(r.iso)).sort((a, b) => b - a)[0];
+    bits.push(`${rbPlural(c.booked, "recording", "recordings")} booked${last ? ` through ${last.toLocaleDateString("en-US", { month: "long", year: "numeric" })}` : ""}`);
+  }
+  if (c.inprogress) bits.push(`${rbPlural(c.inprogress, "pre-call", "pre-calls")} on the calendar`);
+  const list = bits.length > 1 ? bits.slice(0, -1).join(", ") + " and " + bits[bits.length - 1] : (bits[0] || "");
+  return `Between ${start} and ${end} we sent ${reportCfg.pitches} targeted pitches. ${reportCfg.responses} hosts replied (a ${rbRate()}% response rate), turning into ${rbPlural(total, "active opportunity", "active opportunities")}${list ? `: ${list}` : ""}.`;
+}
+
+// "Calls in the next 30 days" item, built from call dates after the period end.
+function rbUpcomingCalls(rows){
+  const from = rbEndOfDay(reportCfg.end).getTime();
+  const to = from + 30 * 86400000;
+  return rows
+    .filter(r => r.included && r.iso && (r.cat === "booked" || r.cat === "inprogress"))
+    .filter(r => { const t = new Date(r.iso).getTime(); return t > from && t <= to; })
+    .sort((a, b) => new Date(a.iso) - new Date(b.iso));
+}
+function rbUpcomingItem(rows){
+  const calls = rbUpcomingCalls(rows);
+  if (!calls.length) return null;
+  const byDay = [];
+  calls.forEach(r => {
+    const day = new Date(r.iso).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: callTz(r.p.id) });
+    const name = rbShortName(r.p) + (r.cat === "inprogress" ? " pre-call" : "");
+    const last = byDay[byDay.length - 1];
+    if (last && last.day === day) last.names.push(name); else byDay.push({ day, names: [name] });
+  });
+  const text = byDay.map(g => `${g.names.join(" and ")} (${g.day})`).join(", ") + ".";
+  const words = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
+  const n = calls.length;
+  return { title: `${words[n] || n} ${n === 1 ? "call" : "calls"} in the next 30 days`, text };
+}
+
+// ---- Preview (page 1) ----
+function rbPlanetSVG(){
+  // Simplified copy of the Figma "planet" group (blurred glow + dotted globe + bottom fade).
+  // Swap for the exported asset on the platform.
+  return `<svg class="rp-planet" viewBox="0 0 752 923" aria-hidden="true">
+    <defs>
+      <filter id="rpBlur" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="50"/></filter>
+      <linearGradient id="rpGlow" x1="676" y1="118" x2="703" y2="549" gradientUnits="userSpaceOnUse"><stop offset=".61" stop-color="#6279DF"/><stop offset="1" stop-color="#fff"/></linearGradient>
+      <pattern id="rpDots" width="9" height="9" patternUnits="userSpaceOnUse"><circle cx="4.5" cy="4.5" r="1.7" fill="#91A5FC"/></pattern>
+      <radialGradient id="rpGlobeMask" cx=".62" cy=".32" r=".75"><stop offset="0" stop-color="#fff"/><stop offset=".7" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+      <mask id="rpMask"><circle cx="657" cy="488" r="380" fill="url(#rpGlobeMask)"/></mask>
+      <linearGradient id="rpFade" x1="566" y1="530" x2="566" y2="869" gradientUnits="userSpaceOnUse"><stop offset=".24" stop-color="#EFF2FD" stop-opacity="0"/><stop offset=".71" stop-color="#fff"/></linearGradient>
+    </defs>
+    <g opacity=".5">
+      <line x1="0" y1="124.5" x2="543" y2="124.5" stroke="#94A4E9"/>
+      <ellipse cx="676.5" cy="461.5" rx="362.5" ry="361.5" fill="url(#rpGlow)" fill-opacity=".7" filter="url(#rpBlur)"/>
+      <g opacity=".8">
+        <rect x="277" y="108" width="760" height="760" fill="url(#rpDots)" mask="url(#rpMask)"/>
+        <g fill="none" stroke="#91A5FC" stroke-width="1" opacity=".55">
+          <circle cx="657" cy="488" r="380"/>
+          <ellipse cx="657" cy="488" rx="190" ry="380"/>
+          <ellipse cx="657" cy="488" rx="380" ry="130"/>
+        </g>
+      </g>
+      <rect x="192" y="617" width="748" height="252" fill="url(#rpFade)"/>
+    </g>
+  </svg>`;
+}
+
+function rbPage1HTML(){
+  const rows = reportRows();
+  const c = rbCounts(rows);
+  const total = c.published + c.recorded + c.booked + c.inprogress;
+  const cfg = reportCfg;
+  const startLong = rbFmt(cfg.start, { month: "long", day: "numeric" });
+  const endLong = rbFmt(cfg.end, { month: "long", day: "numeric", year: "numeric" });
+  const title = cfg.title.trim() || rbAutoTitle();
+  const goalParts = rbGoalParts(c);
+  const win = rows.find(r => r.p.id === cfg.winId);
+  const winHost = win ? (win.p.host || "").split(" · ")[0] : "";
+  const winVerb = win ? ({ published: "episode is live", recorded: "episode recorded", booked: "recording booked", inprogress: "pre-call booked" }[win.cat] || "") : "";
+  const winImg = cfg.winImage || (win ? reportCover(win.p.id) : "");
+  const winText = cfg.winText.trim() || (win ? `${cfg.clientName.split(" ")[0]}'s conversation with ${winHost} on ${win.p.name}.` : "");
+
+  const legend = REPORT_CATEGORIES.filter(k => cfg.cats[k.key]).map(k =>
+    `<span><i style="background:${k.color}"></i>${escHTML(k.label)} (${c[k.key]})</span>`).join("");
+  const bar = total ? REPORT_CATEGORIES.filter(k => cfg.cats[k.key] && c[k.key]).map(k =>
+    `<i style="flex:${c[k.key]} 1 0;background:${k.color}"></i>`).join("") : `<i style="flex:1 1 0;background:#e8ecfc"></i>`;
+
+  const nextItems = [];
+  if (cfg.nextAuto){ const auto = rbUpcomingItem(rows); if (auto) nextItems.push(auto); }
+  cfg.nextItems.forEach(it => { if ((it.title || "").trim() || (it.text || "").trim()) nextItems.push(it); });
+
+  const sections = [];
+  if (cfg.blocks.win && win){
+    sections.push(`<section class="rp-sec"><h3 class="rp-h2">This Period's Win</h3>
+      <div class="rp-win">
+        ${winImg ? `<img class="rp-win-img" src="${escHTML(winImg)}" alt="" />` : ""}
+        <div class="rp-card" style="padding-left:12px;flex:1 1 auto">
+          <p class="rp-win-title">${cfg.winLink ? `<a href="${escHTML(cfg.winLink)}">${escHTML(win.p.name)}</a>` : escHTML(win.p.name)}${winVerb ? ` — ${winVerb}` : ""}</p>
+          <p class="rp-win-text">${escHTML(winText)}</p>
+        </div>
+      </div></section>`);
+  }
+  if (cfg.blocks.funnel){
+    sections.push(`<section class="rp-sec"><h3 class="rp-h2">Outreach Funnel</h3>
+      <div class="rp-card"><div class="rp-funnel">
+        <div class="rp-kpi"><p class="rp-kpi-label">Pitches sent:</p><p class="rp-kpi-value">${escHTML(String(cfg.pitches))}</p></div>
+        <div class="rp-kpi"><p class="rp-kpi-label">Host responses:</p><p class="rp-kpi-value">${escHTML(String(cfg.responses))}</p></div>
+        <div class="rp-kpi"><p class="rp-kpi-label">Response rate:</p><p class="rp-kpi-value">${rbRate()}%</p></div>
+        <div class="rp-kpi"><p class="rp-kpi-label">Active opportunities:</p><p class="rp-kpi-value">${total}</p></div>
+      </div></div></section>`);
+  }
+  if (cfg.blocks.opps){
+    sections.push(`<section class="rp-sec rp-card" style="padding-left:12px"><h3 class="rp-h2">Active Opportunities (${total})</h3>
+      <div class="rp-legend">${legend}</div>
+      <div class="rp-bar">${bar}</div>
+      <p class="rp-caption">${escHTML(String(cfg.pitches))} pitches sent · plus ~1–2 follow-ups per lead — over ${rbTouchpoints()} total touchpoints</p>
+    </section>`);
+  }
+  if (cfg.blocks.overview){
+    sections.push(`<section class="rp-sec"><h3 class="rp-h2">Overview</h3>
+      <div class="rp-card" style="padding-left:0"><p class="rp-overview">${escHTML(cfg.overview.trim() || rbAutoOverview(rows, c))}</p></div></section>`);
+  }
+  if (cfg.blocks.next && nextItems.length){
+    sections.push(`<section class="rp-sec"><h3 class="rp-h2">Next 30 Days</h3>
+      <div class="rp-next">${nextItems.map(it => `<div class="rp-next-item">
+        <p class="rp-next-title">${escHTML(it.title || "")}</p><p class="rp-next-text">${escHTML(it.text || "")}</p></div>`).join("")}</div></section>`);
+  }
+
+  return `<div class="rp-page" data-page="1">
+    ${rbPlanetSVG()}
+    <div class="rp-head">${REPORT_LOGO_SVG}</div>
+    <div class="rp-body">
+      <div class="rp-intro">
+        <div>
+          <p class="rp-meta">Performance Report (${escHTML(startLong)} – ${escHTML(endLong)}) &nbsp;·&nbsp; Prepared for ${escHTML(cfg.clientName)}</p>
+          <h2 class="rp-h1">${escHTML(title)}</h2>
+        </div>
+        ${total ? `<div class="rp-goal">
+          <span class="rp-goal-check"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6.2l2.3 2.3 4.7-4.9" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span><span class="rp-goal-num">${rbPlural(total, "podcast", "podcasts")}</span> <span class="rp-goal-text">secured${goalParts.length ? " — " + escHTML(goalParts.join(", ")) : ""}</span></span>
+        </div>` : ""}
+      </div>
+      <div class="rp-sections">${sections.join("") || `<p class="rp-empty">Turn on at least one block in the settings.</p>`}</div>
+    </div>
+    <div class="rp-foot"><span>Prepared by Novacast for ${escHTML(cfg.clientName)}</span><span>Report generated ${escHTML(rbFmt(cfg.end, { month: "short", day: "numeric", year: "numeric" }))}</span></div>
+  </div>`;
+}
+
+function renderReportPreview(){
+  const pages = document.getElementById("rbPages");
+  if (!pages) return;
+  pages.innerHTML = `<div class="rb-frame">${rbPage1HTML()}</div>`;
+  // Overflow guard: content must end above the footer (y = 1074). Flag it instead of letting it overlap.
+  pages.querySelectorAll(".rp-page").forEach(page => {
+    const body = page.querySelector(".rp-body");
+    if (body && body.offsetTop + body.offsetHeight > 1058){
+      page.insertAdjacentHTML("beforeend", `<div class="rp-overflow">Content runs into the footer. Shorten a text or turn off a block.</div>`);
+    }
+  });
+  fitReportPages();
+}
+function fitReportPages(){
+  const preview = document.getElementById("rbPreview");
+  if (!preview) return;
+  const avail = preview.clientWidth - (window.innerWidth <= 900 ? 32 : 48);
+  const scale = Math.min(1, avail / 794);
+  preview.querySelectorAll(".rb-frame").forEach(f => {
+    f.style.width = `${794 * scale}px`;
+    f.style.height = `${1123 * scale}px`;
+    const page = f.querySelector(".rp-page");
+    if (page) page.style.transform = `scale(${scale})`;
+  });
+}
+
+// ---- Settings panel ----
+function rbPodRowHTML(r){
+  const off = !r.included;
+  const opts = [`<option value="">Auto${r.autoCat ? ` (${REPORT_CAT[r.autoCat].label})` : " (not in report)"}</option>`]
+    .concat(REPORT_CATEGORIES.map(k => `<option value="${k.key}" ${reportCfg.override[r.p.id] === k.key ? "selected" : ""}>${k.label}</option>`)).join("");
+  const dateTxt = r.iso ? ` · ${new Date(r.iso).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: callTz(r.p.id) })}` : "";
+  return `<div class="rb-pod ${off ? "is-off" : ""}">
+    <input type="checkbox" id="rbPod-${r.p.id}" data-rb-pod="${r.p.id}" ${r.included ? "checked" : ""} ${r.cat && reportCfg.cats[r.cat] ? "" : "disabled"} aria-label="Include ${escHTML(r.p.name)}" />
+    <img class="rb-pod-cover" src="${escHTML(reportCover(r.p.id))}" alt="" width="32" height="32" loading="lazy" />
+    <div style="min-width:0">
+      <p class="rb-pod-name">${escHTML(r.p.name)}</p>
+      <p class="rb-pod-meta">${escHTML(statusLabel(r.status))}${escHTML(dateTxt)}</p>
+      ${r.stale && !reportCfg.override[r.p.id] ? `<p class="rb-pod-warn">Call date has passed. Recorded? Set "Show as" below.</p>` : ""}
+    </div>
+    <select class="rb-select" data-rb-override="${r.p.id}" aria-label="Show ${escHTML(r.p.name)} as">${opts}</select>
+  </div>`;
+}
+
+function renderReportPanel(){
+  const panel = document.getElementById("rbPanel");
+  if (!panel) return;
+  const scroll = panel.scrollTop;
+  const cfg = reportCfg;
+  const rows = reportRows();
+  const c = rbCounts(rows);
+  const inReport = REPORT_CATEGORIES.map(k => {
+    const list = rows.filter(r => r.cat === k.key);
+    if (!list.length) return "";
+    return `<div class="rb-group"><p class="rb-group-title"><span class="rb-dot" style="background:${k.color}"></span>${k.label}</p>${list.map(rbPodRowHTML).join("")}</div>`;
+  }).join("");
+  const others = rows.filter(r => !r.cat);
+  const winOptions = rows.filter(r => r.included).map(r => `<option value="${r.p.id}" ${r.p.id === cfg.winId ? "selected" : ""}>${escHTML(r.p.name)}</option>`).join("");
+  const autoNext = rbUpcomingItem(rows);
+
+  panel.innerHTML = `
+    <section class="rb-sec" aria-labelledby="rbSecPeriod">
+      <h3 class="rb-sec-title" id="rbSecPeriod">Period</h3>
+      <div class="rb-field">
+        <label class="rb-label" for="rbPreset">Preset</label>
+        <select class="rb-select" id="rbPreset" data-rb-preset>
+          ${[["last30", "Last 30 days"], ["thisMonth", "This month"], ["lastMonth", "Last month"], ["custom", "Custom range"]]
+            .map(([v, l]) => `<option value="${v}" ${cfg.preset === v ? "selected" : ""}>${l}</option>`).join("")}
+        </select>
+      </div>
+      <div class="rb-row">
+        <div class="rb-field"><label class="rb-label" for="rbStart">From</label><input class="rb-input" type="date" id="rbStart" data-rb-date="start" value="${cfg.start}" max="${cfg.end}" /></div>
+        <div class="rb-field"><label class="rb-label" for="rbEnd">To</label><input class="rb-input" type="date" id="rbEnd" data-rb-date="end" value="${cfg.end}" min="${cfg.start}" /></div>
+      </div>
+      <p class="rb-hint">Each podcast is shown with its status on the last day of the period.</p>
+    </section>
+
+    <section class="rb-sec" aria-labelledby="rbSecClient">
+      <h3 class="rb-sec-title" id="rbSecClient">Client</h3>
+      <div class="rb-field"><label class="rb-label" for="rbClientName">Name</label><input class="rb-input" id="rbClientName" data-rb-text="clientName" value="${escHTML(cfg.clientName)}" /></div>
+      <div class="rb-field"><label class="rb-label" for="rbTitleIn">Report title</label><input class="rb-input" id="rbTitleIn" data-rb-text="title" value="${escHTML(cfg.title)}" placeholder="${escHTML(rbAutoTitle())}" /></div>
+    </section>
+
+    <section class="rb-sec" aria-labelledby="rbSecFunnel">
+      <h3 class="rb-sec-title" id="rbSecFunnel">Outreach numbers</h3>
+      <div class="rb-row">
+        <div class="rb-field"><label class="rb-label" for="rbPitches">Pitches sent</label><input class="rb-input" type="number" min="0" id="rbPitches" data-rb-num="pitches" value="${escHTML(String(cfg.pitches))}" /></div>
+        <div class="rb-field"><label class="rb-label" for="rbResponses">Host responses</label><input class="rb-input" type="number" min="0" id="rbResponses" data-rb-num="responses" value="${escHTML(String(cfg.responses))}" /></div>
+      </div>
+      <div class="rb-row">
+        <div class="rb-field"><label class="rb-label" for="rbRate">Response rate</label><input class="rb-input" id="rbRate" value="${rbRate()}%" readonly /></div>
+        <div class="rb-field"><label class="rb-label" for="rbTouch">Total touchpoints</label><input class="rb-input" type="number" min="0" id="rbTouch" data-rb-num="touchpoints" value="${escHTML(String(cfg.touchpoints))}" placeholder="${rbTouchpoints()} (auto)" /></div>
+      </div>
+      <p class="rb-hint">Entered by hand for now. Platform: taken from outreach data.</p>
+    </section>
+
+    <section class="rb-sec" aria-labelledby="rbSecCats">
+      <h3 class="rb-sec-title" id="rbSecCats">Show in report</h3>
+      ${REPORT_CATEGORIES.map(k => `<label class="rb-check"><input type="checkbox" data-rb-cat="${k.key}" ${cfg.cats[k.key] ? "checked" : ""} />
+        <span class="rb-dot" style="background:${k.color}"></span>${k.label}<span class="rb-count">${c[k.key]}</span></label>`).join("")}
+    </section>
+
+    <section class="rb-sec" aria-labelledby="rbSecPods">
+      <h3 class="rb-sec-title" id="rbSecPods">Podcasts</h3>
+      <p class="rb-hint" style="margin-top:-6px">Untick a podcast to leave it out. "Show as" fixes a status for this report only.</p>
+      ${inReport || `<p class="rb-hint">No podcasts with a report status in this period.</p>`}
+      ${others.length ? `<details class="rb-others"><summary>Other statuses (${others.length})</summary>${others.map(rbPodRowHTML).join("")}</details>` : ""}
+    </section>
+
+    <section class="rb-sec" aria-labelledby="rbSecBlocks">
+      <h3 class="rb-sec-title" id="rbSecBlocks">Blocks</h3>
+      ${[["win", "This period's win"], ["funnel", "Outreach funnel"], ["opps", "Active opportunities"], ["overview", "Overview"], ["next", "Next 30 days"]]
+        .map(([k, l]) => `<label class="rb-check"><input type="checkbox" data-rb-block="${k}" ${cfg.blocks[k] ? "checked" : ""} />${l}</label>`).join("")}
+    </section>
+
+    ${cfg.blocks.win ? `<section class="rb-sec" aria-labelledby="rbSecWin">
+      <h3 class="rb-sec-title" id="rbSecWin">This period's win</h3>
+      <div class="rb-field"><label class="rb-label" for="rbWin">Podcast</label><select class="rb-select" id="rbWin" data-rb-win>${winOptions}</select></div>
+      <div class="rb-field"><label class="rb-label" for="rbWinLink">Link</label><input class="rb-input" type="url" id="rbWinLink" data-rb-text="winLink" value="${escHTML(cfg.winLink)}" placeholder="https://open.spotify.com/..." /></div>
+      <div class="rb-field"><label class="rb-label" for="rbWinText">Text</label><textarea class="rb-textarea" id="rbWinText" data-rb-text="winText">${escHTML(cfg.winText)}</textarea></div>
+      <div class="rb-field"><label class="rb-label" for="rbWinImg">Image</label>
+        <input class="rb-file" type="file" id="rbWinImg" accept="image/png,image/jpeg,image/webp" data-rb-winimg />
+        <p class="rb-hint">${cfg.winImage ? `Custom image. <button type="button" class="rb-link" data-rb-winimg-reset>Use podcast cover</button>` : "Podcast cover is used by default."}</p>
+      </div>
+    </section>` : ""}
+
+    ${cfg.blocks.overview ? `<section class="rb-sec" aria-labelledby="rbSecOverview">
+      <h3 class="rb-sec-title" id="rbSecOverview">Overview ${cfg.overview.trim() ? "" : `<span class="rb-ai">AI draft</span>`}</h3>
+      <textarea class="rb-textarea" id="rbOverview" data-rb-text="overview" aria-labelledby="rbSecOverview" placeholder="${escHTML(rbAutoOverview(rows, c))}" style="min-height:140px">${escHTML(cfg.overview)}</textarea>
+      <p class="rb-hint">${cfg.overview.trim() ? `Edited. <button type="button" class="rb-link" data-rb-overview-reset>Back to the auto draft</button>` : "Empty = auto draft from the numbers. Type to replace it."}</p>
+    </section>` : ""}
+
+    ${cfg.blocks.next ? `<section class="rb-sec" aria-labelledby="rbSecNext">
+      <h3 class="rb-sec-title" id="rbSecNext">Next 30 days</h3>
+      <div class="rb-item rb-auto-item">
+        <label class="rb-check" style="min-height:auto"><input type="checkbox" data-rb-nextauto ${cfg.nextAuto ? "checked" : ""} />Upcoming calls (from call dates)</label>
+        <p>${autoNext ? `<strong>${escHTML(autoNext.title)}</strong><br>${escHTML(autoNext.text)}` : "No booked calls in the 30 days after the period."}</p>
+      </div>
+      ${cfg.nextItems.map((it, i) => `<div class="rb-item">
+        <div class="rb-item-head">
+          <input class="rb-input" data-rb-next="${i}" data-rb-next-field="title" value="${escHTML(it.title)}" placeholder="Title" aria-label="Item ${i + 1} title" />
+          <button type="button" class="rb-icon-btn" data-rb-next-del="${i}" aria-label="Remove item ${i + 1}">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <textarea class="rb-textarea" data-rb-next="${i}" data-rb-next-field="text" placeholder="One line of detail" aria-label="Item ${i + 1} detail">${escHTML(it.text)}</textarea>
+      </div>`).join("")}
+      <button type="button" class="btn secondary" data-rb-next-add style="margin-top:4px">
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-linecap="round"/></svg>
+        <span>Add item</span>
+      </button>
+    </section>` : ""}
+  `;
+  panel.scrollTop = scroll;
+  bindReportPanel();
+}
+
+function rbRefresh(full){
+  saveReportCfg();
+  if (full) renderReportPanel();
+  renderReportPreview();
+}
+
+function bindReportPanel(){
+  const panel = document.getElementById("rbPanel");
+  panel.querySelector("[data-rb-preset]").addEventListener("change", e => {
+    if (e.target.value !== "custom") rbApplyPreset(e.target.value); else reportCfg.preset = "custom";
+    rbRefresh(true);
+  });
+  panel.querySelectorAll("[data-rb-date]").forEach(el => el.addEventListener("change", () => {
+    if (!el.value) return;
+    reportCfg[el.dataset.rbDate] = el.value;
+    if (reportCfg.start > reportCfg.end){ if (el.dataset.rbDate === "start") reportCfg.end = reportCfg.start; else reportCfg.start = reportCfg.end; }
+    reportCfg.preset = "custom";
+    rbRefresh(true);
+  }));
+  // Text fields: update the preview only, so the field keeps focus while typing.
+  panel.querySelectorAll("[data-rb-text]").forEach(el => el.addEventListener("input", () => {
+    reportCfg[el.dataset.rbText] = el.value;
+    rbRefresh(false);
+  }));
+  panel.querySelectorAll("[data-rb-text='overview']").forEach(el => el.addEventListener("change", () => rbRefresh(true)));
+  panel.querySelectorAll("[data-rb-num]").forEach(el => el.addEventListener("input", () => {
+    reportCfg[el.dataset.rbNum] = el.value === "" ? "" : Math.max(0, Number(el.value));
+    const rate = panel.querySelector("#rbRate"); if (rate) rate.value = `${rbRate()}%`;
+    const touch = panel.querySelector("#rbTouch"); if (touch) touch.placeholder = `${rbTouchpoints()} (auto)`;
+    rbRefresh(false);
+  }));
+  panel.querySelectorAll("[data-rb-cat]").forEach(el => el.addEventListener("change", () => { reportCfg.cats[el.dataset.rbCat] = el.checked; rbRefresh(true); }));
+  panel.querySelectorAll("[data-rb-block]").forEach(el => el.addEventListener("change", () => { reportCfg.blocks[el.dataset.rbBlock] = el.checked; rbRefresh(true); }));
+  panel.querySelectorAll("[data-rb-pod]").forEach(el => el.addEventListener("change", () => {
+    if (el.checked) delete reportCfg.excluded[el.dataset.rbPod]; else reportCfg.excluded[el.dataset.rbPod] = true;
+    rbRefresh(true);
+  }));
+  panel.querySelectorAll("[data-rb-override]").forEach(el => el.addEventListener("change", () => {
+    if (el.value) reportCfg.override[el.dataset.rbOverride] = el.value; else delete reportCfg.override[el.dataset.rbOverride];
+    rbRefresh(true);
+  }));
+  const win = panel.querySelector("[data-rb-win]");
+  if (win) win.addEventListener("change", () => { reportCfg.winId = win.value; reportCfg.winText = ""; reportCfg.winLink = ""; rbRefresh(true); });
+  const img = panel.querySelector("[data-rb-winimg]");
+  if (img) img.addEventListener("change", () => {
+    const file = img.files && img.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024){ window.alert("Please use an image under 2 MB."); img.value = ""; return; }
+    const reader = new FileReader();
+    reader.onload = () => { reportCfg.winImage = String(reader.result); rbRefresh(true); };
+    reader.readAsDataURL(file); // Prototype storage: data URL in the draft. Platform: upload to file storage.
+  });
+  const imgReset = panel.querySelector("[data-rb-winimg-reset]");
+  if (imgReset) imgReset.addEventListener("click", () => { reportCfg.winImage = ""; rbRefresh(true); });
+  const ovReset = panel.querySelector("[data-rb-overview-reset]");
+  if (ovReset) ovReset.addEventListener("click", () => { reportCfg.overview = ""; rbRefresh(true); });
+  const nextAuto = panel.querySelector("[data-rb-nextauto]");
+  if (nextAuto) nextAuto.addEventListener("change", () => { reportCfg.nextAuto = nextAuto.checked; rbRefresh(false); });
+  panel.querySelectorAll("[data-rb-next]").forEach(el => el.addEventListener("input", () => {
+    reportCfg.nextItems[Number(el.dataset.rbNext)][el.dataset.rbNextField] = el.value;
+    rbRefresh(false);
+  }));
+  panel.querySelectorAll("[data-rb-next-del]").forEach(el => el.addEventListener("click", () => {
+    reportCfg.nextItems.splice(Number(el.dataset.rbNextDel), 1);
+    rbRefresh(true);
+  }));
+  const add = panel.querySelector("[data-rb-next-add]");
+  if (add) add.addEventListener("click", () => {
+    reportCfg.nextItems.push({ title: "", text: "" });
+    rbRefresh(true);
+    const inputs = panel.querySelectorAll("[data-rb-next-field='title']");
+    if (inputs.length) inputs[inputs.length - 1].focus();
+  });
+}
+
+// ---- Open / close ----
+let rbLastFocus = null;
+function openReportBuilder(){
+  if (!reportCfg) reportCfg = loadReportCfg();
+  const rb = document.getElementById("reportBuilder");
+  rbLastFocus = document.activeElement;
+  rb.hidden = false;
+  document.body.classList.add("rb-open");
+  renderReportPanel();
+  renderReportPreview();
+  document.getElementById("rbClose").focus();
+}
+function closeReportBuilder(){
+  document.getElementById("reportBuilder").hidden = true;
+  document.body.classList.remove("rb-open");
+  if (rbLastFocus && rbLastFocus.focus) rbLastFocus.focus();
+}
+(function setupReportBuilder(){
+  const openBtn = document.getElementById("openReportBuilder");
+  if (openBtn) openBtn.addEventListener("click", openReportBuilder);
+  document.getElementById("rbClose").addEventListener("click", closeReportBuilder);
+  document.getElementById("rbReset").addEventListener("click", () => {
+    if (!window.confirm("Reset all report settings to the defaults?")) return;
+    reportCfg = structuredClone(REPORT_SEED);
+    rbRefresh(true);
+  });
+  // Prototype: the browser's "Save as PDF" (print CSS keeps only the A4 pages, links stay clickable).
+  // Platform: server-side render (headless Chrome) so every user gets the same file.
+  document.getElementById("rbPdf").addEventListener("click", () => window.print());
+  document.querySelectorAll("[data-rb-view]").forEach(btn => btn.addEventListener("click", () => {
+    const rb = document.getElementById("reportBuilder");
+    rb.dataset.view = btn.dataset.rbView;
+    document.querySelectorAll("[data-rb-view]").forEach(b => b.setAttribute("aria-selected", String(b === btn)));
+    if (btn.dataset.rbView === "preview") fitReportPages();
+  }));
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && !document.getElementById("reportBuilder").hidden) closeReportBuilder();
+  });
+  window.addEventListener("resize", () => { if (!document.getElementById("reportBuilder").hidden) fitReportPages(); });
+})();
 
 // ---------- 10. Boot ----------
 async function loadResponses(){
