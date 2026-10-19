@@ -260,6 +260,43 @@
     margin-top: 4px;
   }
   .sidebar-event-details.sent{ color: var(--status-done-fg); }
+  /* Calendar history: past calls sit above "Today"; the list opens scrolled to Today (like Gmail). */
+  .sidebar-top{
+    position: sticky; top: -12px; z-index: 2;
+    margin: -12px -12px 12px; padding: 12px 12px 8px;
+    background: #ffffff; border-bottom: 1px solid transparent;
+  }
+  .sidebar.is-scrolled-past .sidebar-top{ border-bottom-color: var(--panel-border); }
+  .sidebar-header{ display: flex; align-items: center; gap: 8px; }
+  .sidebar-header-title{ flex: 1 1 auto; }
+  .sidebar-today-btn{
+    height: 28px; padding: 0 10px; border-radius: 8px;
+    border: 1px solid var(--panel-border); background: #ffffff; color: var(--heading);
+    font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer;
+  }
+  .sidebar-today-btn[hidden]{ display: none; }
+  .sidebar-today-btn:hover{ background: var(--amber-tint); }
+  .sidebar-today-btn:focus-visible{ outline: 2px solid var(--amber); outline-offset: 2px; }
+  .sidebar-today-date{ margin-bottom: 0; }
+  .sidebar-now{
+    display: flex; align-items: center; gap: 8px; margin: 4px 0 16px;
+    font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: var(--amber);
+    scroll-margin-top: 80px;
+  }
+  .sidebar-now::after{ content: ""; flex: 1 1 auto; height: 1px; background: var(--amber); }
+  .sidebar-past-hint{ font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--ink-dim); margin: 0 0 12px; text-align: center; }
+  .sidebar-event.is-past{ background: #fafafb; border-color: var(--panel-border); }
+  .sidebar-event.is-past .sidebar-event-title,
+  .sidebar-event.is-past .sidebar-event-meta{ color: var(--ink-dim); }
+  .sidebar-event-details.needs-outcome{ color: var(--status-action-fg); }
+  .sidebar-filler{ pointer-events: none; }
+  .call-outcome-row{
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    margin-top: 12px; padding: 12px; border-radius: 8px;
+    background: var(--status-action-bg, #fff4e8); border: 1px solid var(--status-action-fg);
+  }
+  .call-outcome-text{ font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--heading); }
+  .call-outcome-actions{ display: inline-flex; gap: 8px; }
   .sidebar-event-details.not-sent{ color: var(--status-action-fg); }
 
   @media (max-width: 980px){
@@ -299,7 +336,8 @@
     .shell-actions{ display: contents; }
     .calendar-toggle{ display: inline-flex; grid-area: cal; align-self: center; margin-bottom: 1px; }
     .shell-search{ grid-area: search; width: auto; margin: 16px 4px 0; }
-    .sidebar-header{ display: flex; align-items: center; justify-content: space-between; }
+    .sidebar-header{ display: flex; align-items: center; }
+    .sidebar-top{ top: -16px; margin: -16px -16px 12px; padding: 16px 16px 8px; }
     .sidebar-close{ display: inline-flex; border: none; }
     .sidebar{
       position: fixed;
@@ -1545,7 +1583,7 @@
       <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.4"/><path d="M17.5 17.5l-3.6-3.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
       <input type="text" placeholder="Search by name..." />
     </div>
-    <button type="button" class="calendar-toggle" id="calendarToggle" aria-label="Open upcoming calendar" aria-controls="sidebar" aria-expanded="false">
+    <button type="button" class="calendar-toggle" id="calendarToggle" aria-label="Open calendar" aria-controls="sidebar" aria-expanded="false">
       <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="3" y="4.5" width="14" height="12.5" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M3 8.5h14M7 2.75v3.5M13 2.75v3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
     </button>
     </div>
@@ -1570,9 +1608,11 @@
 </div>
 
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
-<aside class="sidebar" id="sidebar" aria-label="Upcoming">
-  <div class="sidebar-header">Upcoming<button type="button" class="sidebar-close" id="sidebarClose" aria-label="Close calendar"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button></div>
+<aside class="sidebar" id="sidebar" aria-label="Calendar">
+  <div class="sidebar-top">
+  <div class="sidebar-header"><span class="sidebar-header-title">Calendar</span><button type="button" class="sidebar-today-btn" id="sidebarTodayBtn" hidden>Today</button><button type="button" class="sidebar-close" id="sidebarClose" aria-label="Close calendar"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button></div>
   <div class="sidebar-today-date" id="sidebarTodayDate"></div>
+  </div>
   <div class="sidebar-events" id="sidebarEvents"></div>
 </aside>
 </div>
@@ -1703,7 +1743,7 @@
    4. Statuses .................. STATUS_OPTIONS, priority, chip groups
    5. Next step & messages ...... CTA, editable links, client messages
    6. Render .................... list, panel body, event binding
-   7. Sidebar calendar .......... "Upcoming"
+   7. Sidebar calendar .......... "Calendar" (past above, upcoming below, opens at Today)
    8. Side panel ................ open/close, header, menu, accordions
    9. Prep doc .................. modal, generating, preview, saved file, PDF
    10. Mobile & boot ............ drawer, tabs, loadResponses()
@@ -2156,9 +2196,23 @@ const STATUS_OPTIONS = [
   { value: "need_precall", label: "Need to book pre-call", cls: "action" },
   { value: "need_recording", label: "Need to book recording", cls: "action" },
   { value: "precall_booked", label: "Pre-call booked", cls: "prebooked" },
+  { value: "precall_done", label: "Pre-call done", cls: "precall" },          // waiting group: host sends the recording invite next
+  { value: "precall_missed", label: "Pre-call didn't happen", cls: "action" }, // no-show / dropped: reschedule
   { value: "recording_booked", label: "Recording booked", cls: "prebooked" }, // blue "Booked" group, same as pre-call
+  { value: "recording_missed", label: "Recording didn't happen", cls: "action" },
   { value: "episode_recorded", label: "Episode recorded", cls: "done" }
 ];
+
+// Statuses that carry a call date (Call details block + calendar). Booked = upcoming;
+// done/missed/recorded keep the date so the call stays in the calendar history.
+const BOOKED_STATUSES = new Set(["precall_booked", "recording_booked"]);
+const DATED_STATUSES = new Set(["precall_booked", "precall_done", "precall_missed", "recording_booked", "recording_missed", "episode_recorded"]);
+const PRECALL_STATUSES = new Set(["precall_booked", "precall_done", "precall_missed"]);
+// Outcome buttons shown once a booked call's time has passed.
+const CALL_OUTCOMES = {
+  precall_booked:   { happened: "precall_done",     missed: "precall_missed" },
+  recording_booked: { happened: "episode_recorded", missed: "recording_missed" },
+};
 
 const BOX_CLASS_BY_CLS = { done: "info-box", action: "action-box", precall: "precall-box", prebooked: "prebooked-box", skip: "skip-box" };
 
@@ -2166,8 +2220,8 @@ const BOX_CLASS_BY_CLS = { done: "info-box", action: "action-box", precall: "pre
 // book), 1 = in process (waiting on someone), 2 = pre-call booked, 3 = done.
 // Unset status defaults to tier 0 since it also needs a first action.
 const STATUS_PRIORITY = {
-  need_form: 0, need_precall: 0, need_recording: 0,
-  waiting_reply: 1, replied_to_host: 1, host_replied_need_response: 1, form_filled: 1,
+  need_form: 0, need_precall: 0, need_recording: 0, precall_missed: 0, recording_missed: 0,
+  waiting_reply: 1, replied_to_host: 1, host_replied_need_response: 1, form_filled: 1, precall_done: 1,
   precall_booked: 2,
   recording_booked: 3,
   episode_recorded: 4
@@ -2205,6 +2259,9 @@ const NEXT_STEP_EDITABLE = {
   need_precall:   { field: "Booking link", fallbackLabel: "Book pre-call",  placeholder: "https://calendly.com/..." },
   need_recording: { field: "Booking link", fallbackLabel: "Book recording", placeholder: "https://calendar.app.google/..." },
   need_form:      { field: "Form link",    fallbackLabel: "Fill out form",  placeholder: "https://docs.google.com/forms/..." },
+  precall_done:     { field: "Booking link", fallbackLabel: "Book recording",       placeholder: "https://calendly.com/..." },
+  precall_missed:   { field: "Booking link", fallbackLabel: "Reschedule pre-call",  placeholder: "https://calendly.com/..." },
+  recording_missed: { field: "Booking link", fallbackLabel: "Reschedule recording", placeholder: "https://calendly.com/..." },
   // Episode recorded: a place to keep the published episode link. Never falls back to the
   // conversation link (that would be the booking/recording room, not the episode).
   episode_recorded: { field: "Episode link", fallbackLabel: "Open episode", placeholder: "https://open.spotify.com/episode/...", ownLinkOnly: true,
@@ -2398,7 +2455,8 @@ function isoToTimeParts(iso, tz){
   const ampm = h >= 12 ? "PM" : "AM";
   h = h % 12;
   if (h === 0) h = 12;
-  const minute = z.min < 30 ? "00" : "30";
+  // 15-minute steps (00/15/30/45); off-grid times round down to the slot they fall in.
+  const minute = String(Math.floor(z.min / 15) * 15).padStart(2, "0");
   return { hour: h, minute, ampm };
 }
 
@@ -2443,7 +2501,7 @@ function render(){
     const statusMeta = STATUS_OPTIONS.find(o => o.value === resp) || null;
     const badgeCls = statusMeta ? statusMeta.cls : "skip";
     const scheduledAt = scheduledDates[p.id] || null;
-    const showsSchedule = resp === "recording_booked" || resp === "episode_recorded" || resp === "precall_booked";
+    const showsSchedule = DATED_STATUSES.has(resp);
     const showsPrepDoc = resp === "precall_booked" || resp === "recording_booked";
     const prepFile = showsPrepDoc ? readPrepFile(p.id) : null;
     const badgeLabel = statusMeta
@@ -2538,7 +2596,7 @@ function render(){
             const tp = isoToTimeParts(scheduledAt, tz);
             const hourOptions = Array.from({length: 12}, (_, i) => i + 1)
               .map(h => `<option value="${h}" ${h === tp.hour ? "selected" : ""}>${h}</option>`).join("");
-            const scheduleLabel = resp === "precall_booked" ? "Pre-call date &amp; time" : "Recording date &amp; time";
+            const scheduleLabel = PRECALL_STATUSES.has(resp) ? "Pre-call date &amp; time" : "Recording date &amp; time";
             return `
           <div class="schedule-row">
             <label class="schedule-label" for="schedule-date-${p.id}">${scheduleLabel}</label>
@@ -2548,7 +2606,9 @@ function render(){
               <span class="schedule-colon">:</span>
               <select class="schedule-input schedule-minute" data-schedule-part="minute" data-schedule-id="${p.id}">
                 <option value="00" ${tp.minute === "00" ? "selected" : ""}>00</option>
+                <option value="15" ${tp.minute === "15" ? "selected" : ""}>15</option>
                 <option value="30" ${tp.minute === "30" ? "selected" : ""}>30</option>
+                <option value="45" ${tp.minute === "45" ? "selected" : ""}>45</option>
               </select>
               <select class="schedule-input schedule-ampm" data-schedule-part="ampm" data-schedule-id="${p.id}">
                 <option value="AM" ${tp.ampm === "AM" ? "selected" : ""}>AM</option>
@@ -2559,7 +2619,15 @@ function render(){
               </select>
             </div>
           </div>
-          ${(resp === "precall_booked" || resp === "recording_booked") ? `
+          ${(BOOKED_STATUSES.has(resp) && scheduledAt && new Date(scheduledAt) < new Date()) ? `
+          <div class="call-outcome-row">
+            <span class="call-outcome-text">This ${resp === "precall_booked" ? "pre-call" : "recording"} time has passed. Did it happen?</span>
+            <span class="call-outcome-actions">
+              <button type="button" class="btn secondary" data-call-outcome="happened" data-outcome-id="${p.id}">It happened</button>
+              <button type="button" class="btn secondary" data-call-outcome="missed" data-outcome-id="${p.id}">Didn't happen</button>
+            </span>
+          </div>` : ""}
+          ${BOOKED_STATUSES.has(resp) ? `
           <div class="call-cancel-row">
             <span class="form-hint">Rescheduled? Just change the date — the prep doc will be flagged as outdated.</span>
             <button type="button" class="prep-link-btn call-cancel-btn" data-cancel-call="${p.id}">Mark as cancelled</button>
@@ -2603,6 +2671,24 @@ function render(){
         if (!statusHistory[id]) statusHistory[id] = [];
         statusHistory[id].push({ status: val, changed_at: new Date().toISOString() });
       }
+      render();
+      updateStatusChip();
+      try { await saveResponse(id, val); } catch (err) { console.error("save error", err); }
+    });
+  });
+
+  // Past booked call: one click sets the outcome. The date stays, so the call stays in the calendar history.
+  document.querySelectorAll("[data-call-outcome]").forEach(el => {
+    el.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const id = el.dataset.outcomeId;
+      const map = CALL_OUTCOMES[responses[id]];
+      if (!map) return;
+      const val = map[el.dataset.callOutcome];
+      responses[id] = val;
+      aiSuggestedStatus.delete(id);
+      if (!statusHistory[id]) statusHistory[id] = [];
+      statusHistory[id].push({ status: val, changed_at: new Date().toISOString() });
       render();
       updateStatusChip();
       try { await saveResponse(id, val); } catch (err) { console.error("save error", err); }
@@ -2795,30 +2881,38 @@ function render(){
   renderSidebar();
 }
 
-// Right-hand "Upcoming" panel: every podcast with a scheduled date/time
-// (pre-call, recording, or the date carried over to episode_recorded),
-// grouped by day and sorted soonest-first — mirrors a calendar sidebar.
+// Right-hand "Calendar" panel: every podcast with a call date (booked, done, missed, recorded),
+// grouped by day, oldest first. Past calls sit above a "Today" line; the list opens scrolled so the
+// next upcoming call is at the top (scroll up for history, like Gmail). "Today" button jumps back.
+// Prototype limit: one date per podcast, so a pre-call disappears once the recording date is set.
+// Platform: a calls table (podcast_id, type, starts_at, tz, outcome) so every call stays in history.
 // ---------- 7. Sidebar calendar ----------
+let sidebarInitialScrollDone = false;
 function renderSidebar(){
   const sidebarEl = document.getElementById("sidebarEvents");
   if (!sidebarEl) return;
+  const scroller = document.getElementById("sidebar");
+  const keepScroll = scroller ? scroller.scrollTop : 0;
 
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
+  const now = new Date();
 
   const events = PODCASTS
-    .filter(p => !deletedFlags[p.id] && scheduledDates[p.id] && new Date(scheduledDates[p.id]) >= startOfToday
-      && (responses[p.id] === "precall_booked" || responses[p.id] === "recording_booked"))
+    .filter(p => !deletedFlags[p.id] && scheduledDates[p.id] && DATED_STATUSES.has(responses[p.id]))
     .map(p => {
       const resp = responses[p.id];
       const meta = STATUS_OPTIONS.find(o => o.value === resp);
-      const showsDetails = resp === "precall_booked" || resp === "recording_booked";
-      return { id: p.id, name: p.name, host: p.host, date: scheduledDates[p.id], cls: meta ? meta.cls : "skip", label: meta ? meta.label : "", showsDetails, detailsSent: !!detailsSent[p.id] };
+      const at = new Date(scheduledDates[p.id]);
+      const booked = BOOKED_STATUSES.has(resp);
+      return { id: p.id, name: p.name, date: scheduledDates[p.id], cls: meta ? meta.cls : "skip", label: meta ? meta.label : "",
+        booked, isPast: at < startOfToday, needsOutcome: booked && at < now, detailsSent: !!detailsSent[p.id] };
     })
     .sort((a, b) => new Date(a.date) - new Date(b.date));
 
   if (!events.length) {
     sidebarEl.innerHTML = `<div class="sidebar-empty">No calls or recordings scheduled yet.</div>`;
+    updateTodayBtn();
     return;
   }
 
@@ -2828,24 +2922,57 @@ function renderSidebar(){
     const dayKey = isoToDateInputValue(ev.date, tz);
     let group = groups.find(g => g.dayKey === dayKey);
     if (!group) {
-      group = { dayKey, label: fmtDay(ev.date, tz, { weekday: "short", month: "short", day: "numeric" }), items: [] };
+      group = { dayKey, isPast: ev.isPast, label: fmtDay(ev.date, tz, { weekday: "short", month: "short", day: "numeric" }), items: [] };
       groups.push(group);
     }
     group.items.push(ev);
   });
 
-  sidebarEl.innerHTML = groups.map(g => `
+  const eventHTML = ev => {
+    const z = zonedParts(ev.date, callTz(ev.id));
+    let details = "";
+    if (ev.needsOutcome) details = `<div class="sidebar-event-details needs-outcome">Time passed. Update status</div>`;
+    else if (ev.booked) details = `<div class="sidebar-event-details ${ev.detailsSent ? "sent" : "not-sent"}">${ev.detailsSent ? "✓ Details sent" : "Details not sent yet"}</div>`;
+    return `
+        <button type="button" class="sidebar-event cls-${ev.cls} ${ev.isPast ? "is-past" : ""}" data-jump-id="${ev.id}">
+          <div class="sidebar-event-title">${ev.name}</div>
+          <div class="sidebar-event-meta">${ev.label} · ${fmtClock(z.h, z.min)} ${tzShort(callTz(ev.id))}</div>
+          ${details}
+        </button>`;
+  };
+  const groupHTML = g => `
     <div class="sidebar-date-group">
       <div class="sidebar-date-label">${g.label}</div>
-      ${g.items.map(ev => `
-        <button type="button" class="sidebar-event cls-${ev.cls}" data-jump-id="${ev.id}">
-          <div class="sidebar-event-title">${ev.name}</div>
-          <div class="sidebar-event-meta">${ev.label} · ${(z => fmtClock(z.h, z.min))(zonedParts(ev.date, callTz(ev.id)))} ${tzShort(callTz(ev.id))}</div>
-          ${ev.showsDetails ? `<div class="sidebar-event-details ${ev.detailsSent ? "sent" : "not-sent"}">${ev.detailsSent ? "✓ Details sent" : "Details not sent yet"}</div>` : ""}
-        </button>
-      `).join("")}
-    </div>
-  `).join("");
+      ${g.items.map(eventHTML).join("")}
+    </div>`;
+
+  const past = groups.filter(g => g.isPast);
+  const upcoming = groups.filter(g => !g.isPast);
+  sidebarEl.innerHTML = `
+    ${past.length ? `<p class="sidebar-past-hint">Past calls</p>${past.map(groupHTML).join("")}` : ""}
+    <div class="sidebar-now" id="sidebarNow">Today</div>
+    ${upcoming.length ? upcoming.map(groupHTML).join("") : `<div class="sidebar-empty">No upcoming calls.</div>`}
+    <div class="sidebar-filler" id="sidebarFiller"></div>
+  `;
+
+  // Filler lets "Today" reach the top even when few upcoming calls are below it.
+  const filler = document.getElementById("sidebarFiller");
+  const nowEl = document.getElementById("sidebarNow");
+  if (scroller && filler && nowEl){
+    const topH = scroller.querySelector(".sidebar-top").offsetHeight;
+    const below = sidebarEl.getBoundingClientRect().bottom - nowEl.getBoundingClientRect().top;
+    // Desktop sidebar grows with content up to its max-height; the drawer is full height.
+    const mh = parseFloat(getComputedStyle(scroller).maxHeight);
+    const avail = (Number.isFinite(mh) ? mh : scroller.clientHeight) - 26; // minus padding + border
+    filler.style.height = past.length ? Math.max(0, avail - topH - below) + "px" : "0px";
+    if (!sidebarInitialScrollDone && scroller.clientHeight > 0){
+      scrollSidebarToToday(false);
+      sidebarInitialScrollDone = true;
+    } else {
+      scroller.scrollTop = keepScroll; // re-render (status change etc.) keeps the user's position
+    }
+  }
+  updateTodayBtn();
 
   sidebarEl.querySelectorAll("[data-jump-id]").forEach(btn => {
     btn.addEventListener("click", (e) => {
@@ -2855,6 +2982,28 @@ function renderSidebar(){
       openPodPanel(id, btn);
     });
   });
+}
+function scrollSidebarToToday(smooth){
+  const scroller = document.getElementById("sidebar");
+  const nowEl = document.getElementById("sidebarNow");
+  if (!scroller || !nowEl) return;
+  const topH = scroller.querySelector(".sidebar-top").offsetHeight;
+  const target = nowEl.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop - topH - 8;
+  scroller.scrollTo({ top: Math.max(0, target), behavior: smooth ? "smooth" : "auto" });
+  updateTodayBtn();
+}
+// "Today" button only when the Today line is out of view (scrolled far into the past or future).
+function updateTodayBtn(){
+  const scroller = document.getElementById("sidebar");
+  const btn = document.getElementById("sidebarTodayBtn");
+  const nowEl = document.getElementById("sidebarNow");
+  if (!scroller || !btn) return;
+  scroller.classList.toggle("is-scrolled-past", scroller.scrollTop > 0);
+  if (!nowEl){ btn.hidden = true; return; }
+  const topH = scroller.querySelector(".sidebar-top").offsetHeight;
+  const box = scroller.getBoundingClientRect();
+  const r = nowEl.getBoundingClientRect();
+  btn.hidden = r.top >= box.top + topH - 4 && r.bottom <= box.bottom;
 }
 
 function updateStatusChip(){
@@ -2910,7 +3059,7 @@ function renderPodPanel(bodyHTML){
   const statusMeta = STATUS_OPTIONS.find(o => o.value === resp) || null;
   const badgeCls = statusMeta ? statusMeta.cls : "skip";
   const scheduledAt = scheduledDates[p.id] || null;
-  const showsSchedule = resp === "recording_booked" || resp === "episode_recorded" || resp === "precall_booked";
+  const showsSchedule = DATED_STATUSES.has(resp);
   const badgeLabel = statusMeta ? (showsSchedule && scheduledAt ? `${statusMeta.label} · ${fmtDateTime(scheduledAt, callTz(p.id))}` : statusMeta.label) : "Not set";
   const hist = statusHistory[p.id] || [];
   const updated = aiSuggestedStatus.has(p.id) ? "Status suggested by AI"
@@ -3721,7 +3870,9 @@ function openCalendarDrawer(){
   document.getElementById("sidebarOverlay").classList.add("is-open");
   document.body.classList.add("drawer-open");
   document.getElementById("calendarToggle").setAttribute("aria-expanded", "true");
-  document.getElementById("sidebarClose").focus();
+  renderSidebar();
+  scrollSidebarToToday(false);
+  document.getElementById("sidebarClose").focus({ preventScroll: true });
 }
 function closeCalendarDrawer(returnFocus){
   const sidebar = document.getElementById("sidebar");
@@ -3746,6 +3897,7 @@ function closeCalendarDrawer(returnFocus){
   window.addEventListener("resize", fit);
 })();
 document.getElementById("calendarToggle").addEventListener("click", (e) => { e.stopPropagation(); openCalendarDrawer(); });
+document.getElementById("sidebarTodayBtn").addEventListener("click", (e) => { e.stopPropagation(); scrollSidebarToToday(true); });
 document.getElementById("sidebarClose").addEventListener("click", (e) => { e.stopPropagation(); closeCalendarDrawer(); });
 document.getElementById("sidebarOverlay").addEventListener("click", (e) => { e.stopPropagation(); closeCalendarDrawer(); });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeCalendarDrawer(true); });
@@ -3793,6 +3945,7 @@ async function loadResponses(){
   if (!sidebarEl) return;
   let hideTimer = null;
   sidebarEl.addEventListener("scroll", () => {
+    updateTodayBtn();
     sidebarEl.classList.add("is-scrolling");
     clearTimeout(hideTimer);
     hideTimer = setTimeout(() => sidebarEl.classList.remove("is-scrolling"), 800);
