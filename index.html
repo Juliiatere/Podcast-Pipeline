@@ -2361,14 +2361,34 @@ const PODCASTS = [
       { label: "About the show", text: "Daily interview podcast since September 2012 — about 1,690 episodes. Candid conversations with founders, marketers, creators and authors about the stories, systems, mistakes and breakthroughs behind their success: marketing strategy, podcasting, lead generation, AI for business, automation, SOPs and predictable revenue. Rated 4.9 on Apple Podcasts (161 ratings); around 2M YouTube views." },
       { label: "About the host", text: "Robert Plank — podcast host, author of \"WWHW: Why, What, How-To, What-If\" (a guide to creating a book, podcast or online course), and owner of DFY Podcast, a done-for-you podcast production service (editing, show notes, transcripts, publishing, promo clips)." },
       { label: "Why you're a fit", text: "Strong fit. The audience is exactly Cahill's ICP — consultants, agency owners and expert-led service businesses — and the show regularly covers podcasting, AI for business and automation. Robert already framed the topic: what Cahill learned building and selling his companies and what he's doing differently with Novacast.ai. Bonus: Robert runs a podcast production business, so there may be a natural partnership angle with Novacast." },
-      { label: "Timeline", text: "✓ Pitched Robert → ✓ Robert replied with a pre-call link to check fit and choose the story (Oct 14)" },
+      { label: "Timeline", text: "✓ Pitched Robert (Sep 25) → ✓ Robert replied with a pre-call link to check fit and choose the story (Oct 14) → ✓ Pre-call booked via Calendly (Oct 15) → Pre-call: Tue Oct 27, 10:30–10:45 AM PT (1:30 PM ET / 5:30 PM UK), Zoom → Recording, if it's a fit" },
+      { label: "Pre-call", text: "15-minute guest fit call, not the recording. Robert will pick the strongest episode angle, check it fits the Marketer of the Day audience and decide on a recording.<br>Zoom: <a href=\"https://us02web.zoom.us/j/85144916139?pwd=sZzFUa5AmcO0AbtFKU6iC8RpbBRi7L.1\" target=\"_blank\" rel=\"noopener noreferrer\">us02web.zoom.us/j/85144916139</a> · Meeting ID 851-449-16139 · Password 823224<br>Reschedule: <a href=\"https://calendly.com/reschedulings/480b84b4-381f-4666-99c2-88e59a0dc082\" target=\"_blank\" rel=\"noopener noreferrer\">Calendly link</a>" },
+      { label: "What Cahill told Robert in the booking form", text: "Focus: Novacast AI (direct sales, signing 20 marketing agency launch partners) and Digital Vision Media Group. Audience: founders, consultants and agency owners. Topics: what he learned building and selling Coinberry and Blockchain Foundry as CMO ($52M+), the counterintuitive GTM moves, and what he does differently with Novacast.ai. Strong opinion: AI in outreach should find genuine fit, not send more generic pitches. Story: being downsized twice, once a week before his equity vested. Website to mention: digitalvision.io." },
       { label: "What we pitched Robert", text: "\"Wanted to see if you're open to guests on Marketer of the Day with Robert Plank: Business Growth & Entrepreneur Stories? There are actionable takeaways your audience would get from my experience scaling two companies to 8-figure exits ($52M+). I've also spent the last few years building Novacast.ai. Think it'd be a fit for your audience? Happy to chat.\"" },
       { label: "What Robert said back", text: "\"Hey Cahill, still up for a conversation about what you learned building and selling your companies and what you're doing differently with Novacast.ai? Let's start with a quick pre-call to check fit and choose the story: <a href=\"https://www.calendly.com/robertplank/pre\" target=\"_blank\" rel=\"noopener noreferrer\">calendly.com/robertplank/pre</a>\"" },
       { label: "Who's coordinating on their end", text: "Robert Plank directly — robert.plank@gmail.com." }
     ],
-    action: "Robert wants a quick pre-call to check fit and pick the story (building and selling the companies + what Cahill does differently with Novacast.ai). Book a slot on his Calendly — check the time zone on the booking page.",
-    link: { url: "https://www.calendly.com/robertplank/pre", label: "Book pre-call with Robert" },
-    suggestedStatus: "need_precall"
+    action: "Pre-call booked for Tue Oct 27, 10:30–10:45 AM PT on Zoom (password 823224). It's a fit check, not the recording: Robert picks the episode angle and decides on a recording.",
+    link: { url: "https://us02web.zoom.us/j/85144916139?pwd=sZzFUa5AmcO0AbtFKU6iC8RpbBRi7L.1", label: "Join Zoom pre-call" },
+    suggestedStatus: "precall_booked"
+  },
+  {
+    id: "chopping-it-up-chris-champion",
+    name: "Chopping It Up with Chris Champion",
+    host: "Chris Champion · Champion Experiences / Champion AI",
+    niche: "Founder and entrepreneur stories, AI and high-value connections — Chris also runs live podcast stages at events (CES in January)",
+    fields: [
+      { label: "Podcast", text: "Interview podcast by Chris Champion. Book via <a href=\"https://calendly.com/iamchrischampion\" target=\"_blank\" rel=\"noopener noreferrer\">calendly.com/iamchrischampion</a> · <a href=\"https://www.wearechampionai.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Champion AI</a> · <a href=\"https://championexperiences.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Champion Experiences</a>" },
+      { label: "About the host", text: "Chris Champion — founder of Champion Experiences (red carpet events), Champion AI and Champion Introductions (a paid connections community). Runs live podcast stages at events, including one at CES in January. Telegram / Instagram @IamChrisChampion, X @ImChrisChampion." },
+      { label: "Why you're a fit", text: "Warm intro, not a cold pitch: Pete Vera (Exit Algorithms) recommended Cahill right after his recording and called him \"a really quality guest\". Chris's world is founders, AI and events, so the exits + Novacast.ai story fits. Possible bonus: a spot on one of his live event stages (CES)." },
+      { label: "Timeline", text: "✓ Recorded Exit Algorithms with Pete Vera (Oct 23) → ✓ Pete introduced Cahill to Chris by email, \"AI OR DIE!! Podcast Intro\" (Oct 23) → ✓ Chris replied, mentioned live podcast stages incl. CES (Oct 23) → ✓ Recording booked via Calendly with 5 talking points (Oct 26) → Recording: Thu Oct 29, 11:00 AM–12:00 PM PT (1 hour)" },
+      { label: "Talking points sent in the booking form", text: "1. Building and selling Coinberry and Blockchain Foundry as CMO ($52M+). 2. Downsized twice, once a week before equity vested, and starting Digital Vision Media Group. 3. Surviving the day your biggest client disappears (blockchain crash, repositioning around AI). 4. AI should find fit, not send more noise (why Novacast.ai). 5. Why podcasts and live conversations still build trust fastest." },
+      { label: "What Chris said back", text: "\"Hey Peter, we should catch up. We're doing some cool stuff with some LIVE podcast stages at events, and we're doing one for CES coming up in January. Cahill, nice to meet you.\"" },
+      { label: "Who's coordinating on their end", text: "Chris Champion directly — c@nvstor.co. Calendly will send the web conferencing link; Chris may text the mobile number from the form with reminders." }
+    ],
+    action: "Recording booked for Thu Oct 29, 11:00 AM–12:00 PM PT (1 hour). The video link comes with the Calendly invite. After the call, ask Chris about the live podcast stage at CES in January and thank Pete for the intro.",
+    link: { url: "https://calendly.com/iamchrischampion", label: "Open Chris's Calendly" },
+    suggestedStatus: "recording_booked"
   }
 ];
 
